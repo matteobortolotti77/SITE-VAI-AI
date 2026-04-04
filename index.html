@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Volta à Ilha | Agência de Turismo</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.">
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    
+    <!-- Swiper CSS para os carrosseis -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Nosso CSS -->
+    <link rel="stylesheet" href="./css/style.css">
+    
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+
+    <!-- Menu SPA (Links de navegação no header) -->
+    <header class="glass-header">
+        <div class="logo">
+            <!-- O logo será inserido aqui -->
+            <img src="./assets/logo.png" alt="Volta à Ilha Logo" class="brand-logo" id="brand-name"> 
+        </div>
+        <nav class="nav-links">
+            <a href="#" class="nav-item active" data-target="home">Início</a>
+            <a href="#" class="nav-item" data-target="passeios">Passeios</a>
+            <a href="#" class="nav-item" data-target="passagens">Passagens</a>
+        </nav>
+        <button class="cart-btn" aria-label="Abrir carrinho">
+            <i data-lucide="shopping-cart"></i>
+            <span class="cart-badge">0</span>
+        </button>
+    </header>
+
+    <!-- Contêiner SPA (Onde as views vão alternar) -->
+    <main id="app-container">
+        
+        <!-- ================= VIEW: HOME ================= -->
+        <section class="spa-view active" id="view-home">
+            <div class="hero">
+                <div class="video-overlay"></div>
+                <video autoplay muted loop playsinline class="bg-video" id="hero-video">
+                    <!-- Vídeo de placeholder de alta conversão -->
+                    <source src="https://cdn.pixabay.com/video/2021/08/04/83866-584705574_large.mp4" type="video/mp4">
+                </video>
+
+                <div class="hero-content">
+                    <h2 class="animate-up">Descubra o paraíso na<br><span class="highlight">voltaailha.com.br</span></h2>
+                    <p class="animate-up delay-1">Reserve passeios incríveis e transfers com a melhor agência de Morro de São Paulo. Aventura e segurança em um só lugar.</p>
+                    <div class="hero-buttons animate-up delay-2">
+                        <button class="btn btn-primary nav-item" data-target="passeios">Explorar Passeios</button>
+                        <button class="btn btn-secondary nav-item" data-target="passagens">Comprar Passagens</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: PASSEIOS ================= -->
+        <section class="spa-view" id="view-passeios">
+            <div class="section-header">
+                <h2>Experiências <span class="highlight">Inesquecíveis</span></h2>
+                <p>Nossos melhores roteiros em Morro de São Paulo</p>
+            </div>
+            
+            <!-- Swiper Slider para Produtos -->
+            <div class="swiper product-slider">
+                <div class="swiper-wrapper">
+                    <!-- Produto 1 -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 250</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Volta à Ilha Tradicional</h3>
+                            <p>O passeio mais famoso. Piscinas naturais, banco de areia e pôr do sol mágico.</p>
+                            <button class="btn-buy" onclick="addToCart('Volta à Ilha Tradicional', 250)">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- Produto 2 -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 180</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Mergulho com Cilindro</h3>
+                            <p>Explore a vida marinha exuberante de Morro de São Paulo com segurança.</p>
+                            <button class="btn-buy" onclick="addToCart('Mergulho com Cilindro', 180)">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="swiper-pagination"></div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: PASSAGENS ================= -->
+        <section class="spa-view" id="view-passagens">
+            <div class="section-header">
+                <h2>Transfers e <span class="highlight">Passagens</span></h2>
+                <p>Chegue ao paraíso com segurança e conforto</p>
+            </div>
+            
+            <div class="tickets-grid">
+                <!-- Passagem 1 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="ship"></i></div>
+                    <div class="ticket-details">
+                        <h3>Catamarã Salvador -> Morro</h3>
+                        <p>Viagem rápida e confortável todos os dias.</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 150</span>
+                        <button class="btn-buy rounded" onclick="addToCart('Catamarã Salvador -> Morro', 150)">Comprar</button>
+                    </div>
+                </div>
+                <!-- Passagem 2 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="bus"></i></div>
+                    <div class="ticket-details">
+                        <h3>Transfer Semi-Terrestre</h3>
+                        <p>A melhor opção para quem tem enjoo no mar.</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 130</span>
+                        <button class="btn-buy rounded" onclick="addToCart('Transfer Semi-Terrestre', 130)">Comprar</button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlay do Carrinho (Gaveta Lateral) -->
+    <div class="cart-drawer-overlay"></div>
+    <div class="cart-drawer">
+        <div class="cart-header">
+            <h3>Seu Carrinho</h3>
+            <button class="close-cart"><i data-lucide="x"></i></button>
+        </div>
+        <div class="cart-items" id="cart-items-container">
+            <!-- Itens do carrinho serão inseridos via JS vazio por padrão -->
+            <p class="empty-cart-msg">Seu carrinho está vazio.</p>
+        </div>
+        <div class="cart-footer">
+            <div class="cart-total">Total: <span id="cart-total-value">R$ 0,00</span></div>
+            <button class="btn btn-primary w-100 checkout-btn">Finalizar Reserva</button>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+    <script>lucide.createIcons();</script>
+    <script src="./js/script.js"></script>
+</body>
+</html>
