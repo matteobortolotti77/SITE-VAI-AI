@@ -82,11 +82,113 @@ cartBtn.addEventListener('click', toggleCart);
 closeCartBtn.addEventListener('click', toggleCart);
 cartOverlay.addEventListener('click', toggleCart);
 
-// Função chamada pelos botões de compra no HTML
-window.addToCart = function(productName, price) {
-    cart.push({ name: productName, price: price });
-    updateCartUI();
-    toggleCart(); // Abre a gaveta pra mostrar q add
+// 5. SISTEMA DE AGENDAMENTO (Modal & Flatpickr)
+const bookingModal = document.getElementById('booking-modal');
+const closeBookingBtn = document.getElementById('close-booking');
+const confirmBookingBtn = document.getElementById('confirm-booking-btn');
+
+let currentBookingProduct = null;
+let currentBookingPrice = 0;
+let currentBookingFullPrice = 0;
+
+window.openBookingModal = function(productName, price, timesArray, fullPrice = null) {
+    currentBookingProduct = productName;
+    currentBookingPrice = price;
+    currentBookingFullPrice = fullPrice || price;
+    
+    document.getElementById('booking-title').innerText = productName;
+    
+    const displayEl = document.getElementById('booking-price-display');
+    if (fullPrice && fullPrice > price) {
+        displayEl.innerHTML = `<del style="color:#999; font-size:0.9rem;">Valor Total: R$ ${fullPrice}</del><br><span style="color:var(--primary-color)">Sinal para Reserva: R$ ${price} / pessoa</span>`;
+    } else {
+        displayEl.innerHTML = `R$ ${price} por pessoa`;
+    }
+    
+    document.getElementById('booking-qty').value = 1;
+    document.getElementById('booking-total').innerText = price;
+    
+    // Configurar Horários
+    const timeSelect = document.getElementById('booking-time');
+    timeSelect.innerHTML = '';
+    
+    if (timesArray && timesArray.length > 0) {
+        document.getElementById('booking-time-group').style.display = 'block';
+        timesArray.forEach(time => {
+            const opt = document.createElement('option');
+            opt.value = time;
+            opt.innerText = time;
+            timeSelect.appendChild(opt);
+        });
+    } else {
+        document.getElementById('booking-time-group').style.display = 'none';
+        timeSelect.innerHTML = '<option value="A combinar">A combinar pelo WhatsApp</option>';
+    }
+
+    // Limpar data
+    document.getElementById('booking-date').value = '';
+
+    bookingModal.classList.add('open');
+};
+
+if(closeBookingBtn) {
+    closeBookingBtn.addEventListener('click', () => {
+        bookingModal.classList.remove('open');
+    });
+}
+
+// Inicializar Flatpickr
+if(document.getElementById('booking-date')) {
+    let tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    flatpickr("#booking-date", {
+        minDate: tomorrow,
+        dateFormat: "d/m/Y",
+        locale: "pt"
+    });
+}
+
+window.changeQty = function(delta) {
+    const input = document.getElementById('booking-qty');
+    let newVal = parseInt(input.value) + delta;
+    if (newVal < 1) newVal = 1;
+    input.value = newVal;
+    
+    document.getElementById('booking-total').innerText = newVal * currentBookingPrice;
+};
+
+if(confirmBookingBtn) {
+    confirmBookingBtn.addEventListener('click', () => {
+        const date = document.getElementById('booking-date').value;
+        const time = document.getElementById('booking-time').value;
+        const qty = parseInt(document.getElementById('booking-qty').value);
+        
+        if (!date) {
+            alert("Por favor, selecione uma data.");
+            return;
+        }
+        
+        let detailStr = `(Data: ${date}`;
+        if (time !== 'A combinar' && time !== '') {
+            detailStr += ` - ${time}`;
+        }
+        if (currentBookingFullPrice > currentBookingPrice) {
+            let restante = (currentBookingFullPrice - currentBookingPrice) * qty;
+            detailStr += ` | Pagar no embarque: R$ ${restante}`;
+        }
+        detailStr += `) [x${qty}]`;
+        
+        const finalProductName = `${currentBookingProduct} ${detailStr}`;
+        const finalPrice = currentBookingPrice * qty;
+        
+        // Adiciona ao carrinho
+        cart.push({ name: finalProductName, price: finalPrice });
+        updateCartUI();
+        
+        bookingModal.classList.remove('open');
+        toggleCart();
+    });
 }
 
 function updateCartUI() {
@@ -115,4 +217,29 @@ function updateCartUI() {
     });
     
     totalEl.innerText = `R$ ${total},00`;
+}
+
+// 6. ACCORDION (Menu Sanfona)
+window.toggleAccordion = function(header) {
+    const item = header.parentElement;
+    const body = header.nextElementSibling;
+    
+    // Fechar se já está aberto
+    if (item.classList.contains('active')) {
+        item.classList.remove('active');
+        body.style.maxHeight = null;
+    } else {
+        // Fechar outros da mesma sanfona
+        const parentAccordion = item.closest('.custom-accordion');
+        if (parentAccordion) {
+            parentAccordion.querySelectorAll('.accordion-item.active').forEach(activeItem => {
+                activeItem.classList.remove('active');
+                activeItem.querySelector('.accordion-body').style.maxHeight = null;
+            });
+        }
+        
+        // Abrir clicado
+        item.classList.add('active');
+        body.style.maxHeight = body.scrollHeight + "px";
+    }
 }

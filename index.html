@@ -19,15 +19,22 @@
     <!-- Nosso CSS -->
     <link rel="stylesheet" href="./css/style.css">
     
+    <!-- Flatpickr (Calendário) -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
 
+    <!-- Marca d'Água de Fundo -->
+    <img src="./assets/Logo%20FX.png" class="site-watermark" alt="" aria-hidden="true">
+
     <!-- Menu SPA (Links de navegação no header) -->
     <header class="glass-header">
         <div class="logo">
-            <!-- O logo será inserido aqui -->
-            <img src="./assets/logo.png" alt="Volta à Ilha Logo" class="brand-logo" id="brand-name"> 
+            <a href="#" class="nav-item" data-target="home" aria-label="Ir para a página principal">
+                <img src="./assets/logo.png" alt="Volta à Ilha Logo" class="brand-logo" id="brand-name"> 
+            </a>
         </div>
         <nav class="nav-links">
             <a href="#" class="nav-item active" data-target="home">Início</a>
@@ -48,13 +55,13 @@
             <div class="hero">
                 <div class="video-overlay"></div>
                 <video autoplay muted loop playsinline class="bg-video" id="hero-video">
-                    <!-- Vídeo de placeholder de alta conversão -->
-                    <source src="https://cdn.pixabay.com/video/2021/08/04/83866-584705574_large.mp4" type="video/mp4">
+                    <!-- Vídeo oficial do cliente -->
+                    <source src="./assets/hero.mp4" type="video/mp4">
                 </video>
 
                 <div class="hero-content">
                     <h2 class="animate-up">Descubra o paraíso na<br><span class="highlight">voltaailha.com.br</span></h2>
-                    <p class="animate-up delay-1">Reserve passeios incríveis e transfers com a melhor agência de Morro de São Paulo. Aventura e segurança em um só lugar.</p>
+                    <p class="animate-up delay-1">Reserve passeios incríveis e transfers com a melhor agência da ilha. Experiência e segurança em um só lugar.</p>
                     <div class="hero-buttons animate-up delay-2">
                         <button class="btn btn-primary nav-item" data-target="passeios">Explorar Passeios</button>
                         <button class="btn btn-secondary nav-item" data-target="passagens">Comprar Passagens</button>
@@ -76,12 +83,43 @@
                     <!-- Produto 1 -->
                     <div class="swiper-slide product-card">
                         <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-                            <div class="price-tag">R$ 250</div>
+                            <div class="price-tag">R$ 350</div>
                         </div>
                         <div class="card-content">
                             <h3>Volta à Ilha Tradicional</h3>
                             <p>O passeio mais famoso. Piscinas naturais, banco de areia e pôr do sol mágico.</p>
-                            <button class="btn-buy" onclick="addToCart('Volta à Ilha Tradicional', 250)">Adicionar <i data-lucide="plus"></i></button>
+                            
+                            <!-- Accordion Menu -->
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Saída: 09:30 da Terceira Praia.</li>
+                                                <li>Paradas: Piscinas Naturais de Garapuá e Moreré, Boipeba (para almoço) e Cairu.</li>
+                                                <li>Duração média: 6 a 7 horas.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>O que está incluso</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <p>✔️ Transporte em Lancha Rápida guiada.<br>❌ Não incluso: Refeições e taxa de preservação (TUPA).</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" onclick="openBookingModal('Volta à Ilha Tradicional', 100, ['09:30'], 350)">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
                     <!-- Produto 2 -->
@@ -92,7 +130,38 @@
                         <div class="card-content">
                             <h3>Mergulho com Cilindro</h3>
                             <p>Explore a vida marinha exuberante de Morro de São Paulo com segurança.</p>
-                            <button class="btn-buy" onclick="addToCart('Mergulho com Cilindro', 180)">Adicionar <i data-lucide="plus"></i></button>
+                            
+                            <!-- Accordion Menu -->
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Saída: Conforme maré.</li>
+                                                <li>Ponto de encontro: Primeira Praia.</li>
+                                                <li>Duração do mergulho: Aprox. 30 a 40 minutos submerso.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>O que está incluso</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <p>✔️ Equipamento completo (cilindro, roupa de neoprene, máscara).<br>✔️ Instrutor certificado.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" onclick="openBookingModal('Mergulho com Cilindro', 180, ['08:00', '13:00'])">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -118,7 +187,7 @@
                     </div>
                     <div class="ticket-action">
                         <span class="price">R$ 150</span>
-                        <button class="btn-buy rounded" onclick="addToCart('Catamarã Salvador -> Morro', 150)">Comprar</button>
+                        <button class="btn-buy rounded" onclick="openBookingModal('Catamarã Salvador -> Morro', 150, ['09:00', '10:30', '13:00', '14:30'])">Comprar</button>
                     </div>
                 </div>
                 <!-- Passagem 2 -->
@@ -130,7 +199,7 @@
                     </div>
                     <div class="ticket-action">
                         <span class="price">R$ 130</span>
-                        <button class="btn-buy rounded" onclick="addToCart('Transfer Semi-Terrestre', 130)">Comprar</button>
+                        <button class="btn-buy rounded" onclick="openBookingModal('Transfer Semi-Terrestre', 130, ['07:30', '13:30'])">Comprar</button>
                     </div>
                 </div>
             </div>
@@ -155,7 +224,49 @@
         </div>
     </div>
 
+    <!-- Modal de Agendamento -->
+    <div class="booking-modal-overlay" id="booking-modal">
+        <div class="booking-modal-content">
+            <button class="close-modal" id="close-booking" aria-label="Fechar"><i data-lucide="x"></i></button>
+            <h3 id="booking-title" style="padding-right: 30px;">Nome do Passeio</h3>
+            <div id="booking-price-display" class="booking-price">
+                R$ <span id="booking-price-unit">0</span> por pessoa
+            </div>
+            
+            <div class="form-group">
+                <label><i data-lucide="calendar"></i> Data Inicial</label>
+                <input type="text" id="booking-date" placeholder="Selecione uma data" readonly>
+            </div>
+
+            <div class="form-group" id="booking-time-group">
+                <label><i data-lucide="clock"></i> Horário</label>
+                <select id="booking-time">
+                    <!-- Opções dinâmicas -->
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i data-lucide="users"></i> Quantidade de Pessoas</label>
+                <div class="qty-selector">
+                    <button type="button" onclick="changeQty(-1)">-</button>
+                    <input type="number" id="booking-qty" value="1" min="1" readonly>
+                    <button type="button" onclick="changeQty(1)">+</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-100" id="confirm-booking-btn" style="margin-top: 20px;">
+                Adicionar (Total: R$ <span id="booking-total">0</span>)
+            </button>
+            
+            <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
+                *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
+            </p>
+        </div>
+    </div>
+
     <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script>lucide.createIcons();</script>
     <script src="./js/script.js"></script>

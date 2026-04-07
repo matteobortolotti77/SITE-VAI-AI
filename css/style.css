@@ -9,8 +9,8 @@
     --text-main: #2C2C2C;
     --text-light: #FFFFFF;
     
-    --glass-bg: rgba(255, 255, 255, 0.1);
-    --glass-border: rgba(255, 255, 255, 0.2);
+    --glass-bg: rgba(255, 255, 255, 0.4);
+    --glass-border: rgba(255, 255, 255, 0.5);
     --glass-blur: blur(16px);
 }
 
@@ -26,6 +26,22 @@ body {
     background-color: var(--light-bg);
     color: var(--text-main);
     overflow-x: hidden;
+}
+
+/* =========================================
+   MARCA D'ÁGUA
+   ========================================= */
+.site-watermark {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 75vw;
+    max-width: 700px;
+    opacity: 0.1; /* Menos transparente e mais visível */
+    pointer-events: none; /* Ignora cliques */
+    z-index: -5; /* Fica atrás de tudo */
+    user-select: none;
 }
 
 /* =========================================
@@ -64,6 +80,7 @@ body {
     height: 60px;
     width: auto;
     object-fit: contain;
+    margin-top: 6px;
     transition: transform 0.3s ease;
 }
 .brand-logo:hover {
@@ -344,6 +361,198 @@ body {
 .cart-footer {
     padding: 20px;
     border-top: 1px solid #eee;
+}
+
+/* =========================================
+   MODAL DE AGENDAMENTO
+   ========================================= */
+.booking-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 3000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+}
+
+.booking-modal-overlay.open {
+    opacity: 1;
+    visibility: visible;
+}
+
+.booking-modal-content {
+    background: white;
+    width: 90%;
+    max-width: 450px;
+    border-radius: 20px;
+    padding: 30px;
+    position: relative;
+    transform: translateY(20px);
+    transition: all 0.3s ease;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.booking-modal-overlay.open .booking-modal-content {
+    transform: translateY(0);
+}
+
+.close-modal {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+    transition: color 0.3s;
+}
+
+.close-modal:hover {
+    color: var(--primary-color);
+}
+
+.booking-price {
+    color: var(--primary-color);
+    font-weight: 700;
+    font-size: 1.2rem;
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-main);
+    font-size: 0.95rem;
+}
+
+.form-group label i {
+    width: 18px;
+    height: 18px;
+    color: var(--primary-color);
+}
+
+.form-group input[type="text"],
+.form-group select {
+    width: 100%;
+    padding: 12px 15px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-family: inherit;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+    background: var(--light-bg);
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    border-color: var(--primary-color);
+}
+
+.qty-selector {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.qty-selector button {
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #ddd;
+    background: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.qty-selector button:hover {
+    background: var(--light-bg);
+}
+
+.qty-selector input {
+    width: 60px;
+    text-align: center;
+    border: none;
+    font-size: 1.1rem;
+    font-weight: 600;
+    background: transparent;
+}
+
+.mt-20 { margin-top: 20px; }
+.w-100 { width: 100%; }
+
+/* =========================================
+   ACCORDION NOS CARDS
+   ========================================= */
+.custom-accordion {
+    margin: 15px 0;
+    border-top: 1px solid #eee;
+    text-align: left;
+}
+
+.accordion-item {
+    border-bottom: 1px solid #eee;
+}
+
+.accordion-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 0;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-main);
+    transition: color 0.3s;
+}
+
+.accordion-header:hover {
+    color: var(--primary-color);
+}
+
+.accordion-header i {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+}
+
+.accordion-item.active .accordion-header i {
+    transform: rotate(180deg);
+    color: var(--primary-color);
+}
+
+.accordion-body {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+}
+
+.accordion-inner {
+    padding-bottom: 15px;
+    font-size: 0.85rem;
+    color: #555;
+    line-height: 1.5;
+}
+
+.accordion-inner ul {
+    padding-left: 15px;
+    margin-top: 5px;
 }
 
 /* Responsividade Mobile */
