@@ -57,7 +57,7 @@ const swiper = new Swiper('.product-slider', {
     slidesPerView: 1.2,
     spaceBetween: 20,
     pagination: {
-        el: '.swiper-pagination',
+        el: '.product-slider > .swiper-pagination', /* Avoid controlling inner swipers */
         clickable: true,
     },
     breakpoints: {
@@ -65,6 +65,17 @@ const swiper = new Swiper('.product-slider', {
         1024: { slidesPerView: 3.2 }
     }
 });
+
+// SLIDER INTERNO (FOTOS DO PRODUTO)
+const innerSwipers = new Swiper('.inner-swiper', {
+    slidesPerView: 1,
+    nested: true, /* Ensures it works inside the outer swiper */
+    pagination: {
+        el: '.inner-pagination',
+        clickable: true,
+    },
+});
+
 
 // 4. SISTEMA DE CARRINHO DE COMPRAS
 const cartBtn = document.querySelector('.cart-btn');
@@ -100,7 +111,7 @@ window.openBookingModal = function(productName, price, timesArray, fullPrice = n
     
     const displayEl = document.getElementById('booking-price-display');
     if (fullPrice && fullPrice > price) {
-        displayEl.innerHTML = `<del style="color:#999; font-size:0.9rem;">Valor Total: R$ ${fullPrice}</del><br><span style="color:var(--primary-color)">Sinal para Reserva: R$ ${price} / pessoa</span>`;
+        displayEl.innerHTML = `<span style="color:#666; font-size:0.9rem;">Valor Total: R$ ${fullPrice}</span><br><span style="color:var(--primary-color); font-weight: bold;">Sinal para Reserva: R$ ${price} / pessoa</span>`;
     } else {
         displayEl.innerHTML = `R$ ${price} por pessoa`;
     }
@@ -139,14 +150,49 @@ if(closeBookingBtn) {
 
 // Inicializar Flatpickr
 if(document.getElementById('booking-date')) {
-    let tomorrow = new Date();
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Helper para obter a data atual no Brasil
+    function getBrazilToday() {
+        const now = new Date();
+        const brazilStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Bahia' }); 
+        const [y, m, d] = brazilStr.split('-').map(Number);
+        return new Date(y, m - 1, d); 
+    }
 
-    flatpickr("#booking-date", {
-        minDate: tomorrow,
+    const flatpickrInstance = flatpickr("#booking-date", {
+        minDate: getBrazilToday(),
         dateFormat: "d/m/Y",
-        locale: "pt"
+        locale: "pt",
+        disableMobile: true,
+        onChange: function(selectedDates, dateStr, instance) {
+            if (selectedDates.length === 0) return;
+            
+            // Verifica se a data selecionada é hoje
+            const today = getBrazilToday();
+            const selected = selectedDates[0];
+            
+            if (selected.getTime() === today.getTime()) {
+                // Checar horário atual na Bahia
+                const brTimeStr = new Date().toLocaleString("en-US", {timeZone: "America/Bahia", hour12: false});
+                const brTime = new Date(brTimeStr);
+                const hours = brTime.getHours();
+                const minutes = brTime.getMinutes();
+                
+                // Passou de 08:30?
+                if (hours > 8 || (hours === 8 && minutes >= 30)) {
+                    instance.clear();
+                    document.getElementById('urgent-modal').classList.add('open');
+                }
+            }
+        }
     });
+
+    // Fechar modal urgente
+    const closeUrgentBtn = document.getElementById('close-urgent');
+    if (closeUrgentBtn) {
+        closeUrgentBtn.addEventListener('click', () => {
+            document.getElementById('urgent-modal').classList.remove('open');
+        });
+    }
 }
 
 window.changeQty = function(delta) {
@@ -206,20 +252,39 @@ function updateCartUI() {
 
     container.innerHTML = '';
     let total = 0;
-    cart.forEach(item => {
+    cart.forEach((item, index) => {
         total += item.price;
         container.innerHTML += `
-            <div style="display: flex; justify-content: space-between; border-bottom:1px solid #eee; padding: 10px 0;">
-                <span>${item.name}</span>
-                <strong>R$ ${item.price}</strong>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #eee; padding: 15px 0; gap: 10px;">
+                <div style="flex: 1; font-size: 0.9rem; line-height: 1.4;">
+                    <div style="margin-bottom: 5px;">${item.name}</div>
+                    <strong style="color:var(--primary-color)">R$ ${item.price}</strong>
+                </div>
+                <button onclick="removeFromCart(${index})" title="Remover item" style="background: none; border: none; color: #ff4d4f; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.3s;">
+                    <i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>
+                </button>
             </div>
         `;
     });
     
+    // Re-renderizar ícones recém adicionados via string HTML
+    if (window.lucide) {
+        lucide.createIcons();
+    }
+
+    
     totalEl.innerText = `R$ ${total},00`;
 }
 
-// 6. ACCORDION (Menu Sanfona)
+// 6. REMOVER DO CARRINHO
+window.removeFromCart = function(index) {
+    if (confirm("Deseja remover este item do carrinho?")) {
+        cart.splice(index, 1);
+        updateCartUI();
+    }
+};
+
+// 7. ACCORDION (Menu Sanfona)
 window.toggleAccordion = function(header) {
     const item = header.parentElement;
     const body = header.nextElementSibling;

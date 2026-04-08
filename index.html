@@ -82,11 +82,20 @@
                 <div class="swiper-wrapper">
                     <!-- Produto 1 -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-                            <div class="price-tag">R$ 350</div>
+                        <div class="card-image swiper inner-swiper">
+                            <div class="swiper-wrapper">
+                                <!-- Foto Principal -->
+                                <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+                                <!-- 3 Fotos Aleatórias do Passeio -->
+                                <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1582967788606-a171c1070423?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+                                <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1544945582-3b466d874ead?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+                                <div class="swiper-slide" style="background-image: url('https://images.unsplash.com/photo-1507525428034-b723cf961d3e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'); background-size: cover; background-position: center;"></div>
+                            </div>
+                            <div class="swiper-pagination inner-pagination"></div>
+                            <div class="price-tag" style="z-index: 10;">R$ 350</div>
                         </div>
                         <div class="card-content">
-                            <h3>Volta à Ilha Tradicional</h3>
+                            <h3>Volta à Ilha</h3>
                             <p>O passeio mais famoso. Piscinas naturais, banco de areia e pôr do sol mágico.</p>
                             
                             <!-- Accordion Menu -->
@@ -108,22 +117,40 @@
                                 </div>
                                 <div class="accordion-item">
                                     <div class="accordion-header" onclick="toggleAccordion(this)">
-                                        <span>Galeria de Fotos</span>
-                                        <i data-lucide="image"></i>
+                                        <span>O que está incluso</span>
+                                        <i data-lucide="chevron-down"></i>
                                     </div>
                                     <div class="accordion-body">
                                         <div class="accordion-inner">
-                                            <div class="accordion-gallery">
-                                                <img src="https://images.unsplash.com/photo-1544945582-3b466d874ead?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Vista Boipeba">
-                                                <img src="https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Piscinas Naturais">
-                                                <img src="https://images.unsplash.com/photo-1582967788606-a171c1070423?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Pôr do Sol">
-                                            </div>
+                                            <p>✔️ Lancha rápida operada por marinheiros experientes.<br>✔️ Guia credenciado.<br>✔️ Paradas nas piscinas naturais e praias exclusivas.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>Formas de Pagamento</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <p>✔️ <strong>Sinal pelo site:</strong> R$ 100 (Pix/Cartão) para garantir a reserva.<br>✔️ <strong>Restante:</strong> R$ 250 pagos no momento do embarque (Dinheiro, Pix ou Cartão).</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                        <span>O que levar</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <p>🎒 Protetor solar, óculos de sol e chapéu.<br>🩱 Roupas de banho e toalha.<br>💧 Dinheiro trocado ou cartão para consumo nas ilhas.</p>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                             
-                            <button class="btn-buy" onclick="openBookingModal('Volta à Ilha Tradicional', 100, ['09:30'], 350)">Adicionar <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" onclick="openBookingModal('Volta à Ilha', 100, ['09:30'], 350)">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
                     <!-- Produto 2 -->
@@ -238,12 +265,12 @@
             </div>
             
             <div class="form-group">
-                <label><i data-lucide="calendar"></i> Data Inicial</label>
-                <input type="text" id="booking-date" placeholder="Selecione uma data" readonly>
+                <label><i data-lucide="calendar"></i> Data do Passeio</label>
+                <input type="text" id="booking-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none" onfocus="this.blur()">
             </div>
 
             <div class="form-group" id="booking-time-group">
-                <label><i data-lucide="clock"></i> Horário</label>
+                <label><i data-lucide="clock"></i> Horário de Saída</label>
                 <select id="booking-time">
                     <!-- Opções dinâmicas -->
                 </select>
@@ -265,6 +292,22 @@
             <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
                 *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
             </p>
+        </div>
+    </div>
+
+    <!-- Modal de Venda Urgente/Esgotada -->
+    <div class="booking-modal-overlay" id="urgent-modal" style="z-index: 4000;">
+        <div class="booking-modal-content" style="text-align: center;">
+            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Reservas de Última Hora</h3>
+            <p style="margin-bottom: 20px; line-height: 1.5; color: #555;">
+                As compras online para embarques no **mesmo dia** encerram diariamente às 08:30 da manhã. Para verificar a disponibilidade de assentos de última hora para hoje, entre em contato diretamente com nossa equipe.
+            </p>
+            <div style="display: flex; gap: 10px;">
+                <button class="btn btn-secondary w-100" id="close-urgent" style="background:#eee; color:#333; box-shadow:none; padding: 12px; border-radius: 10px;">Voltar</button>
+                <a href="https://wa.me/5575999999999?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn btn-primary w-100" style="background: #25D366; display:flex; align-items:center; justify-content:center; text-decoration:none; padding: 12px; border-radius: 10px;">
+                    <i data-lucide="message-circle" style="margin-right: 8px; width: 18px;"></i> WhatsApp
+                </a>
+            </div>
         </div>
     </div>
 
