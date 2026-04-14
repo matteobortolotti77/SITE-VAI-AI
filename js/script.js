@@ -8,11 +8,26 @@ window.addEventListener('scroll', () => {
     }
 });
 
-// 2. SISTEMA DE SPA (Troca de Telas)
+// 2. SISTEMA DE SPA (Troca de Telas com SEO Dinâmico)
 const navItems = document.querySelectorAll('.nav-item');
 const spaViews = document.querySelectorAll('.spa-view');
 
-function navigateTo(targetId) {
+const routeMeta = {
+    'home': { 
+        title: 'Volta à Ilha | Agência de Turismo em Morro de São Paulo', 
+        desc: 'A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.' 
+    },
+    'passeios': { 
+        title: 'Passeios e Reservas | Volta à Ilha', 
+        desc: 'Conheça os melhores roteiros: Passeio Volta à Ilha, Mergulho, Quadriciclo e mais. Agende online.' 
+    },
+    'passagens': { 
+        title: 'Transfers e Passagens (Catamarã) | Volta à Ilha', 
+        desc: 'Compre ingressos para transfer semi-terrestre ou catamarã para Morro de São Paulo com segurança e pontualidade.' 
+    }
+};
+
+function navigateTo(targetId, pushHistory = true) {
     // Esconder todas as telas
     spaViews.forEach(view => view.classList.remove('active'));
     
@@ -25,20 +40,30 @@ function navigateTo(targetId) {
     // Mostrar tela alvo
     const targetView = document.getElementById(`view-${targetId}`);
     if(targetView) {
+        // Atualizar SEO Metadados em tempo real na aba do navegador
+        if (routeMeta[targetId]) {
+            document.title = routeMeta[targetId].title;
+            const metaDesc = document.querySelector('meta[name="description"]');
+            if (metaDesc) metaDesc.setAttribute('content', routeMeta[targetId].desc);
+        }
+
         targetView.classList.add('active');
         // Rolar p/ topo
         window.scrollTo(0,0);
+        
+        // Push state para o navegador (Ajuste do botão voltar)
+        if (pushHistory) {
+            history.pushState({ view: targetId }, '', `#${targetId}`);
+        }
         
         // Se formos para passeios/passagens, dar um fundo sólido pro header
         if(targetId !== 'home') {
             header.style.background = 'white';
             header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.05)';
-            // document.querySelector('.logo h1').style.color = 'var(--text-main)';
             document.querySelectorAll('.nav-links a, .cart-btn').forEach(el => el.style.color = 'var(--text-main)');
         } else {
             // Volta pro glassmorphism padrão se estiver no Home
             header.style = '';
-            // document.querySelector('.logo h1').style = '';
             document.querySelectorAll('.nav-links a, .cart-btn').forEach(el => el.style = '');
         }
     }
@@ -50,6 +75,12 @@ navItems.forEach(item => {
         const target = item.dataset.target;
         navigateTo(target);
     });
+});
+
+// Escuta botão voltar do navegador
+window.addEventListener('popstate', (e) => {
+    const targetId = e.state && e.state.view ? e.state.view : 'home';
+    navigateTo(targetId, false);
 });
 
 // 3. SWIPER SLIDER PARA PASSEIOS
@@ -82,7 +113,27 @@ const cartBtn = document.querySelector('.cart-btn');
 const closeCartBtn = document.querySelector('.close-cart');
 const cartDrawer = document.querySelector('.cart-drawer');
 const cartOverlay = document.querySelector('.cart-drawer-overlay');
+// Recuperar carrinho do LocalStorage (Amnésia Resolvida)
 let cart = [];
+try {
+    const savedCart = localStorage.getItem('voltaAilhaCart');
+    if (savedCart) {
+        cart = JSON.parse(savedCart);
+    }
+} catch(e) {
+    console.error("Erro ao ler carrinho:", e);
+}
+
+// Inicializar e rotear primeira aba
+document.addEventListener('DOMContentLoaded', () => {
+    updateCartUI();
+    const hash = window.location.hash.replace('#', '');
+    if (hash && document.getElementById(`view-${hash}`)) {
+        navigateTo(hash, false);
+    } else {
+        history.replaceState({ view: 'home' }, '', '#home');
+    }
+});
 
 function toggleCart() {
     cartDrawer.classList.toggle('open');
@@ -238,6 +289,9 @@ if(confirmBookingBtn) {
 }
 
 function updateCartUI() {
+    // Salvar estado atual do carrinho na memória do celular do cliente
+    localStorage.setItem('voltaAilhaCart', JSON.stringify(cart));
+
     // Atualiza contagem na bolinha do header
     document.querySelector('.cart-badge').innerText = cart.length;
     
