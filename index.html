@@ -246,30 +246,178 @@
                 <p>Chegue ao paraíso com segurança e conforto</p>
             </div>
             
-            <div class="tickets-grid" style="grid-template-columns: 1fr; max-width: 600px; margin: 0 auto;">
-                <!-- Card Único IDA -->
-                <div class="ticket-card" style="box-shadow: 0 5px 25px rgba(37, 211, 102, 0.15); border: 1px solid #25D366;">
-                    <div class="ticket-icon" style="color: #25D366; background: rgba(37, 211, 102, 0.1);"><i data-lucide="map-pin"></i></div>
-                    <div class="ticket-details">
-                        <h3 style="font-size: 1.2rem;">IDA: De Salvador ➔ Para Morro</h3>
-                        <p>Partidas do Aeroporto e Terminal Marítimo.</p>
-                    </div>
-                    <div class="ticket-action" style="display: block;">
-                        <button class="btn-buy rounded w-100" style="background:#25D366; margin-top: 10px;" data-action="consult-ticket" data-product="IDA: De Salvador ➔ Para Morro de SP" data-routes='[{"name": "06:30 - Oficial (Saída Terminal SSA)", "price": 165},{"name": "09:30 - Oficial (Saída Terminal SSA)", "price": 165},{"name": "12:30 - Oficial (Saída Terminal SSA)", "price": 165},{"name": "15:30 - Oficial (Saída Terminal SSA)", "price": 165},{"name": "03:30 - Expresso Madrugada Direto BR (Saída Aeroporto)", "price": 210},{"name": "05:15 - Conexão Semi-Terrestre (Saída Aeroporto)", "price": 205},{"name": "08:15 - Conexão Semi-Terrestre (Saída Aeroporto)", "price": 205},{"name": "11:15 - Conexão Semi-Terrestre (Saída Aeroporto)", "price": 205},{"name": "14:40 - Conexão Semi-Terrestre (Saída Aeroporto)", "price": 205}]'>Consultar Opções</button>
-                    </div>
-                </div>
+            <div class="route-toggle">
+                <button class="active" id="btn-toggle-ida">Ida para Morro</button>
+                <button id="btn-toggle-volta">Volta para Salvador</button>
+            </div>
 
-                <!-- Card Único VOLTA -->
-                <div class="ticket-card" style="box-shadow: 0 5px 25px rgba(255, 107, 107, 0.15); border: 1px solid #ff6b6b;">
-                    <div class="ticket-icon" style="color: #ff6b6b; background: rgba(255, 107, 107, 0.1);"><i data-lucide="map-pin"></i></div>
-                    <div class="ticket-details">
-                        <h3 style="font-size: 1.2rem;">VOLTA: De Morro ➔ Para Salvador</h3>
-                        <p>Chegadas conectadas ao Aeroporto e Terminal Marítimo.</p>
+            <!-- CARROSSEL IDA -->
+            <div class="swiper product-slider theme-blue" id="carousel-ida">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1 (Ida Terminal) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 165</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Terminal SSA ➔ Morro</h3>
+                            <p>Transferência Semi-Terrestre Oficial via Itaparica.</p>
+                            
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Embarque: Terminal Marítimo de Salvador (São Joaquim / Mar Grande).</li>
+                                                <li>Conexões: Barco + Van climatizada + Lancha rápida.</li>
+                                                <li>Duração média: ~3h30min.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro" data-price="165" data-times="06:30,09:30,12:30,15:30">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
                     </div>
-                    <div class="ticket-action" style="display: block;">
-                        <button class="btn-buy rounded w-100" style="background:#ff6b6b; margin-top: 10px;" data-action="consult-ticket" data-product="VOLTA: De Morro de SP ➔ Para Salvador" data-routes='[{"name": "06:20 - Destino: Terminal Marítimo SSA", "price": 145},{"name": "09:20 - Destino: Terminal Marítimo SSA", "price": 145},{"name": "12:20 - Destino: Terminal Marítimo SSA", "price": 145},{"name": "15:20 - Destino: Terminal Marítimo SSA", "price": 145},{"name": "06:20 - Destino Região Aeroporto SSA", "price": 185},{"name": "09:20 - Destino Região Aeroporto SSA", "price": 185},{"name": "12:20 - Destino Região Aeroporto SSA", "price": 185},{"name": "15:20 - Destino Região Aeroporto SSA", "price": 185}]'>Consultar Opções</button>
+                    
+                    <!-- Slide 2 (Ida Aeroporto Expresso) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 210</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Aeroporto ➔ Morro (Madrugada)</h3>
+                            <p>Transfer Especial Direto via BR.</p>
+                            
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Embarque: Aeroporto Internacional de Salvador.</li>
+                                                <li>Conexões: Ônibus / Van Direta + Lancha.</li>
+                                                <li>Chega cedo na ilha. Otimiza seu tempo.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Expresso Madrugada)" data-price="210" data-times="03:30">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Slide 3 (Ida Aeroporto Semi) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1570125909232-eb263c188f7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 205</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Aeroporto ➔ Morro</h3>
+                            <p>Conexão Semi-Terrestre oficial do Aeroporto.</p>
+                            
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Embarque: Desembarque do Aeroporto de Salvador.</li>
+                                                <li>Conexões: Transfer até Terminal Marítimo + Travessia + Van + Lancha.</li>
+                                                <li>Mala: 1 bagagem normal por pessoa.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Semi-Terrestre)" data-price="205" data-times="05:15,08:15,11:15,14:40">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
                     </div>
                 </div>
+                <!-- Pagination -->
+                <div class="swiper-pagination" style="position: relative; margin-top: 20px;"></div>
+            </div>
+
+            <!-- CARROSSEL VOLTA -->
+            <div class="swiper product-slider theme-blue" id="carousel-volta" style="display: none;">
+                <div class="swiper-wrapper">
+                    <!-- Slide 1 (Volta Terminal) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 145</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Morro ➔ Terminal SSA</h3>
+                            <p>Ticket de Retorno Semi-Terrestre direto para a cidade.</p>
+                            
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Apresentação: Píer Principal de Morro de SP.</li>
+                                                <li>Desembarque: Terminal Marítimo de Salvador (São Joaquim).</li>
+                                                <li>Recomendado chegar 30 min antes.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA" data-price="145" data-times="06:20,09:20,12:20,15:20">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Slide 2 (Volta Aeroporto) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                            <div class="price-tag">R$ 185</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Morro ➔ Aeroporto SSA</h3>
+                            <p>Retorno Semi-Terrestre conectado diretamente ao Aeroporto.</p>
+                            
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body">
+                                        <div class="accordion-inner">
+                                            <ul>
+                                                <li>Apresentação: Píer Principal de Morro de SP.</li>
+                                                <li>Desembarque final no Aeroporto de Salvador.</li>
+                                                <li>Duração média: ~4 horas. Planeje seu voo.</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA" data-price="185" data-times="06:20,09:20,12:20,15:20">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+                <!-- Pagination -->
+                <div class="swiper-pagination" style="position: relative; margin-top: 20px;"></div>
             </div>
         </section>
 
@@ -336,10 +484,10 @@
     <div class="booking-modal-overlay" id="ticket-modal">
         <div class="booking-modal-content">
             <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
-            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: #25D366;">Solicitação de Passagem</h3>
+            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: #02b3e4;">Solicitação de Passagem</h3>
             <p id="ticket-product-display" style="font-weight: 600; margin-bottom: 5px;"></p>
-            <div class="booking-price" style="margin-bottom: 20px; font-size: 0.9rem; color: #666;">
-                Unidade: R$ <span id="ticket-price-unit">0</span>
+            <div class="booking-price" style="margin-bottom: 20px;">
+                R$ <span id="ticket-price-unit">0</span> por pessoa
             </div>
             
             <div class="form-group">
@@ -348,7 +496,7 @@
             </div>
 
             <div class="form-group" id="ticket-time-group">
-                <label><i data-lucide="clock"></i> Ponto de Partida e Horário</label>
+                <label><i data-lucide="clock"></i> Horário Disponível</label>
                 <select id="ticket-time">
                 </select>
             </div>

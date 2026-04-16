@@ -78,19 +78,54 @@ window.addEventListener('popstate', (e) => {
     navigateTo(targetId, false);
 });
 
-// 3. SWIPER SLIDER PARA PASSEIOS
-const swiper = new Swiper('.product-slider', {
+// 3. SWIPER SLIDERS
+const defaultSwiperOptions = {
     slidesPerView: 1.2,
     spaceBetween: 20,
-    pagination: {
-        el: '.product-slider > .swiper-pagination', 
-        clickable: true,
-    },
     breakpoints: {
         640: { slidesPerView: 2.2 },
         1024: { slidesPerView: 3.2 }
     }
+};
+
+const swiperPasseios = new Swiper('#view-passeios .product-slider', {
+    ...defaultSwiperOptions,
+    pagination: { el: '#view-passeios .product-slider > .swiper-pagination', clickable: true }
 });
+
+const swiperIda = new Swiper('#carousel-ida', {
+    ...defaultSwiperOptions,
+    pagination: { el: '#carousel-ida > .swiper-pagination', clickable: true }
+});
+
+const swiperVolta = new Swiper('#carousel-volta', {
+    ...defaultSwiperOptions,
+    pagination: { el: '#carousel-volta > .swiper-pagination', clickable: true }
+});
+
+// 3.1 TOGGLE IDA E VOLTA (Passagens)
+const btnToggleIda = document.getElementById('btn-toggle-ida');
+const btnToggleVolta = document.getElementById('btn-toggle-volta');
+const carouselIda = document.getElementById('carousel-ida');
+const carouselVolta = document.getElementById('carousel-volta');
+
+if (btnToggleIda && btnToggleVolta) {
+    btnToggleIda.addEventListener('click', () => {
+        btnToggleIda.classList.add('active');
+        btnToggleVolta.classList.remove('active');
+        carouselIda.style.display = 'block';
+        carouselVolta.style.display = 'none';
+        if (swiperIda) swiperIda.update(); 
+    });
+
+    btnToggleVolta.addEventListener('click', () => {
+        btnToggleVolta.classList.add('active');
+        btnToggleIda.classList.remove('active');
+        carouselVolta.style.display = 'block';
+        carouselIda.style.display = 'none';
+        if (swiperVolta) swiperVolta.update();
+    });
+}
 
 const innerSwipers = new Swiper('.inner-swiper', {
     slidesPerView: 1,

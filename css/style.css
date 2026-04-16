@@ -650,3 +650,56 @@ body {
         border-radius: 14px !important;
     }
 }
+
+/* =========================================
+   ESTÉTICA PASSAGENS (AZUL & TOGGLE)
+   ========================================= */
+.route-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin: 20px auto 40px;
+    background: #f0f4f8;
+    padding: 8px;
+    border-radius: 50px;
+    width: fit-content;
+}
+
+.route-toggle button {
+    background: transparent;
+    color: #555;
+    border: none;
+    padding: 10px 30px;
+    border-radius: 40px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.route-toggle button.active {
+    background: #02b3e4;
+    color: white;
+    box-shadow: 0 4px 15px rgba(2, 179, 228, 0.4);
+}
+
+.theme-blue .btn-buy {
+    background: #02b3e4;
+}
+
+.theme-blue .btn-buy:hover {
+    background: #029bbc;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(2, 179, 228, 0.2);
+}
+
+.theme-blue .price-tag {
+    background: rgba(2, 179, 228, 0.9);
+}
+
+.theme-blue .accordion-header:hover {
+    color: #02b3e4;
+}
+.theme-blue .accordion-item.active .accordion-header [data-lucide],
+.theme-blue .accordion-item.active .accordion-header svg {
+    color: #02b3e4;
+}
