@@ -247,8 +247,9 @@
             </div>
             
             <div class="route-toggle">
-                <button class="active" id="btn-toggle-ida">Ida para Morro</button>
-                <button id="btn-toggle-volta">Volta para Salvador</button>
+                <button class="active" id="btn-toggle-route" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
+                    <i data-lucide="arrow-right-left"></i> Trocar para: VOLTA (Salvador)
+                </button>
             </div>
 
             <!-- CARROSSEL IDA -->
@@ -484,9 +485,9 @@
     <div class="booking-modal-overlay" id="ticket-modal">
         <div class="booking-modal-content">
             <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
-            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: #02b3e4;">Solicitação de Passagem</h3>
+            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: var(--secondary-color);">Solicitação de Passagem</h3>
             <p id="ticket-product-display" style="font-weight: 600; margin-bottom: 5px;"></p>
-            <div class="booking-price" style="margin-bottom: 20px;">
+            <div class="booking-price" style="margin-bottom: 20px; color: var(--secondary-color);">
                 R$ <span id="ticket-price-unit">0</span> por pessoa
             </div>
             
@@ -510,7 +511,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: #25D366; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: var(--secondary-color); border-color: var(--secondary-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <i data-lucide="message-circle"></i> Solicitar no WhatsApp (R$ <span id="ticket-total">0</span>)
             </button>
             

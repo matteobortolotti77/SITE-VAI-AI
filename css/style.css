@@ -677,29 +677,32 @@ body {
 }
 
 .route-toggle button.active {
-    background: #02b3e4;
+    background: var(--secondary-color);
     color: white;
-    box-shadow: 0 4px 15px rgba(2, 179, 228, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 91, 171, 0.4);
 }
 
 .theme-blue .btn-buy {
-    background: #02b3e4;
+    background: transparent !important;
+    border-color: var(--secondary-color) !important;
+    color: var(--secondary-color) !important;
 }
 
 .theme-blue .btn-buy:hover {
-    background: #029bbc;
+    background: var(--secondary-color) !important;
+    color: white !important;
     transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(2, 179, 228, 0.2);
+    box-shadow: 0 10px 20px rgba(0, 91, 171, 0.2);
 }
 
 .theme-blue .price-tag {
-    background: rgba(2, 179, 228, 0.9);
+    background: var(--secondary-color) !important;
 }
 
 .theme-blue .accordion-header:hover {
-    color: #02b3e4;
+    color: var(--secondary-color) !important;
 }
 .theme-blue .accordion-item.active .accordion-header [data-lucide],
 .theme-blue .accordion-item.active .accordion-header svg {
-    color: #02b3e4;
+    color: var(--secondary-color) !important;
 }
