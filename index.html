@@ -100,9 +100,9 @@
                 <div class="hero-content">
                     <h2 class="animate-up">Descubra o paraíso na<br><span class="highlight">voltaailha.com.br</span></h2>
                     <p class="animate-up delay-1">Reserve passeios incríveis e transfers com a melhor agência da ilha. Experiência e segurança em um só lugar.</p>
-                    <div class="hero-buttons animate-up delay-2">
-                        <button class="btn btn-primary nav-item" data-target="passeios">Explorar Passeios</button>
-                        <button class="btn btn-secondary nav-item" data-target="passagens">Comprar Passagens</button>
+                    <div class="hero-buttons animate-up delay-2" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
+                        <button class="btn-buy nav-item" data-target="passeios" style="margin: 0;">Passeios</button>
+                        <button class="btn-buy nav-item" data-target="passagens" style="margin: 0;">Passagens</button>
                     </div>
                 </div>
             </div>
@@ -483,7 +483,12 @@
 
     <!-- Modal Secundário Exclusivo para Transfers Third-Party -->
     <div class="booking-modal-overlay" id="ticket-modal">
-        <div class="booking-modal-content">
+        <style>
+            .theme-blue-modal .close-modal:hover {
+                color: var(--secondary-color) !important;
+            }
+        </style>
+        <div class="booking-modal-content theme-blue-modal">
             <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
             <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: var(--secondary-color);">Solicitação de Passagem</h3>
             <p id="ticket-product-display" style="font-weight: 600; margin-bottom: 5px;"></p>
@@ -511,7 +516,7 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: #25D366; border-color: #25D366; display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: var(--primary-color); border-color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
                 <i data-lucide="message-circle"></i> Solicitar no WhatsApp (R$ <span id="ticket-total">0</span>)
             </button>
             
