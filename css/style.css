@@ -114,7 +114,7 @@ body {
 .cart-btn {
     background: none;
     border: none;
-    color: var(--text-light);
+    color: var(--secondary-color);
     cursor: pointer;
     position: relative;
     display: flex;
@@ -137,6 +137,8 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
+    /* Começa invisível até o JS avaliar */
+    display: none;
 }
 
 /* =========================================

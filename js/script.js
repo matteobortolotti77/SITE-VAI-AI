@@ -431,7 +431,13 @@ if(confirmTicketBtn) {
 
 function updateCartUI() {
     localStorage.setItem('voltaAilhaCart', JSON.stringify(cart));
-    document.querySelector('.cart-badge').textContent = cart.length;
+    const badgeEl = document.querySelector('.cart-badge');
+    badgeEl.textContent = cart.length;
+    if(cart.length === 0) {
+        badgeEl.style.display = 'none';
+    } else {
+        badgeEl.style.display = 'flex';
+    }
     
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-value');
