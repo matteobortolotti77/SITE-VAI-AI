@@ -29,5 +29,10 @@ O projeto é um sistema de agendamento e vitrine (SPA - Single Page Application)
 2.  **Urgência (Regra do dia atual):** Sempre mantenha ativa a lógica que impede reservas on-line imediatas para a data de *hoje*, redirecionando o fluxo automaticamente para contato manual no WhatsApp.
 3.  **Drawer/Carrinho:** Ações de adicionar itens ("Mergulho", "Passeio Volta à Ilha") não recarregam a página, elas preenchem o modal lateral do carrinho, calculando somente o "Sinal/Entrada" quando especificado.
 
+## 🛡️ Leis de Imutabilidade do Projeto (Diretrizes Arquiteturais)
+*   **Lei de Proteção Financeira e Ética de Dados (Zero-Knowledge):** **NUNCA** armazene, transacione ou transite dados brutos de cartão de crédito no banco de dados da própria agência. Toda e qualquer interação financeira deve ser delegada obrigatoriamente (via tokenização e iframes seguros) ao Gateway de Pagamentos parceiro, garantindo obediência estrita ao PCI-DSS e a LGPD. Esta regra geral deve ser honrada em todos os projetos de e-commerce gerenciados e deve constar **explícita e claramente em tela ao cliente** (Políticas de Privacidade) assegurando que a Agência "Volta à Ilha" não guarda seu cartão de crédito.
+*   **Modularidade e Portas Abertas (Arquitetura Ágil):** Todo o desenvolvimento (tanto de UI, quanto de Servidor ou Integrações com Gateways) deve prever substituições futuras. Não crie travamentos (*vendor lock-in*). Sempre crie os serviços de modo que se amanhã precisarmos trocar o Gateway de D+30 para um D+2, ou a API de WhatsApp mudar, a estrutura geral permaneça inatingível.
+*   **Resiliência Offline (Operacional):** Em cenários de operações remotas (ex: ilhas sem sinal 4G), os provedores dos serviços não devem depender de acessos e logins em nuvem. A comunicação dos dados brutos processados pelo painel precisa ser enviada **pushed** (assincronamente via textos de WhatsApp) para o celular offline dos provedores antes do passeio, evitando falhas de comunicação no cais.
+
 ---
 *Para o assistente*: Ao abrir o repositório, sempre leia estas regras para entender a linha criativa e as limitações do código antes de implementar novas features.
