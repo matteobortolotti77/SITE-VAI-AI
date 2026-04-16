@@ -247,28 +247,64 @@
             </div>
             
             <div class="tickets-grid">
-                <!-- Passagem 1 -->
-                <div class="ticket-card">
-                    <div class="ticket-icon"><i data-lucide="ship"></i></div>
-                    <div class="ticket-details">
-                        <h3>Catamarã Salvador -> Morro</h3>
-                        <p>Viagem rápida e confortável todos os dias.</p>
-                    </div>
-                    <div class="ticket-action">
-                        <span class="price">R$ 150</span>
-                        <button class="btn-buy rounded" data-action="book" data-product="Catamarã Salvador -> Morro" data-price="150" data-times="09:00,10:30,13:00,14:30">Comprar</button>
-                    </div>
-                </div>
-                <!-- Passagem 2 -->
+                <!-- Ida 1 -->
                 <div class="ticket-card">
                     <div class="ticket-icon"><i data-lucide="bus"></i></div>
                     <div class="ticket-details">
-                        <h3>Transfer Semi-Terrestre</h3>
-                        <p>A melhor opção para quem tem enjoo no mar.</p>
+                        <h3>Ida: Terminal SSA ➔ Morro</h3>
+                        <p>Semi-Terrestre (Cassi). Via Itaparica.</p>
                     </div>
                     <div class="ticket-action">
-                        <span class="price">R$ 130</span>
-                        <button class="btn-buy rounded" data-action="book" data-product="Transfer Semi-Terrestre" data-price="130" data-times="07:30,13:30">Comprar</button>
+                        <span class="price">R$ 165</span>
+                        <button class="btn-buy rounded" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro (Cassi)" data-price="165" data-times="06:30,09:30,12:30,15:30">Consultar</button>
+                    </div>
+                </div>
+                <!-- Ida 2 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="moon"></i></div>
+                    <div class="ticket-details">
+                        <h3>Ida: Aeroporto ➔ Morro (Madrugada)</h3>
+                        <p>Transfer Especial Via BR (Politur).</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 210</span>
+                        <button class="btn-buy rounded" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Madrugada / Politur)" data-price="210" data-times="03:30">Consultar</button>
+                    </div>
+                </div>
+                <!-- Ida 3 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="plane"></i></div>
+                    <div class="ticket-details">
+                        <h3>Ida: Aeroporto ➔ Morro</h3>
+                        <p>Semi-Terrestre padrão (Cassi).</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 205</span>
+                        <button class="btn-buy rounded" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Cassi)" data-price="205" data-times="05:15,08:15,11:15,14:40">Consultar</button>
+                    </div>
+                </div>
+                <!-- Volta 1 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="bus"></i></div>
+                    <div class="ticket-details">
+                        <h3>Volta: Morro ➔ Terminal SSA</h3>
+                        <p>Retorno Semi-Terrestre (Cassi).</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 145</span>
+                        <button class="btn-buy rounded" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA (Cassi)" data-price="145" data-times="06:20,09:20,12:20,15:20">Consultar</button>
+                    </div>
+                </div>
+                 <!-- Volta 2 -->
+                <div class="ticket-card">
+                    <div class="ticket-icon"><i data-lucide="plane"></i></div>
+                    <div class="ticket-details">
+                        <h3>Volta: Morro ➔ Aeroporto SSA</h3>
+                        <p>Retorno Semi-Terrestre direto ao Aeroporto.</p>
+                    </div>
+                    <div class="ticket-action">
+                        <span class="price">R$ 185</span>
+                        <button class="btn-buy rounded" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA (Cassi)" data-price="185" data-times="06:20,09:20,12:20,15:20">Consultar</button>
                     </div>
                 </div>
             </div>
@@ -329,6 +365,46 @@
             
             <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
                 *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
+            </p>
+        </div>
+    </div>
+
+    <!-- Modal Secundário Exclusivo para Transfers Third-Party -->
+    <div class="booking-modal-overlay" id="ticket-modal">
+        <div class="booking-modal-content">
+            <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
+            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: #25D366;">Solicitação de Passagem</h3>
+            <p id="ticket-product-display" style="font-weight: 600; margin-bottom: 5px;"></p>
+            <div class="booking-price" style="margin-bottom: 20px;">
+                R$ <span id="ticket-price-unit">0</span> por pessoa
+            </div>
+            
+            <div class="form-group">
+                <label><i data-lucide="calendar"></i> Data Desejada</label>
+                <input type="text" id="ticket-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none" onfocus="this.blur()">
+            </div>
+
+            <div class="form-group" id="ticket-time-group">
+                <label><i data-lucide="clock"></i> Horário Disponível</label>
+                <select id="ticket-time">
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label><i data-lucide="users"></i> Quantidade de Pessoas</label>
+                <div class="qty-selector">
+                    <button type="button" data-action="change-ticket-qty" data-delta="-1">-</button>
+                    <input type="number" id="ticket-qty" value="1" min="1" readonly>
+                    <button type="button" data-action="change-ticket-qty" data-delta="1">+</button>
+                </div>
+            </div>
+
+            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: #25D366; display: flex; align-items: center; justify-content: center; gap: 10px;">
+                <i data-lucide="message-circle"></i> Solicitar no WhatsApp (R$ <span id="ticket-total">0</span>)
+            </button>
+            
+            <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
+                *Rotas semi-terrestres são operadas por terceiros. A verificação depende de disponibilidade no painel da transportadora parceira.
             </p>
         </div>
     </div>

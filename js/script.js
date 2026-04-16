@@ -136,7 +136,7 @@ cartBtn.addEventListener('click', toggleCart);
 closeCartBtn.addEventListener('click', toggleCart);
 cartOverlay.addEventListener('click', toggleCart);
 
-// 5. SISTEMA DE AGENDAMENTO E ESTADO
+// 5. SISTEMAS DE MODAIS
 const bookingModal = document.getElementById('booking-modal');
 const closeBookingBtn = document.getElementById('close-booking');
 const confirmBookingBtn = document.getElementById('confirm-booking-btn');
@@ -188,14 +188,59 @@ if(closeBookingBtn) {
     });
 }
 
-if(document.getElementById('booking-date')) {
-    function getBrazilToday() {
-        const now = new Date();
-        const brazilStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Bahia' }); 
-        const [y, m, d] = brazilStr.split('-').map(Number);
-        return new Date(y, m - 1, d); 
+// 5.1 SISTEMA DE MODAL TERCEIRIZADO (TICKETS/PASSAGENS)
+const ticketModal = document.getElementById('ticket-modal');
+const closeTicketBtn = document.getElementById('close-ticket-modal');
+const confirmTicketBtn = document.getElementById('confirm-ticket-btn');
+
+let currentTicketProduct = null;
+let currentTicketPrice = 0;
+
+function openTicketModal(productName, price, timesArray) {
+    currentTicketProduct = productName;
+    currentTicketPrice = parseFloat(price);
+    
+    document.getElementById('ticket-product-display').textContent = productName;
+    document.getElementById('ticket-price-unit').textContent = price;
+    
+    document.getElementById('ticket-qty').value = 1;
+    document.getElementById('ticket-total').textContent = price;
+    
+    const timeSelect = document.getElementById('ticket-time');
+    timeSelect.innerHTML = '';
+    
+    if (timesArray && timesArray.length > 0) {
+        document.getElementById('ticket-time-group').style.display = 'block';
+        timesArray.forEach(time => {
+            const opt = document.createElement('option');
+            opt.value = time;
+            opt.textContent = time;
+            timeSelect.appendChild(opt);
+        });
+    } else {
+        document.getElementById('ticket-time-group').style.display = 'none';
+        timeSelect.innerHTML = '<option value="A combinar">A combinar pelo WhatsApp</option>';
     }
 
+    document.getElementById('ticket-date').value = '';
+    if(ticketModal) ticketModal.classList.add('open');
+}
+
+if(closeTicketBtn) {
+    closeTicketBtn.addEventListener('click', () => {
+        ticketModal.classList.remove('open');
+    });
+}
+
+// INICIALIZADORES DO FLATPICKR (Calendários)
+function getBrazilToday() {
+    const now = new Date();
+    const brazilStr = now.toLocaleDateString('en-CA', { timeZone: 'America/Bahia' }); 
+    const [y, m, d] = brazilStr.split('-').map(Number);
+    return new Date(y, m - 1, d); 
+}
+
+if(document.getElementById('booking-date')) {
     flatpickr("#booking-date", {
         minDate: getBrazilToday(),
         dateFormat: "d/m/Y",
@@ -228,6 +273,16 @@ if(document.getElementById('booking-date')) {
     }
 }
 
+// Flatpickr para Passagens (Sem regra de bloqueio 08h30 pois é consultivo no ZAP)
+if(document.getElementById('ticket-date')) {
+    flatpickr("#ticket-date", {
+        minDate: getBrazilToday(),
+        dateFormat: "d/m/Y",
+        locale: "pt",
+        disableMobile: true
+    });
+}
+
 function changeQty(delta) {
     const input = document.getElementById('booking-qty');
     let newVal = parseInt(input.value) + delta;
@@ -235,6 +290,15 @@ function changeQty(delta) {
     input.value = newVal;
     
     document.getElementById('booking-total').textContent = newVal * currentBookingPrice;
+}
+
+function changeTicketQty(delta) {
+    const input = document.getElementById('ticket-qty');
+    let newVal = parseInt(input.value) + delta;
+    if (newVal < 1) newVal = 1;
+    input.value = newVal;
+    
+    document.getElementById('ticket-total').textContent = newVal * currentTicketPrice;
 }
 
 if(confirmBookingBtn) {
@@ -269,6 +333,34 @@ if(confirmBookingBtn) {
     });
 }
 
+// Whatsapp Generator para Tickets Terceirizados
+if(confirmTicketBtn) {
+    confirmTicketBtn.addEventListener('click', () => {
+        const date = document.getElementById('ticket-date').value;
+        const time = document.getElementById('ticket-time').value;
+        const qty = parseInt(document.getElementById('ticket-qty').value);
+        
+        if (!date) {
+            alert("Por favor, selecione uma data para embarque.");
+            return;
+        }
+        
+        const total = qty * currentTicketPrice;
+        
+        let msg = `Olá! Gostaria de consultar a disponibilidade e reservar passagens:\n\n`;
+        msg += `🚍 *TICKET:* ${currentTicketProduct}\n`;
+        msg += `📅 *DATA:* ${date}\n`;
+        if (time && time !== 'A combinar') msg += `⏰ *HORÁRIO:* ${time}\n`;
+        msg += `👥 *PASSAGEIROS:* ${qty}\n`;
+        msg += `💰 *VALOR APROX.*: R$ ${total},00\n\n`;
+        msg += `Aguardo instruções e o link de pagamento da transportadora!`;
+        
+        const encMsg = encodeURIComponent(msg);
+        window.open(`https://wa.me/5575999999999?text=${encMsg}`, '_blank');
+        ticketModal.classList.remove('open');
+    });
+}
+
 function updateCartUI() {
     localStorage.setItem('voltaAilhaCart', JSON.stringify(cart));
     document.querySelector('.cart-badge').textContent = cart.length;
@@ -276,7 +368,7 @@ function updateCartUI() {
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-value');
     
-    container.innerHTML = ''; // Limpa a UI
+    container.innerHTML = ''; 
     
     if(cart.length === 0) {
         container.innerHTML = '<p class="empty-cart-msg">Seu carrinho está vazio.</p>';
@@ -288,7 +380,6 @@ function updateCartUI() {
     cart.forEach((item, index) => {
         total += item.price;
         
-        // 🔒 PROTEÇÃO DOM XSS: Criação de nós inertes 
         const row = document.createElement('div');
         row.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #eee; padding: 15px 0; gap: 10px;";
         
@@ -297,7 +388,7 @@ function updateCartUI() {
         
         const nameDiv = document.createElement('div');
         nameDiv.style.marginBottom = "5px";
-        nameDiv.textContent = item.name; // Injeção Segura e Inerte!
+        nameDiv.textContent = item.name; 
         
         const priceDiv = document.createElement('strong');
         priceDiv.style.color = "var(--primary-color)";
@@ -352,9 +443,9 @@ function toggleAccordion(header) {
     }
 }
 
-// 6. EVENT DELEGATION (Substituição de Atributos ONCLICK)
+// 6. EVENT DELEGATION
 document.addEventListener('click', (e) => {
-    // 6.1 Tratamento do Clique em Comprar/Reservar
+    // 6.1 Tratamento do Clique em Comprar/Reservar (Passeios)
     const bookBtn = e.target.closest('[data-action="book"]');
     if (bookBtn) {
         const product = bookBtn.getAttribute('data-product');
@@ -365,20 +456,36 @@ document.addEventListener('click', (e) => {
         const times = timesStr ? timesStr.split(',') : [];
         openBookingModal(product, price, times, fullprice);
     }
+
+    // 6.2 Tratamento de Consultas WhatsApp (Passagens/Tickets)
+    const consultBtn = e.target.closest('[data-action="consult-ticket"]');
+    if (consultBtn) {
+        const product = consultBtn.getAttribute('data-product');
+        const price = consultBtn.getAttribute('data-price');
+        const timesStr = consultBtn.getAttribute('data-times');
+        
+        const times = timesStr ? timesStr.split(',') : [];
+        openTicketModal(product, price, times);
+    }
     
-    // 6.2 Tratamento de alterar quantidade no Modal
+    // 6.3 Tratamento de alterar quantidade
     const changeQtyBtn = e.target.closest('[data-action="change-qty"]');
     if (changeQtyBtn) {
         changeQty(parseInt(changeQtyBtn.getAttribute('data-delta')));
     }
+
+    const changeTicketQtyBtn = e.target.closest('[data-action="change-ticket-qty"]');
+    if (changeTicketQtyBtn) {
+        changeTicketQty(parseInt(changeTicketQtyBtn.getAttribute('data-delta')));
+    }
     
-    // 6.3 Remoção do Carrinho
+    // 6.4 Remoção do Carrinho
     const removeBtn = e.target.closest('[data-action="remove-cart-item"]');
     if (removeBtn) {
         removeFromCart(parseInt(removeBtn.getAttribute('data-index')));
     }
     
-    // 6.4 Acordeões
+    // 6.5 Acordeões
     const accordionHeader = e.target.closest('[data-action="accordion"]');
     if (accordionHeader) {
         toggleAccordion(accordionHeader);
