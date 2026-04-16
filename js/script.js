@@ -188,42 +188,66 @@ if(closeBookingBtn) {
     });
 }
 
-// 5.1 SISTEMA DE MODAL TERCEIRIZADO (TICKETS/PASSAGENS)
+// 5.1 SISTEMA DE MODAL TERCEIRIZADO DINÂMICO (TICKETS/PASSAGENS)
 const ticketModal = document.getElementById('ticket-modal');
 const closeTicketBtn = document.getElementById('close-ticket-modal');
 const confirmTicketBtn = document.getElementById('confirm-ticket-btn');
 
 let currentTicketProduct = null;
 let currentTicketPrice = 0;
+let currentTicketRoutes = []; 
 
-function openTicketModal(productName, price, timesArray) {
+function openTicketModal(productName, routesJSON) {
     currentTicketProduct = productName;
-    currentTicketPrice = parseFloat(price);
-    
     document.getElementById('ticket-product-display').textContent = productName;
-    document.getElementById('ticket-price-unit').textContent = price;
     
-    document.getElementById('ticket-qty').value = 1;
-    document.getElementById('ticket-total').textContent = price;
+    // Decodifica JSON
+    try {
+        currentTicketRoutes = JSON.parse(routesJSON);
+    } catch(e) {
+        currentTicketRoutes = [];
+        console.error("Erro ao ler JSON de rotas", e);
+    }
     
     const timeSelect = document.getElementById('ticket-time');
     timeSelect.innerHTML = '';
     
-    if (timesArray && timesArray.length > 0) {
+    if (currentTicketRoutes && currentTicketRoutes.length > 0) {
         document.getElementById('ticket-time-group').style.display = 'block';
-        timesArray.forEach(time => {
+        currentTicketRoutes.forEach((route, index) => {
             const opt = document.createElement('option');
-            opt.value = time;
-            opt.textContent = time;
+            opt.value = index; // O valor será o índice do array JS centralizado
+            opt.textContent = `${route.name} — R$ ${route.price},00`;
             timeSelect.appendChild(opt);
         });
+        
+        currentTicketPrice = parseFloat(currentTicketRoutes[0].price);
+        document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
     } else {
         document.getElementById('ticket-time-group').style.display = 'none';
-        timeSelect.innerHTML = '<option value="A combinar">A combinar pelo WhatsApp</option>';
+        timeSelect.innerHTML = '<option value="">A combinar pelo WhatsApp</option>';
+        currentTicketPrice = 0;
+        document.getElementById('ticket-price-unit').textContent = "0";
     }
 
+    document.getElementById('ticket-qty').value = 1;
+    document.getElementById('ticket-total').textContent = currentTicketPrice;
+    
     document.getElementById('ticket-date').value = '';
     if(ticketModal) ticketModal.classList.add('open');
+}
+
+// Escutador Reativo do Dropdown de Rotas
+const ticketTimeSelect = document.getElementById('ticket-time');
+if(ticketTimeSelect) {
+    ticketTimeSelect.addEventListener('change', (e) => {
+        const index = e.target.value;
+        if(currentTicketRoutes[index]) {
+            currentTicketPrice = parseFloat(currentTicketRoutes[index].price);
+            document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
+            changeTicketQty(0); // Truque chamando a si mesmo em delta zero pra forçar o Recálculo do Span HTML
+        }
+    });
 }
 
 if(closeTicketBtn) {
@@ -333,11 +357,11 @@ if(confirmBookingBtn) {
     });
 }
 
-// Whatsapp Generator para Tickets Terceirizados
+// Whatsapp Generator Inteligente e Dinâmico
 if(confirmTicketBtn) {
     confirmTicketBtn.addEventListener('click', () => {
         const date = document.getElementById('ticket-date').value;
-        const time = document.getElementById('ticket-time').value;
+        const selectEl = document.getElementById('ticket-time');
         const qty = parseInt(document.getElementById('ticket-qty').value);
         
         if (!date) {
@@ -345,15 +369,23 @@ if(confirmTicketBtn) {
             return;
         }
         
-        const total = qty * currentTicketPrice;
+        let routeName = "Sob Consulta";
+        let routePrice = 0;
+        const indexVal = selectEl.value;
+        if (currentTicketRoutes[indexVal]) {
+            routeName = currentTicketRoutes[indexVal].name;
+            routePrice = currentTicketRoutes[indexVal].price;
+        }
         
-        let msg = `Olá! Gostaria de consultar a disponibilidade e reservar passagens:\n\n`;
+        const total = qty * routePrice;
+        
+        let msg = `Olá! Gostaria de consultar a disponibilidade e reservar:\n\n`;
         msg += `🚍 *TICKET:* ${currentTicketProduct}\n`;
         msg += `📅 *DATA:* ${date}\n`;
-        if (time && time !== 'A combinar') msg += `⏰ *HORÁRIO:* ${time}\n`;
+        msg += `⏰ *ROTA/HORÁRIO:* ${routeName}\n`;
         msg += `👥 *PASSAGEIROS:* ${qty}\n`;
-        msg += `💰 *VALOR APROX.*: R$ ${total},00\n\n`;
-        msg += `Aguardo instruções e o link de pagamento da transportadora!`;
+        msg += `💰 *VALOR TOTAL APROX.*: R$ ${total},00\n\n`;
+        msg += `Aguardo instruções e o link de pagamento!`;
         
         const encMsg = encodeURIComponent(msg);
         window.open(`https://wa.me/5575999999999?text=${encMsg}`, '_blank');
@@ -457,15 +489,12 @@ document.addEventListener('click', (e) => {
         openBookingModal(product, price, times, fullprice);
     }
 
-    // 6.2 Tratamento de Consultas WhatsApp (Passagens/Tickets)
+    // 6.2 Tratamento de Consultas JSON WhatsApp (Passagens)
     const consultBtn = e.target.closest('[data-action="consult-ticket"]');
     if (consultBtn) {
         const product = consultBtn.getAttribute('data-product');
-        const price = consultBtn.getAttribute('data-price');
-        const timesStr = consultBtn.getAttribute('data-times');
-        
-        const times = timesStr ? timesStr.split(',') : [];
-        openTicketModal(product, price, times);
+        const routesJSON = consultBtn.getAttribute('data-routes');
+        openTicketModal(product, routesJSON);
     }
     
     // 6.3 Tratamento de alterar quantidade
