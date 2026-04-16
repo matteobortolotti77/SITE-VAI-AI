@@ -666,14 +666,18 @@ body {
 }
 
 .route-toggle button {
+    -webkit-appearance: none;
+    appearance: none;
     background: transparent;
     color: #555;
     border: none;
     padding: 10px 30px;
     border-radius: 40px;
     font-weight: 600;
+    font-size: 0.95rem;
     cursor: pointer;
     transition: all 0.3s;
+    outline: none;
 }
 
 .route-toggle button.active {
