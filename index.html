@@ -139,7 +139,7 @@
                             <!-- Accordion Menu -->
                             <div class="custom-accordion">
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -154,7 +154,7 @@
                                     </div>
                                 </div>
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>O que está incluso</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -165,7 +165,7 @@
                                     </div>
                                 </div>
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>O que levar</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -176,7 +176,7 @@
                                     </div>
                                 </div>
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>Formas de Pagamento</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -188,7 +188,7 @@
                                 </div>
                             </div>
                             
-                            <button class="btn-buy" onclick="openBookingModal('Volta à Ilha', 100, ['09:30'], 350)">Adicionar <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Volta à Ilha" data-price="100" data-times="09:30" data-fullprice="350">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
                     <!-- Produto 2 -->
@@ -203,7 +203,7 @@
                             <!-- Accordion Menu -->
                             <div class="custom-accordion">
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -218,7 +218,7 @@
                                     </div>
                                 </div>
                                 <div class="accordion-item">
-                                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                                    <div class="accordion-header" data-action="accordion">
                                         <span>O que está incluso</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
@@ -230,7 +230,7 @@
                                 </div>
                             </div>
                             
-                            <button class="btn-buy" onclick="openBookingModal('Mergulho com Cilindro', 180, ['08:00', '13:00'])">Adicionar <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Mergulho com Cilindro" data-price="180" data-times="08:00,13:00">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
                 </div>
@@ -256,7 +256,7 @@
                     </div>
                     <div class="ticket-action">
                         <span class="price">R$ 150</span>
-                        <button class="btn-buy rounded" onclick="openBookingModal('Catamarã Salvador -> Morro', 150, ['09:00', '10:30', '13:00', '14:30'])">Comprar</button>
+                        <button class="btn-buy rounded" data-action="book" data-product="Catamarã Salvador -> Morro" data-price="150" data-times="09:00,10:30,13:00,14:30">Comprar</button>
                     </div>
                 </div>
                 <!-- Passagem 2 -->
@@ -268,7 +268,7 @@
                     </div>
                     <div class="ticket-action">
                         <span class="price">R$ 130</span>
-                        <button class="btn-buy rounded" onclick="openBookingModal('Transfer Semi-Terrestre', 130, ['07:30', '13:30'])">Comprar</button>
+                        <button class="btn-buy rounded" data-action="book" data-product="Transfer Semi-Terrestre" data-price="130" data-times="07:30,13:30">Comprar</button>
                     </div>
                 </div>
             </div>
@@ -317,9 +317,9 @@
             <div class="form-group">
                 <label><i data-lucide="users"></i> Quantidade de Pessoas</label>
                 <div class="qty-selector">
-                    <button type="button" onclick="changeQty(-1)">-</button>
+                    <button type="button" data-action="change-qty" data-delta="-1">-</button>
                     <input type="number" id="booking-qty" value="1" min="1" readonly>
-                    <button type="button" onclick="changeQty(1)">+</button>
+                    <button type="button" data-action="change-qty" data-delta="1">+</button>
                 </div>
             </div>
 
