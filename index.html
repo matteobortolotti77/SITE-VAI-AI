@@ -54,8 +54,8 @@
     <!-- Swiper CSS para os carrosseis -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <!-- Nosso CSS (Versão para forçar cache móvel) -->
-    <link rel="stylesheet" href="./css/style.css?v=7">
+    <!-- Nosso CSS -->
+    <link rel="stylesheet" href="./css/style.css?v=11">
     
     <!-- Flatpickr (Calendário) -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -83,7 +83,21 @@
             <i data-lucide="shopping-cart"></i>
             <span class="cart-badge">0</span>
         </button>
+        <button class="hamburger" aria-label="Menu" id="hamburger-btn">
+            <i data-lucide="menu"></i>
+        </button>
     </header>
+
+    <!-- Mobile Navigation Drawer -->
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+    <nav class="mobile-nav" id="mobile-nav">
+        <button class="close-mobile-nav" id="close-mobile-nav" aria-label="Fechar menu">
+            <i data-lucide="x"></i>
+        </button>
+        <a href="#" class="nav-item" data-target="home">Início</a>
+        <a href="#" class="nav-item" data-target="passeios">Passeios</a>
+        <a href="#" class="nav-item" data-target="passagens">Passagens</a>
+    </nav>
 
     <!-- Contêiner SPA (Onde as views vão alternar) -->
     <main id="app-container">
@@ -242,7 +256,7 @@
         <!-- ================= VIEW: PASSAGENS ================= -->
         <section class="spa-view" id="view-passagens">
             <div class="section-header">
-                <h2>Transfers e <span class="highlight">Passagens</span></h2>
+                <h2>Transfers e <span class="highlight" style="color: var(--secondary-color);">Passagens</span></h2>
                 <p>Chegue ao paraíso com segurança e conforto</p>
             </div>
             
@@ -253,7 +267,7 @@
             </div>
 
             <!-- CARROSSEL IDA -->
-            <div class="swiper product-slider theme-blue" id="carousel-ida">
+            <div class="swiper product-slider" id="carousel-ida">
                 <div class="swiper-wrapper">
                     <!-- Slide 1 (Ida Terminal) -->
                     <div class="swiper-slide product-card">
@@ -353,7 +367,7 @@
             </div>
 
             <!-- CARROSSEL VOLTA -->
-            <div class="swiper product-slider theme-blue" id="carousel-volta" style="display: none;">
+            <div class="swiper product-slider" id="carousel-volta" style="display: none;">
                 <div class="swiper-wrapper">
                     <!-- Slide 1 (Volta Terminal) -->
                     <div class="swiper-slide product-card">
@@ -483,11 +497,6 @@
 
     <!-- Modal Secundário Exclusivo para Transfers Third-Party -->
     <div class="booking-modal-overlay" id="ticket-modal">
-        <style>
-            .theme-blue-modal .close-modal:hover {
-                color: var(--secondary-color) !important;
-            }
-        </style>
         <div class="booking-modal-content theme-blue-modal">
             <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
             <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: var(--secondary-color);">Solicitação de Passagem</h3>
@@ -535,7 +544,7 @@
             </p>
             <div style="display: flex; gap: 10px;">
                 <button class="btn btn-secondary w-100" id="close-urgent" style="background:#eee; color:#333; box-shadow:none; padding: 12px; border-radius: 10px;">Voltar</button>
-                <a href="https://wa.me/5575999999999?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn btn-primary w-100" style="background: #25D366; display:flex; align-items:center; justify-content:center; text-decoration:none; padding: 12px; border-radius: 10px;">
+                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn btn-primary w-100" style="background: #25D366; display:flex; align-items:center; justify-content:center; text-decoration:none; padding: 12px; border-radius: 10px;">
                     <i data-lucide="message-circle" style="margin-right: 8px; width: 18px;"></i> WhatsApp
                 </a>
             </div>

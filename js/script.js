@@ -57,10 +57,10 @@ function navigateTo(targetId, pushHistory = true) {
         if(targetId !== 'home') {
             header.style.background = 'white';
             header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.05)';
-            document.querySelectorAll('.nav-links a, .cart-btn').forEach(el => el.style.color = 'var(--text-main)');
+            document.querySelectorAll('.nav-links a, .cart-btn, .hamburger').forEach(el => el.style.color = 'var(--text-main)');
         } else {
             header.style = '';
-            document.querySelectorAll('.nav-links a, .cart-btn').forEach(el => el.style = '');
+            document.querySelectorAll('.nav-links a, .cart-btn, .hamburger').forEach(el => el.style = '');
         }
     }
 }
@@ -77,6 +77,41 @@ window.addEventListener('popstate', (e) => {
     const targetId = e.state && e.state.view ? e.state.view : 'home';
     navigateTo(targetId, false);
 });
+
+// 2.1 MENU HAMBURGER (Mobile Navigation)
+const hamburgerBtn = document.getElementById('hamburger-btn');
+const mobileNav = document.getElementById('mobile-nav');
+const mobileNavOverlay = document.getElementById('mobile-nav-overlay');
+const closeMobileNavBtn = document.getElementById('close-mobile-nav');
+
+function toggleMobileNav() {
+    mobileNav.classList.toggle('open');
+    mobileNavOverlay.classList.toggle('open');
+}
+
+if (hamburgerBtn) {
+    hamburgerBtn.addEventListener('click', toggleMobileNav);
+}
+if (closeMobileNavBtn) {
+    closeMobileNavBtn.addEventListener('click', toggleMobileNav);
+}
+if (mobileNavOverlay) {
+    mobileNavOverlay.addEventListener('click', toggleMobileNav);
+}
+
+// Fechar menu e navegar ao clicar nos links do mobile nav
+if (mobileNav) {
+    mobileNav.querySelectorAll('.nav-item').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const target = link.dataset.target;
+            if (mobileNav.classList.contains('open')) {
+                toggleMobileNav();
+            }
+            navigateTo(target);
+        });
+    });
+}
 
 // 3. SWIPER SLIDERS
 const defaultSwiperOptions = {
@@ -224,66 +259,48 @@ if(closeBookingBtn) {
     });
 }
 
-// 5.1 SISTEMA DE MODAL TERCEIRIZADO DINÂMICO (TICKETS/PASSAGENS)
+// 5.1 SISTEMA DE MODAL TERCEIRIZADO (TICKETS/PASSAGENS)
+// Aceita data-times (CSV de horários) e data-price (preço unitário) dos botões HTML
 const ticketModal = document.getElementById('ticket-modal');
 const closeTicketBtn = document.getElementById('close-ticket-modal');
 const confirmTicketBtn = document.getElementById('confirm-ticket-btn');
 
 let currentTicketProduct = null;
 let currentTicketPrice = 0;
-let currentTicketRoutes = []; 
+let currentTicketTimes = [];
 
-function openTicketModal(productName, routesJSON) {
+function openTicketModal(productName, price, timesArray) {
     currentTicketProduct = productName;
-    document.getElementById('ticket-product-display').textContent = productName;
+    currentTicketPrice = parseFloat(price) || 0;
+    currentTicketTimes = timesArray || [];
     
-    // Decodifica JSON
-    try {
-        currentTicketRoutes = JSON.parse(routesJSON);
-    } catch(e) {
-        currentTicketRoutes = [];
-        console.error("Erro ao ler JSON de rotas", e);
-    }
+    document.getElementById('ticket-product-display').textContent = productName;
+    document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
     
     const timeSelect = document.getElementById('ticket-time');
-    timeSelect.innerHTML = '';
+    // Limpar opções existentes sem innerHTML
+    while (timeSelect.firstChild) { timeSelect.removeChild(timeSelect.firstChild); }
     
-    if (currentTicketRoutes && currentTicketRoutes.length > 0) {
+    if (currentTicketTimes.length > 0) {
         document.getElementById('ticket-time-group').style.display = 'block';
-        currentTicketRoutes.forEach((route, index) => {
+        currentTicketTimes.forEach(time => {
             const opt = document.createElement('option');
-            opt.value = index; // O valor será o índice do array JS centralizado
-            opt.textContent = `${route.name} — R$ ${route.price},00`;
+            opt.value = time;
+            opt.textContent = time;
             timeSelect.appendChild(opt);
         });
-        
-        currentTicketPrice = parseFloat(currentTicketRoutes[0].price);
-        document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
     } else {
         document.getElementById('ticket-time-group').style.display = 'none';
-        timeSelect.innerHTML = '<option value="">A combinar pelo WhatsApp</option>';
-        currentTicketPrice = 0;
-        document.getElementById('ticket-price-unit').textContent = "0";
+        const opt = document.createElement('option');
+        opt.value = '';
+        opt.textContent = 'A combinar pelo WhatsApp';
+        timeSelect.appendChild(opt);
     }
 
     document.getElementById('ticket-qty').value = 1;
     document.getElementById('ticket-total').textContent = currentTicketPrice;
-    
     document.getElementById('ticket-date').value = '';
     if(ticketModal) ticketModal.classList.add('open');
-}
-
-// Escutador Reativo do Dropdown de Rotas
-const ticketTimeSelect = document.getElementById('ticket-time');
-if(ticketTimeSelect) {
-    ticketTimeSelect.addEventListener('change', (e) => {
-        const index = e.target.value;
-        if(currentTicketRoutes[index]) {
-            currentTicketPrice = parseFloat(currentTicketRoutes[index].price);
-            document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
-            changeTicketQty(0); // Truque chamando a si mesmo em delta zero pra forçar o Recálculo do Span HTML
-        }
-    });
 }
 
 if(closeTicketBtn) {
@@ -397,6 +414,8 @@ if(confirmBookingBtn) {
 }
 
 // Whatsapp Generator Inteligente e Dinâmico
+const WHATSAPP_NUMBER = '5575998240043';
+
 if(confirmTicketBtn) {
     confirmTicketBtn.addEventListener('click', () => {
         const date = document.getElementById('ticket-date').value;
@@ -408,26 +427,19 @@ if(confirmTicketBtn) {
             return;
         }
         
-        let routeName = "Sob Consulta";
-        let routePrice = 0;
-        const indexVal = selectEl.value;
-        if (currentTicketRoutes[indexVal]) {
-            routeName = currentTicketRoutes[indexVal].name;
-            routePrice = currentTicketRoutes[indexVal].price;
-        }
-        
-        const total = qty * routePrice;
+        const selectedTime = selectEl.value || 'Sob Consulta';
+        const total = qty * currentTicketPrice;
         
         let msg = `Olá! Gostaria de consultar a disponibilidade e reservar:\n\n`;
         msg += `🚍 *TICKET:* ${currentTicketProduct}\n`;
         msg += `📅 *DATA:* ${date}\n`;
-        msg += `⏰ *ROTA/HORÁRIO:* ${routeName}\n`;
+        msg += `⏰ *HORÁRIO:* ${selectedTime}\n`;
         msg += `👥 *PASSAGEIROS:* ${qty}\n`;
         msg += `💰 *VALOR TOTAL APROX.*: R$ ${total},00\n\n`;
         msg += `Aguardo instruções e o link de pagamento!`;
         
         const encMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/5575999999999?text=${encMsg}`, '_blank');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank');
         ticketModal.classList.remove('open');
     });
 }
@@ -534,12 +546,14 @@ document.addEventListener('click', (e) => {
         openBookingModal(product, price, times, fullprice);
     }
 
-    // 6.2 Tratamento de Consultas JSON WhatsApp (Passagens)
+    // 6.2 Tratamento de Consultas WhatsApp (Passagens)
     const consultBtn = e.target.closest('[data-action="consult-ticket"]');
     if (consultBtn) {
         const product = consultBtn.getAttribute('data-product');
-        const routesJSON = consultBtn.getAttribute('data-routes');
-        openTicketModal(product, routesJSON);
+        const price = consultBtn.getAttribute('data-price');
+        const timesStr = consultBtn.getAttribute('data-times');
+        const times = timesStr ? timesStr.split(',') : [];
+        openTicketModal(product, price, times);
     }
     
     // 6.3 Tratamento de alterar quantidade

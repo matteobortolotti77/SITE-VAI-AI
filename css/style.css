@@ -232,12 +232,15 @@ body {
 .btn-primary {
     background: var(--primary-color);
     color: white;
-    box-shadow: 0 10px 20px rgba(255, 90, 95, 0.3);
+    box-shadow: 0 10px 20px rgba(0, 163, 58, 0.15);
 }
 
 /* =========================================
    SEÇÃO PRODUTOS E PASSAGENS
+   Cada seção define --section-accent para tematização
    ========================================= */
+#view-passeios  { --section-accent: var(--primary-color); }
+#view-passagens { --section-accent: var(--secondary-color); }
 #view-passeios, #view-passagens {
     padding: 120px 5% 80px;
     min-height: 100vh;
@@ -292,7 +295,7 @@ body {
     position: absolute;
     bottom: 15px;
     right: 15px;
-    background: var(--primary-color);
+    background: var(--section-accent, var(--primary-color));
     color: white;
     padding: 8px 16px;
     border-radius: 30px;
@@ -305,8 +308,8 @@ body {
 
 .btn-buy {
     background: transparent;
-    color: var(--primary-color);
-    border: 2px solid var(--primary-color);
+    color: var(--section-accent, var(--primary-color));
+    border: 2px solid var(--section-accent, var(--primary-color));
     padding: 10px 20px;
     border-radius: 30px;
     font-weight: 600;
@@ -319,7 +322,7 @@ body {
 }
 
 .btn-buy:hover {
-    background: var(--primary-color);
+    background: var(--section-accent, var(--primary-color));
     color: white;
 }
 
@@ -554,7 +557,7 @@ body {
 }
 
 .accordion-header:hover {
-    color: var(--primary-color);
+    color: var(--section-accent, var(--primary-color));
 }
 
 .accordion-header [data-lucide],
@@ -567,7 +570,7 @@ body {
 .accordion-item.active .accordion-header [data-lucide],
 .accordion-item.active .accordion-header svg {
     transform: rotate(180deg);
-    color: var(--primary-color);
+    color: var(--section-accent, var(--primary-color));
 }
 
 .accordion-body {
@@ -648,6 +651,7 @@ body {
 /* Responsividade Mobile */
 @media (max-width: 768px) {
     .nav-links { display: none; }
+    .hamburger { display: block; }
     .hero-content h2 { font-size: 2.5rem; }
     .cart-drawer { width: 100%; right: -100%; }
 
@@ -660,7 +664,7 @@ body {
 }
 
 /* =========================================
-   ESTÉTICA PASSAGENS (AZUL & TOGGLE)
+   ESTÉTICA PASSAGENS (TOGGLE)
    ========================================= */
 .route-toggle {
     display: flex;
@@ -694,27 +698,101 @@ body {
     box-shadow: 0 4px 15px rgba(0, 91, 171, 0.4);
 }
 
-.theme-blue .btn-buy {
-    background: transparent !important;
-    border-color: var(--secondary-color) !important;
-    color: var(--secondary-color) !important;
+/* Modal Azul (Passagens) */
+.theme-blue-modal .close-modal:hover {
+    color: var(--secondary-color);
+}
+.theme-blue-modal .booking-price {
+    color: var(--secondary-color);
+}
+.theme-blue-modal .form-group label i {
+    color: var(--secondary-color);
+}
+.theme-blue-modal .form-group input:focus,
+.theme-blue-modal .form-group select:focus {
+    border-color: var(--secondary-color);
 }
 
-.theme-blue .btn-buy:hover {
-    background: var(--secondary-color) !important;
-    color: white !important;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(0, 91, 171, 0.2);
+/* =========================================
+   HAMBURGER MENU (MOBILE)
+   ========================================= */
+.hamburger {
+    display: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--secondary-color);
+    padding: 5px;
+    z-index: 1001;
+    transition: color 0.3s;
 }
 
-.theme-blue .price-tag {
-    background: var(--secondary-color) !important;
+.mobile-nav-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.5);
+    backdrop-filter: blur(4px);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s;
 }
 
-.theme-blue .accordion-header:hover {
-    color: var(--secondary-color) !important;
+.mobile-nav-overlay.open {
+    opacity: 1;
+    visibility: visible;
 }
-.theme-blue .accordion-item.active .accordion-header [data-lucide],
-.theme-blue .accordion-item.active .accordion-header svg {
-    color: var(--secondary-color) !important;
+
+.mobile-nav {
+    position: fixed;
+    top: 0;
+    right: -280px;
+    width: 280px;
+    height: 100vh;
+    background: white;
+    z-index: 1000;
+    padding: 100px 30px 30px;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
+    box-shadow: -10px 0 30px rgba(0,0,0,0.1);
+}
+
+.mobile-nav.open {
+    right: 0;
+}
+
+.mobile-nav a {
+    color: var(--text-main);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: 600;
+    padding: 18px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: color 0.3s;
+}
+
+.mobile-nav a:hover {
+    color: var(--primary-color);
+}
+
+.mobile-nav .close-mobile-nav {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-main);
+}
+
+/* Mobile override — MUST come after .hamburger base rule to win cascade */
+@media (max-width: 768px) {
+    .hamburger {
+        display: block;
+    }
 }
