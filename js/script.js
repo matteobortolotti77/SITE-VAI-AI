@@ -339,7 +339,10 @@ if(document.getElementById('ticket-date')) {
         minDate: getBrazilToday(),
         dateFormat: "d/m/Y",
         locale: "pt",
-        disableMobile: true
+        disableMobile: true,
+        onOpen: function(selectedDates, dateStr, instance) {
+            instance.calendarContainer.classList.add('flatpickr-blue');
+        }
     });
 }
 

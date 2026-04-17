@@ -633,6 +633,12 @@ body {
     border-color: var(--primary-color) !important;
 }
 
+.flatpickr-calendar.flatpickr-blue .flatpickr-day.selected,
+.flatpickr-calendar.flatpickr-blue .flatpickr-day.selected:hover {
+    background: var(--secondary-color) !important;
+    border-color: var(--secondary-color) !important;
+}
+
 .flatpickr-calendar {
     border-radius: 14px !important;
     box-shadow: 0 10px 40px rgba(0,0,0,0.15) !important;
