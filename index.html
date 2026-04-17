@@ -114,9 +114,9 @@
                 <div class="hero-content">
                     <h2 class="animate-up">Descubra o paraíso na<br><span class="highlight">voltaailha.com.br</span></h2>
                     <p class="animate-up delay-1">Reserve passeios incríveis e transfers com a melhor agência da ilha. Experiência e segurança em um só lugar.</p>
-                    <div class="hero-buttons animate-up delay-2" style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                        <button class="btn-buy nav-item" data-target="passeios" style="margin: 0; background: var(--primary-color); color: white; border: 2px solid var(--primary-color); padding: 12px 35px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0, 163, 58, 0.4);">Passeios</button>
-                        <button class="btn-buy nav-item" data-target="passagens" style="margin: 0; background: var(--secondary-color); color: white; border: 2px solid var(--secondary-color); padding: 12px 35px; font-size: 1.1rem; box-shadow: 0 4px 15px rgba(0, 91, 171, 0.4);">Passagens</button>
+                    <div class="hero-buttons animate-up delay-2">
+                        <button class="btn-hero btn-hero--green nav-item" data-target="passeios">Passeios</button>
+                        <button class="btn-hero btn-hero--blue nav-item" data-target="passagens">Passagens</button>
                     </div>
                 </div>
             </div>
@@ -144,7 +144,7 @@
                                 <div class="swiper-slide" style="background-image: url('./assets/volta_a_ilha_4.webp'); background-size: cover; background-position: center;"></div>
                             </div>
                             <div class="swiper-pagination inner-pagination"></div>
-                            <div class="price-tag" style="z-index: 10;">R$ 350</div>
+                            <div class="price-tag">R$ 350</div>
                         </div>
                         <div class="card-content">
                             <h3>Volta à Ilha</h3>
@@ -256,13 +256,13 @@
         <!-- ================= VIEW: PASSAGENS ================= -->
         <section class="spa-view" id="view-passagens">
             <div class="section-header">
-                <h2>Transfers e <span class="highlight" style="color: var(--secondary-color);">Passagens</span></h2>
+                <h2>Transfers e <span class="highlight highlight--blue">Passagens</span></h2>
                 <p>Chegue ao paraíso com segurança e conforto</p>
             </div>
             
             <div class="route-toggle">
-                <button class="active" id="btn-toggle-route" style="display: inline-flex; align-items: center; justify-content: center; gap: 8px;">
-                    <i data-lucide="arrow-right-left"></i> Trocar para: VOLTA (Salvador)
+                <button class="active" id="btn-toggle-route">
+                    <i data-lucide="arrow-right-left"></i><span class="toggle-label"> Trocar para: VOLTA (Salvador)</span>
                 </button>
             </div>
 
@@ -363,11 +363,11 @@
                     </div>
                 </div>
                 <!-- Pagination -->
-                <div class="swiper-pagination" style="position: relative; margin-top: 20px;"></div>
+                <div class="swiper-pagination carousel-pagination"></div>
             </div>
 
             <!-- CARROSSEL VOLTA -->
-            <div class="swiper product-slider" id="carousel-volta" style="display: none;">
+            <div class="swiper product-slider hidden" id="carousel-volta">
                 <div class="swiper-wrapper">
                     <!-- Slide 1 (Volta Terminal) -->
                     <div class="swiper-slide product-card">
@@ -432,7 +432,7 @@
                     </div>
                 </div>
                 <!-- Pagination -->
-                <div class="swiper-pagination" style="position: relative; margin-top: 20px;"></div>
+                <div class="swiper-pagination carousel-pagination"></div>
             </div>
         </section>
 
@@ -459,14 +459,14 @@
     <div class="booking-modal-overlay" id="booking-modal">
         <div class="booking-modal-content">
             <button class="close-modal" id="close-booking" aria-label="Fechar"><i data-lucide="x"></i></button>
-            <h3 id="booking-title" style="padding-right: 30px;">Nome do Passeio</h3>
+            <h3 id="booking-title" class="modal-title">Nome do Passeio</h3>
             <div id="booking-price-display" class="booking-price">
                 R$ <span id="booking-price-unit">0</span> por pessoa
             </div>
             
             <div class="form-group">
                 <label><i data-lucide="calendar"></i> Data do Passeio</label>
-                <input type="text" id="booking-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none" onfocus="this.blur()">
+                <input type="text" id="booking-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
             </div>
 
             <div class="form-group" id="booking-time-group">
@@ -485,11 +485,11 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary w-100" id="confirm-booking-btn" style="margin-top: 20px;">
+            <button class="btn btn-primary w-100 mt-20" id="confirm-booking-btn">
                 Adicionar (Total: R$ <span id="booking-total">0</span>)
             </button>
             
-            <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
+            <p class="modal-disclaimer">
                 *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
             </p>
         </div>
@@ -499,15 +499,15 @@
     <div class="booking-modal-overlay" id="ticket-modal">
         <div class="booking-modal-content theme-blue-modal">
             <button class="close-modal" id="close-ticket-modal" aria-label="Fechar"><i data-lucide="x"></i></button>
-            <h3 id="ticket-title" style="padding-right: 30px; font-size: 1.1rem; color: var(--secondary-color);">Solicitação de Passagem</h3>
-            <p id="ticket-product-display" style="font-weight: 600; margin-bottom: 5px;"></p>
-            <div class="booking-price" style="margin-bottom: 20px; color: var(--secondary-color);">
+            <h3 id="ticket-title" class="modal-title modal-title--blue">Solicitação de Passagem</h3>
+            <p id="ticket-product-display" class="ticket-product-name"></p>
+            <div class="booking-price booking-price--blue">
                 R$ <span id="ticket-price-unit">0</span> por pessoa
             </div>
             
             <div class="form-group">
                 <label><i data-lucide="calendar"></i> Data Desejada</label>
-                <input type="text" id="ticket-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none" onfocus="this.blur()">
+                <input type="text" id="ticket-date" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
             </div>
 
             <div class="form-group" id="ticket-time-group">
@@ -525,27 +525,27 @@
                 </div>
             </div>
 
-            <button class="btn btn-primary w-100" id="confirm-ticket-btn" style="margin-top: 20px; background: var(--primary-color); border-color: var(--primary-color); display: flex; align-items: center; justify-content: center; gap: 10px;">
+            <button class="btn btn-primary w-100 mt-20 btn-whatsapp-confirm" id="confirm-ticket-btn">
                 <i data-lucide="message-circle"></i> Solicitar no WhatsApp (R$ <span id="ticket-total">0</span>)
             </button>
             
-            <p style="font-size: 0.8rem; text-align: center; margin-top: 15px; color: #666;">
+            <p class="modal-disclaimer">
                 *Rotas semi-terrestres são operadas por terceiros. A verificação depende de disponibilidade no painel da transportadora parceira.
             </p>
         </div>
     </div>
 
     <!-- Modal de Venda Urgente/Esgotada -->
-    <div class="booking-modal-overlay" id="urgent-modal" style="z-index: 4000;">
-        <div class="booking-modal-content" style="text-align: center;">
-            <h3 style="margin-bottom: 15px; color: var(--primary-color);">Reservas de Última Hora</h3>
-            <p style="margin-bottom: 20px; line-height: 1.5; color: #555;">
-                As compras online para embarques no **mesmo dia** encerram diariamente às 08:30 da manhã. Para verificar a disponibilidade de assentos de última hora para hoje, entre em contato diretamente com nossa equipe.
+    <div class="booking-modal-overlay urgent-modal-overlay" id="urgent-modal">
+        <div class="booking-modal-content urgent-modal-content">
+            <h3 class="urgent-title">Reservas de Última Hora</h3>
+            <p class="urgent-text">
+                As compras online para embarques no <strong>mesmo dia</strong> encerram diariamente às 08:30 da manhã. Para verificar a disponibilidade de assentos de última hora para hoje, entre em contato diretamente com nossa equipe.
             </p>
-            <div style="display: flex; gap: 10px;">
-                <button class="btn btn-secondary w-100" id="close-urgent" style="background:#eee; color:#333; box-shadow:none; padding: 12px; border-radius: 10px;">Voltar</button>
-                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn btn-primary w-100" style="background: #25D366; display:flex; align-items:center; justify-content:center; text-decoration:none; padding: 12px; border-radius: 10px;">
-                    <i data-lucide="message-circle" style="margin-right: 8px; width: 18px;"></i> WhatsApp
+            <div class="urgent-buttons">
+                <button class="btn w-100 btn-urgent-back" id="close-urgent">Voltar</button>
+                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn w-100 btn-urgent-whatsapp">
+                    <i data-lucide="message-circle" class="icon-whatsapp"></i> WhatsApp
                 </a>
             </div>
         </div>
@@ -555,7 +555,7 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <script>lucide.createIcons();</script>
+    <!-- Lucide icons initialized inside the IIFE (script.js) -->
     <script src="./js/script.js"></script>
 </body>
 </html>

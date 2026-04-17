@@ -19,6 +19,9 @@
     padding: 0;
     box-sizing: border-box;
     font-family: 'Outfit', sans-serif;
+}
+
+html {
     scroll-behavior: smooth;
 }
 
@@ -680,6 +683,10 @@ body {
 .route-toggle button {
     -webkit-appearance: none;
     appearance: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
     background: transparent;
     color: #555;
     border: none;
@@ -796,3 +803,172 @@ body {
         display: block;
     }
 }
+
+/* =========================================
+   UTILITY & COMPONENT CLASSES (Refactor Phase 1+2)
+   ========================================= */
+.hidden { display: none; }
+
+/* Header: Section page state (replaces inline .style in navigateTo) */
+.glass-header.on-section {
+    background: white;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+.glass-header.on-section .nav-links a,
+.glass-header.on-section .cart-btn,
+.glass-header.on-section .hamburger {
+    color: var(--text-main);
+}
+
+/* Hero CTA Buttons (replaces inline styles on hero buttons) */
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.btn-hero {
+    margin: 0;
+    color: white;
+    border: 2px solid;
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    border-radius: 30px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: inherit;
+}
+
+.btn-hero--green {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    box-shadow: 0 4px 15px rgba(0, 163, 58, 0.4);
+}
+.btn-hero--green:hover { filter: brightness(1.1); }
+
+.btn-hero--blue {
+    background: var(--secondary-color);
+    border-color: var(--secondary-color);
+    box-shadow: 0 4px 15px rgba(0, 91, 171, 0.4);
+}
+.btn-hero--blue:hover { filter: brightness(1.1); }
+
+/* Highlight color variant */
+.highlight--blue { color: var(--secondary-color); }
+
+/* Inner Swiper price tag elevation */
+.inner-swiper .price-tag { z-index: 10; }
+
+/* Carousel pagination with spacing (replaces inline style) */
+.carousel-pagination {
+    position: relative;
+    margin-top: 20px;
+}
+
+/* Modal shared utilities */
+.modal-title { padding-right: 30px; }
+.modal-title--blue {
+    font-size: 1.1rem;
+    color: var(--secondary-color);
+}
+
+.ticket-product-name {
+    font-weight: 600;
+    margin-bottom: 5px;
+}
+
+.booking-price--blue {
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+}
+
+/* Price display sub-elements (replaces innerHTML spans) */
+.price-full {
+    color: #666;
+    font-size: 0.9rem;
+}
+.price-signal {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* WhatsApp confirm button (ticket modal) */
+.btn-whatsapp-confirm {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+/* Modal disclaimer text */
+.modal-disclaimer {
+    font-size: 0.8rem;
+    text-align: center;
+    margin-top: 15px;
+    color: #666;
+}
+
+/* Cart item layout (replaces inline style.cssText) */
+.cart-item-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    gap: 10px;
+}
+
+.cart-item-info {
+    flex: 1;
+    font-size: 0.9rem;
+    line-height: 1.4;
+}
+
+.cart-item-name { margin-bottom: 5px; }
+.cart-item-price { color: var(--primary-color); }
+
+.cart-item-remove {
+    background: none;
+    border: none;
+    color: #ff4d4f;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 8px;
+    transition: background 0.3s;
+}
+.cart-item-remove:hover { background: rgba(255, 77, 79, 0.1); }
+
+.icon-trash { width: 20px; height: 20px; }
+
+/* Urgent/Same-day modal */
+.urgent-modal-overlay { z-index: 4000; }
+.urgent-modal-content { text-align: center; }
+.urgent-title { margin-bottom: 15px; color: var(--primary-color); }
+.urgent-text { margin-bottom: 20px; line-height: 1.5; color: #555; }
+.urgent-buttons { display: flex; gap: 10px; }
+
+.btn-urgent-back {
+    background: #eee;
+    color: #333;
+    box-shadow: none;
+    padding: 12px;
+    border-radius: 10px;
+}
+
+.btn-urgent-whatsapp {
+    background: #25D366;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    padding: 12px;
+    border-radius: 10px;
+    color: white;
+}
+.btn-urgent-whatsapp:hover { filter: brightness(1.08); }
+
+.icon-whatsapp { margin-right: 8px; width: 18px; }

@@ -2,6 +2,9 @@
 // Previne vazamento de variáveis, colisões de escopo e limpa a Window.
 (() => {
 
+// 0. INICIALIZAÇÃO DE ÍCONES (movido do HTML inline para dentro da IIFE)
+if (window.lucide) lucide.createIcons();
+
 // 1. EFEITO DO HEADER (Glassmorphism)
 const header = document.querySelector('.glass-header');
 window.addEventListener('scroll', () => {
@@ -54,14 +57,7 @@ function navigateTo(targetId, pushHistory = true) {
             history.pushState({ view: targetId }, '', `#${targetId}`);
         }
         
-        if(targetId !== 'home') {
-            header.style.background = 'white';
-            header.style.boxShadow = '0 4px 30px rgba(0, 0, 0, 0.05)';
-            document.querySelectorAll('.nav-links a, .cart-btn, .hamburger').forEach(el => el.style.color = 'var(--text-main)');
-        } else {
-            header.style = '';
-            document.querySelectorAll('.nav-links a, .cart-btn, .hamburger').forEach(el => el.style = '');
-        }
+        header.classList.toggle('on-section', targetId !== 'home');
     }
 }
 
@@ -147,19 +143,16 @@ let isShowingIda = true;
 if (btnToggleRoute) {
     btnToggleRoute.addEventListener('click', () => {
         isShowingIda = !isShowingIda;
-        if (isShowingIda) {
-            carouselIda.style.display = 'block';
-            carouselVolta.style.display = 'none';
-            btnToggleRoute.innerHTML = '<i data-lucide="arrow-right-left"></i> Trocar para: VOLTA (Salvador)';
-            lucide.createIcons();
-            if (swiperIda) swiperIda.update();
-        } else {
-            carouselIda.style.display = 'none';
-            carouselVolta.style.display = 'block';
-            btnToggleRoute.innerHTML = '<i data-lucide="arrow-right-left"></i> Trocar para: IDA (Morro de SP)';
-            lucide.createIcons();
-            if (swiperVolta) swiperVolta.update();
+        const label = btnToggleRoute.querySelector('.toggle-label');
+        carouselIda.classList.toggle('hidden', !isShowingIda);
+        carouselVolta.classList.toggle('hidden', isShowingIda);
+        if (label) {
+            label.textContent = isShowingIda
+                ? ' Trocar para: VOLTA (Salvador)'
+                : ' Trocar para: IDA (Morro de SP)';
         }
+        const activeSwiper = isShowingIda ? swiperIda : swiperVolta;
+        if (activeSwiper) activeSwiper.update();
     });
 }
 
@@ -224,17 +217,27 @@ function openBookingModal(productName, price, timesArray, fullPrice = null) {
     document.getElementById('booking-title').textContent = productName;
     
     const displayEl = document.getElementById('booking-price-display');
+    while (displayEl.firstChild) displayEl.removeChild(displayEl.firstChild);
     if (fullPrice && fullPrice > price) {
-        displayEl.innerHTML = `<span style="color:#666; font-size:0.9rem;">Valor Total: R$ ${fullPrice}</span><br><span style="color:var(--primary-color); font-weight: bold;">Sinal para Reserva: R$ ${price} / pessoa</span>`;
+        const totalSpan = document.createElement('span');
+        totalSpan.className = 'price-full';
+        totalSpan.textContent = 'Valor Total: R$ ' + fullPrice;
+        const br = document.createElement('br');
+        const signalSpan = document.createElement('span');
+        signalSpan.className = 'price-signal';
+        signalSpan.textContent = 'Sinal para Reserva: R$ ' + price + ' / pessoa';
+        displayEl.appendChild(totalSpan);
+        displayEl.appendChild(br);
+        displayEl.appendChild(signalSpan);
     } else {
-        displayEl.textContent = `R$ ${price} por pessoa`;
+        displayEl.textContent = 'R$ ' + price + ' por pessoa';
     }
     
     document.getElementById('booking-qty').value = 1;
     document.getElementById('booking-total').textContent = price;
     
     const timeSelect = document.getElementById('booking-time');
-    timeSelect.innerHTML = '';
+    while (timeSelect.firstChild) timeSelect.removeChild(timeSelect.firstChild);
     
     if (timesArray && timesArray.length > 0) {
         document.getElementById('booking-time-group').style.display = 'block';
@@ -246,7 +249,10 @@ function openBookingModal(productName, price, timesArray, fullPrice = null) {
         });
     } else {
         document.getElementById('booking-time-group').style.display = 'none';
-        timeSelect.innerHTML = '<option value="A combinar">A combinar pelo WhatsApp</option>';
+        const fallbackOpt = document.createElement('option');
+        fallbackOpt.value = 'A combinar';
+        fallbackOpt.textContent = 'A combinar pelo WhatsApp';
+        timeSelect.appendChild(fallbackOpt);
     }
 
     document.getElementById('booking-date').value = '';
@@ -457,10 +463,13 @@ function updateCartUI() {
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-value');
     
-    container.innerHTML = ''; 
+    while (container.firstChild) container.removeChild(container.firstChild);
     
     if(cart.length === 0) {
-        container.innerHTML = '<p class="empty-cart-msg">Seu carrinho está vazio.</p>';
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'empty-cart-msg';
+        emptyMsg.textContent = 'Seu carrinho está vazio.';
+        container.appendChild(emptyMsg);
         totalEl.textContent = 'R$ 0,00';
         return;
     }
@@ -470,28 +479,31 @@ function updateCartUI() {
         total += item.price;
         
         const row = document.createElement('div');
-        row.style.cssText = "display: flex; justify-content: space-between; align-items: center; border-bottom:1px solid #eee; padding: 15px 0; gap: 10px;";
+        row.className = 'cart-item-row';
         
         const infoDiv = document.createElement('div');
-        infoDiv.style.cssText = "flex: 1; font-size: 0.9rem; line-height: 1.4;";
+        infoDiv.className = 'cart-item-info';
         
         const nameDiv = document.createElement('div');
-        nameDiv.style.marginBottom = "5px";
+        nameDiv.className = 'cart-item-name';
         nameDiv.textContent = item.name; 
         
         const priceDiv = document.createElement('strong');
-        priceDiv.style.color = "var(--primary-color)";
-        priceDiv.textContent = `R$ ${item.price}`;
+        priceDiv.className = 'cart-item-price';
+        priceDiv.textContent = 'R$ ' + item.price;
         
         infoDiv.appendChild(nameDiv);
         infoDiv.appendChild(priceDiv);
         
         const removeBtn = document.createElement('button');
+        removeBtn.className = 'cart-item-remove';
         removeBtn.setAttribute('data-action', 'remove-cart-item');
         removeBtn.setAttribute('data-index', index);
         removeBtn.title = 'Remover item';
-        removeBtn.style.cssText = "background: none; border: none; color: #ff4d4f; cursor: pointer; padding: 8px; border-radius: 8px; transition: background 0.3s;";
-        removeBtn.innerHTML = '<i data-lucide="trash-2" style="width: 20px; height: 20px;"></i>';
+        const trashIcon = document.createElement('i');
+        trashIcon.setAttribute('data-lucide', 'trash-2');
+        trashIcon.className = 'icon-trash';
+        removeBtn.appendChild(trashIcon);
         
         row.appendChild(infoDiv);
         row.appendChild(removeBtn);
