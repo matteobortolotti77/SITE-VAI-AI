@@ -63,21 +63,16 @@ Não criar subpastas desnecessárias. Não criar arquivos `.ts`, `.jsx`, `.vue`.
 ## 4. ARQUITETURA SPA
 
 ### Views
-Três views controladas por visibilidade CSS (`.spa-view.active`):
+Quatro views controladas por visibilidade CSS (`.spa-view.active`):
 
 | ID | URL hash | Conteúdo |
 |----|----------|---------|
 | `view-home` | `#home` | Hero com vídeo |
-| `view-passeios` | `#passeios` | 2 carrosséis: Passeios + Atividades |
+| `view-passeios` | `#passeios` | Carrossel `#carousel-passeios` (Volta à Ilha, Garapuá 4X4, Gamboa Full, Gamboa Convencional, Quadriciclo, Buggy) |
+| `view-atividades` | `#atividades` | Carrossel `#carousel-atividades` (Mergulho, Cavalgada, Tiroleza, Banana Boat, Bike Aquática, Bicicletas) |
 | `view-passagens` | `#passagens` | Toggle IDA/VOLTA com 2 carrosséis |
 
-### Carrosséis da view Passeios (PENDENTE)
-```
-view-passeios
-├── Swiper#carousel-passeios   → produtos tipo "passeio" (Volta à Ilha, etc.)
-└── Swiper#carousel-atividades → produtos tipo "atividade" (Mergulho, Quadriciclo, etc.)
-```
-Cada section tem seu próprio `<h3>` separador e `.swiper-pagination`.
+Ordem do menu: Início · Passeios · Atividades · Passagens.
 
 ### Fluxo de dados dos produtos
 Atualmente os dados estão nos `data-attributes` dos botões. **Não refatorar para JSON/API ainda** — isso vem no backend. Manter o padrão existente.

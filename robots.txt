@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /assets/
+Allow: /assets/logo.png
+Allow: /assets/og_share.jpg
+
+Sitemap: https://voltaailha.com.br/sitemap.xml

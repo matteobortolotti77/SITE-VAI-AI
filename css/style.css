@@ -32,22 +32,6 @@ body {
 }
 
 /* =========================================
-   MARCA D'ÁGUA
-   ========================================= */
-.site-watermark {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 75vw;
-    max-width: 700px;
-    opacity: 0.1; /* Menos transparente e mais visível */
-    pointer-events: none; /* Ignora cliques */
-    z-index: -5; /* Fica atrás de tudo */
-    user-select: none;
-}
-
-/* =========================================
    HEADER (Glassmorphism)
    ========================================= */
 .glass-header {
@@ -167,13 +151,24 @@ body {
 .hero {
     position: relative;
     width: 100vw;
-    height: 100vh;
+    height: 72vh;
+    min-height: 520px;
     display: flex;
     align-items: center;
     justify-content: center;
     overflow: hidden;
     text-align: center;
 }
+
+/* Placeholders de cards de passagens (sem imagens externas) */
+.ticket-card-img {
+    background-size: cover;
+    background-position: center;
+}
+.ticket-card-img--terminal  { background: linear-gradient(135deg, #0a4d8c 0%, #1b7ac4 100%); }
+.ticket-card-img--hotels    { background: linear-gradient(135deg, #b5651d 0%, #e3a76f 100%); }
+.ticket-card-img--airport   { background: linear-gradient(135deg, #2a2a40 0%, #5a6680 100%); }
+.ticket-card-img--catamaran { background: linear-gradient(135deg, #006d77 0%, #83c5be 100%); }
 
 .bg-video {
     position: absolute;
@@ -208,7 +203,7 @@ body {
 }
 
 .hero-content h2 {
-    font-size: 3.5rem;
+    font-size: 2.9rem;
     font-weight: 800;
     line-height: 1.1;
     margin-bottom: 20px;
@@ -655,7 +650,8 @@ body {
 @media (max-width: 768px) {
     .nav-links { display: none; }
     .hamburger { display: block; }
-    .hero-content h2 { font-size: 2.5rem; }
+    .hero-content h2 { font-size: 2.1rem; }
+    .hero { height: 65vh; min-height: 460px; }
     .cart-drawer { width: 100%; right: -100%; }
 
     .flatpickr-calendar {
@@ -972,3 +968,113 @@ body {
 .btn-urgent-whatsapp:hover { filter: brightness(1.08); }
 
 .icon-whatsapp { margin-right: 8px; width: 18px; }
+
+/* === Subsection headers (Passeios / Atividades) === */
+.subsection-header {
+    max-width: 1200px;
+    margin: 0 auto 20px;
+    padding: 0 20px;
+    text-align: left;
+}
+.subsection-header + .product-slider { margin-bottom: 40px; }
+.subsection-title {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--dark-text, #1a1a1d);
+    margin: 10px 0 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.subsection-title::before {
+    content: '';
+    width: 6px;
+    height: 24px;
+    border-radius: 3px;
+    background: var(--primary-color, #00A33A);
+}
+#carousel-atividades .subsection-title::before,
+.subsection-header:has(+ #carousel-atividades) .subsection-title::before {
+    background: var(--secondary-color, #005BAB);
+}
+.subsection-sub {
+    color: #6a6a72;
+    font-size: 0.95rem;
+    margin: 0 0 10px 16px;
+}
+
+/* === Child fare policy hint inside accordions === */
+.fare-policy {
+    margin-top: 10px;
+    padding: 8px 10px;
+    background: rgba(0, 163, 58, 0.08);
+    border-left: 3px solid var(--primary-color, #00A33A);
+    border-radius: 6px;
+    font-size: 0.88rem;
+    color: #333;
+}
+.theme-blue-modal .fare-policy,
+#view-passagens .fare-policy {
+    background: rgba(0, 91, 171, 0.08);
+    border-left-color: var(--secondary-color, #005BAB);
+}
+
+/* === Passenger group (children selector) === */
+.pax-children {
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 12px;
+    padding: 12px 14px;
+    background: rgba(0,0,0,0.015);
+}
+.pax-children[hidden] { display: none !important; }
+.pax-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 8px 0;
+}
+.pax-row + .pax-row { border-top: 1px dashed rgba(0,0,0,0.08); }
+.pax-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+.pax-label i {
+    width: 22px;
+    height: 22px;
+    color: var(--primary-color, #00A33A);
+    flex-shrink: 0;
+}
+.theme-blue-modal .pax-label i { color: var(--secondary-color, #005BAB); }
+.pax-label strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #1a1a1d;
+    line-height: 1.2;
+}
+.pax-label small {
+    display: block;
+    font-size: 0.78rem;
+    color: #6a6a72;
+    margin-top: 2px;
+}
+.pax-hint {
+    margin: 10px 0 0;
+    font-size: 0.78rem;
+    color: #6a6a72;
+    line-height: 1.35;
+}
+.qty-selector--mini { gap: 6px; }
+.qty-selector--mini button {
+    width: 30px;
+    height: 30px;
+    font-size: 1rem;
+}
+.qty-selector--mini input {
+    width: 40px;
+    height: 30px;
+    font-size: 0.95rem;
+}

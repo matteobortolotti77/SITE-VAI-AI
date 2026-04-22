@@ -4,28 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Volta à Ilha | Agência de Turismo</title>
-    
-    <!-- Meta SEO Base -->
+
+    <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    <link rel="canonical" href="https://voltaailha.com.br/">
+
     <meta name="description" content="A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.">
     <meta name="keywords" content="Morro de São Paulo, Turismo, Passeio Volta à Ilha, Catamarã, Transfers, Mergulho, Agência, Boipeba">
     <meta name="author" content="Agência Volta à Ilha">
 
-    <!-- Open Graph (WhatsApp, Insta, Facebook) -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://voltaailha.com.br/">
     <meta property="og:title" content="Volta à Ilha | Agência de Turismo em Morro de São Paulo">
     <meta property="og:description" content="Reserve passeios inesquecíveis, transfers e passagens para explorar o paraíso.">
-    <!-- ATENÇÃO USER: Substitua a linha abaixo quando a foto oficial for criada -->
-    <meta property="og:image" content="https://voltaailha.com.br/assets/OG_PLACEHOLDER.jpg">
+    <meta property="og:image" content="https://voltaailha.com.br/assets/og_share.jpg">
 
-    <!-- Twitter / X Cards -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://voltaailha.com.br/">
     <meta property="twitter:title" content="Volta à Ilha | Turismo em Morro">
     <meta property="twitter:description" content="Reserve agora passagens e passeios em Morro de São Paulo.">
-    <meta property="twitter:image" content="https://voltaailha.com.br/assets/OG_PLACEHOLDER.jpg">
+    <meta property="twitter:image" content="https://voltaailha.com.br/assets/og_share.jpg">
 
-    <!-- JSON-LD (Schema.org para SEO do Google) -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -34,7 +32,7 @@
       "image": "https://voltaailha.com.br/assets/logo.png",
       "@id": "https://voltaailha.com.br/",
       "url": "https://voltaailha.com.br/",
-      "telephone": "+5575999999999",
+      "telephone": "+5575998240043",
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Vila",
@@ -46,26 +44,16 @@
       "priceRange": "$$"
     }
     </script>
-    <!-- Google Fonts -->
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
-    <!-- Swiper CSS para os carrosseis -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
 
-    <!-- Nosso CSS -->
-    <link rel="stylesheet" href="./css/style.css?v=11">
-    
-    <!-- Flatpickr (Calendário) -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-    
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="./css/style.css?v=14">
 </head>
 <body>
-
-    <!-- Marca d'Água de Fundo -->
-    <img src="./assets/Logo%20FX.png" class="site-watermark" alt="" aria-hidden="true">
 
     <!-- Menu SPA (Links de navegação no header) -->
     <header class="glass-header">
@@ -77,6 +65,7 @@
         <nav class="nav-links">
             <a href="#" class="nav-item active" data-target="home">Início</a>
             <a href="#" class="nav-item" data-target="passeios">Passeios</a>
+            <a href="#" class="nav-item" data-target="atividades">Atividades</a>
             <a href="#" class="nav-item" data-target="passagens">Passagens</a>
         </nav>
         <button class="cart-btn" aria-label="Abrir carrinho">
@@ -96,6 +85,7 @@
         </button>
         <a href="#" class="nav-item" data-target="home">Início</a>
         <a href="#" class="nav-item" data-target="passeios">Passeios</a>
+        <a href="#" class="nav-item" data-target="atividades">Atividades</a>
         <a href="#" class="nav-item" data-target="passagens">Passagens</a>
     </nav>
 
@@ -128,17 +118,15 @@
                 <h2>Experiências <span class="highlight">Inesquecíveis</span></h2>
                 <p>Nossos melhores roteiros em Morro de São Paulo</p>
             </div>
-            
-            <!-- Swiper Slider para Produtos -->
-            <div class="swiper product-slider">
+
+            <div class="swiper product-slider" id="carousel-passeios">
                 <div class="swiper-wrapper">
-                    <!-- Produto 1 -->
+
+                    <!-- Passeio: Volta à Ilha -->
                     <div class="swiper-slide product-card">
                         <div class="card-image swiper inner-swiper">
                             <div class="swiper-wrapper">
-                                <!-- Foto Principal -->
                                 <div class="swiper-slide" style="background-image: url('./assets/volta_a_ilha_1.webp'); background-size: cover; background-position: center;"></div>
-                                <!-- 3 Fotos Aleatórias do Passeio -->
                                 <div class="swiper-slide" style="background-image: url('./assets/volta_a_ilha_2.webp'); background-size: cover; background-position: center;"></div>
                                 <div class="swiper-slide" style="background-image: url('./assets/volta_a_ilha_3.webp'); background-size: cover; background-position: center;"></div>
                                 <div class="swiper-slide" style="background-image: url('./assets/volta_a_ilha_4.webp'); background-size: cover; background-position: center;"></div>
@@ -149,107 +137,386 @@
                         <div class="card-content">
                             <h3>Volta à Ilha</h3>
                             <p>O passeio mais famoso. Piscinas naturais, banco de areia e pôr do sol mágico.</p>
-                            
-                            <!-- Accordion Menu -->
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Saída: 09:30 da Terceira Praia.</li>
-                                                <li>Paradas: Piscinas Naturais de Garapuá e Moreré, Boipeba (para almoço) e Cairu.</li>
-                                                <li>Duração média: 6 a 7 horas.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saída: 09:30 da Terceira Praia.</li>
+                                            <li>Paradas: Piscinas Naturais de Garapuá e Moreré, Boipeba (almoço) e Cairu.</li>
+                                            <li>Duração média: 6 a 7 horas.</li>
+                                        </ul>
+                                    </div></div>
                                 </div>
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>O que está incluso</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <p>✔️ Lancha rápida operada por marinheiros experientes.<br>✔️ Guia credenciado.<br>✔️ Paradas nas piscinas naturais e praias exclusivas.</p>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ Lancha rápida com tripulação credenciada.<br>✔️ Guia local durante todo o passeio.<br>✔️ Paradas em piscinas naturais e banco de areia.</p>
+                                    </div></div>
                                 </div>
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>O que levar</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <p>🎒 Protetor solar, óculos de sol e chapéu.<br>🩱 Roupas de banho e toalha.<br>💧 Dinheiro trocado ou cartão para consumo nas ilhas.</p>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>🎒 Protetor solar e repelente.<br>🩱 Roupas de banho e toalha.<br>💧 Dinheiro para almoço em Boipeba e despesas extras.</p>
+                                    </div></div>
                                 </div>
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Formas de Pagamento</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <p>✔️ <strong>Sinal pelo site:</strong> R$ 100 (Pix/Cartão) para garantir a reserva.<br>✔️ <strong>Restante:</strong> R$ 250 pagos no momento do embarque (Dinheiro, Pix ou Cartão).</p>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal pelo site:</strong> R$ 100 para garantir a reserva.<br>✔️ <strong>Restante:</strong> R$ 250 no embarque.</p>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50% · A idade é considerada na data do passeio.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
-                            <button class="btn-buy" data-action="book" data-product="Volta à Ilha" data-price="100" data-times="09:30" data-fullprice="350">Adicionar <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Volta à Ilha" data-price="100" data-times="09:30" data-fullprice="350" data-child-policy="1">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
-                    <!-- Produto 2 -->
+
+                    <!-- Passeio: Garapuá 4X4 -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-                            <div class="price-tag">R$ 180</div>
+                        <div class="card-image swiper inner-swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide" style="background-image: url('./assets/Garapuá_1.webp'); background-size: cover; background-position: center;"></div>
+                                <div class="swiper-slide" style="background-image: url('./assets/Garapuá_2.webp'); background-size: cover; background-position: center;"></div>
+                                <div class="swiper-slide" style="background-image: url('./assets/Garapuá_3.webp'); background-size: cover; background-position: center;"></div>
+                                <div class="swiper-slide" style="background-image: url('./assets/Garapuá_4.webp'); background-size: cover; background-position: center;"></div>
+                            </div>
+                            <div class="swiper-pagination inner-pagination"></div>
+                            <div class="price-tag">R$ 130</div>
                         </div>
                         <div class="card-content">
-                            <h3>Mergulho com Cilindro</h3>
-                            <p>Explore a vida marinha exuberante de Morro de São Paulo com segurança.</p>
-                            
-                            <!-- Accordion Menu -->
+                            <h3>Garapuá 4X4</h3>
+                            <p>Travessia terrestre 4x4 até a Vila de Garapuá, com piscinas naturais e praia paradisíaca.</p>
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Saída: Conforme maré.</li>
-                                                <li>Ponto de encontro: Primeira Praia.</li>
-                                                <li>Duração do mergulho: Aprox. 30 a 40 minutos submerso.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Trajeto terrestre 4x4 saindo de Morro de São Paulo.</li>
+                                            <li>⚠️ <strong>Capacidade: até 2 passageiros</strong> por veículo.</li>
+                                            <li>Horário a combinar com a operação.</li>
+                                        </ul>
+                                    </div></div>
                                 </div>
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
-                                        <span>O que está incluso</span>
+                                        <span>Formas de Pagamento</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <p>✔️ Equipamento completo (cilindro, roupa de neoprene, máscara).<br>✔️ Instrutor certificado.</p>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal:</strong> R$ 30 · <strong>Restante:</strong> R$ 100 no embarque.</p>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50% · A idade é considerada na data do passeio.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
+                            <button class="btn-buy" data-action="book" data-product="Garapuá 4X4" data-price="30" data-times="A combinar" data-fullprice="130" data-child-policy="1">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Passeio: Gamboa Full -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--hotels">
+                            <div class="price-tag">R$ 260</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Gamboa Full</h3>
+                            <p>Experiência completa em Gamboa: argila medicinal, piscinas e almoço à beira-mar.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saída matinal conforme maré.</li>
+                                            <li>Duração: dia inteiro, com almoço incluso.</li>
+                                        </ul>
+                                    </div></div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Formas de Pagamento</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal:</strong> R$ 80 · <strong>Restante:</strong> R$ 180 no embarque.</p>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Gamboa Full" data-price="80" data-times="A combinar" data-fullprice="260" data-child-policy="1">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Passeio: Gamboa Convencional -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--terminal">
+                            <div class="price-tag">R$ 100</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Gamboa Convencional</h3>
+                            <p>Versão essencial do passeio a Gamboa, com argila e tempo livre na praia.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saída em grupo, conforme maré.</li>
+                                            <li>Meia-diária.</li>
+                                        </ul>
+                                    </div></div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Formas de Pagamento</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal:</strong> R$ 20 · <strong>Restante:</strong> R$ 80 no embarque.</p>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Gamboa Convencional" data-price="20" data-times="A combinar" data-fullprice="100" data-child-policy="1">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Passeio: Quadriciclo -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--airport">
+                            <div class="price-tag">R$ 710</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Quadriciclo</h3>
+                            <p>Trilhas off-road pelas praias e pela mata atlântica. Adrenalina garantida.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Requisitos</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>⚠️ <strong>Obrigatório apresentar CNH</strong> válida para pilotar.</p>
+                                    </div></div>
+                                </div>
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Formas de Pagamento</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal:</strong> R$ 200 · <strong>Restante:</strong> R$ 510 no local.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Quadriciclo" data-price="200" data-times="A combinar" data-fullprice="710">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Passeio: Buggy -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--catamaran">
+                            <div class="price-tag">R$ 700</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Buggy</h3>
+                            <p>Volta à ilha terrestre de buggy passando pelos principais mirantes e praias.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Formas de Pagamento</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>✔️ <strong>Sinal:</strong> R$ 200 · <strong>Restante:</strong> R$ 500 no local.</p>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Buggy" data-price="200" data-times="A combinar" data-fullprice="700" data-child-policy="1">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="swiper-pagination carousel-pagination"></div>
+            </div>
+        </section>
+
+        <!-- ================= VIEW: ATIVIDADES ================= -->
+        <section class="spa-view" id="view-atividades">
+            <div class="section-header">
+                <h2>Atividades <span class="highlight">Extras</span></h2>
+                <p>Experiências para complementar a sua estadia</p>
+            </div>
+
+            <div class="swiper product-slider" id="carousel-atividades">
+                <div class="swiper-wrapper">
+
+                    <!-- Atividade: Mergulho com Cilindro -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--catamaran">
+                            <div class="price-tag">R$ 180</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Mergulho com Cilindro</h3>
+                            <p>Explore a vida marinha exuberante de Morro de São Paulo com segurança.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saída conforme maré · Ponto: Primeira Praia.</li>
+                                            <li>30 a 40 minutos submerso.</li>
+                                        </ul>
+                                    </div></div>
+                                </div>
+                            </div>
                             <button class="btn-buy" data-action="book" data-product="Mergulho com Cilindro" data-price="180" data-times="08:00,13:00">Adicionar <i data-lucide="plus"></i></button>
                         </div>
                     </div>
+
+                    <!-- Atividade: Cavalgada -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--hotels">
+                            <div class="price-tag">R$ 150</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Cavalgada</h3>
+                            <p>Passeio a cavalo pela costa e pela mata atlântica.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Detalhes</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>Duração: ~1h30 · Nível: iniciante · Guia experiente.</p>
+                                        <p class="fare-policy">🧒 Crianças a partir de 6 anos (com acompanhante).</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Cavalgada" data-price="150" data-times="A combinar">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Atividade: Tiroleza -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--airport">
+                            <div class="price-tag">R$ 80</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Tiroleza</h3>
+                            <p>Descida de tiroleza com vista para a Segunda Praia.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Detalhes</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>Equipamento completo · Instrutor credenciado.</p>
+                                        <p class="fare-policy">🧒 Idade mínima: 6 anos.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Tiroleza" data-price="80" data-times="A combinar">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Atividade: Banana Boat -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--catamaran">
+                            <div class="price-tag">R$ 60</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Banana Boat</h3>
+                            <p>Diversão em grupo na Segunda Praia.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Detalhes</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>Duração: ~20 min · Saídas conforme condição do mar.</p>
+                                        <p class="fare-policy">🧒 A partir de 6 anos.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Banana Boat" data-price="60" data-times="A combinar">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Atividade: Bike Aquática -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--terminal">
+                            <div class="price-tag">R$ 70</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Bike Aquática</h3>
+                            <p>Pedale sobre o mar em uma bicicleta especial, vista panorâmica da costa.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Detalhes</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>Aluguel por hora · Equipamento de flutuação incluso.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Bike Aquática" data-price="70" data-times="A combinar">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Atividade: Bicicletas -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--hotels">
+                            <div class="price-tag">R$ 50</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Bicicletas</h3>
+                            <p>Aluguel de bicicletas para explorar as vilas e trilhas da ilha.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Detalhes</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <p>Aluguel por dia · Cadeado incluso.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="book" data-product="Aluguel de Bicicleta" data-price="50" data-times="A combinar">Adicionar <i data-lucide="plus"></i></button>
+                        </div>
+                    </div>
+
                 </div>
-                <!-- Pagination -->
-                <div class="swiper-pagination"></div>
+                <div class="swiper-pagination carousel-pagination"></div>
             </div>
         </section>
 
@@ -269,169 +536,239 @@
             <!-- CARROSSEL IDA -->
             <div class="swiper product-slider" id="carousel-ida">
                 <div class="swiper-wrapper">
-                    <!-- Slide 1 (Ida Terminal) -->
+
+                    <!-- IDA 1: Semi-Terrestre Terminal SSA -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="card-image ticket-card-img ticket-card-img--terminal">
                             <div class="price-tag">R$ 165</div>
                         </div>
                         <div class="card-content">
                             <h3>Terminal SSA ➔ Morro</h3>
-                            <p>Transferência Semi-Terrestre Oficial via Itaparica.</p>
-                            
+                            <p>Semi-Terrestre: travessia marítima + van + lancha.</p>
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Embarque: Terminal Marítimo de Salvador (São Joaquim / Mar Grande).</li>
-                                                <li>Conexões: Barco + Van climatizada + Lancha rápida.</li>
-                                                <li>Duração média: ~3h30min.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Embarque: Terminal Marítimo de Salvador (Mercado Modelo).</li>
+                                            <li>Saídas: 06:30, 09:30, 12:30, 15:30.</li>
+                                            <li>Duração: ~3h30min.</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito (sem assento próprio) · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro" data-price="165" data-times="06:30,09:30,12:30,15:30">Consultar <i data-lucide="arrow-right"></i></button>
-                        </div>
-                    </div>
-                    
-                    <!-- Slide 2 (Ida Aeroporto Expresso) -->
-                    <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1449965408869-eaa3f722e40d?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-                            <div class="price-tag">R$ 210</div>
-                        </div>
-                        <div class="card-content">
-                            <h3>Aeroporto ➔ Morro (Madrugada)</h3>
-                            <p>Transfer Especial Direto via BR.</p>
-                            
-                            <div class="custom-accordion">
-                                <div class="accordion-item">
-                                    <div class="accordion-header" data-action="accordion">
-                                        <span>Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
-                                    </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Embarque: Aeroporto Internacional de Salvador.</li>
-                                                <li>Conexões: Ônibus / Van Direta + Lancha.</li>
-                                                <li>Chega cedo na ilha. Otimiza seu tempo.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Expresso Madrugada)" data-price="210" data-times="03:30">Consultar <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro (Semi-Terrestre)" data-price="165" data-times="06:30,09:30,12:30,15:30" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
                         </div>
                     </div>
 
-                    <!-- Slide 3 (Ida Aeroporto Semi) -->
+                    <!-- IDA 2: Semi-Terrestre Hotéis -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1570125909232-eb263c188f7e?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
-                            <div class="price-tag">R$ 205</div>
+                        <div class="card-image ticket-card-img ticket-card-img--hotels">
+                            <div class="price-tag">R$ 180</div>
                         </div>
                         <div class="card-content">
-                            <h3>Aeroporto ➔ Morro</h3>
-                            <p>Conexão Semi-Terrestre oficial do Aeroporto.</p>
-                            
+                            <h3>Hotéis Salvador ➔ Morro</h3>
+                            <p>Semi-Terrestre com retirada na porta do hotel.</p>
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Embarque: Desembarque do Aeroporto de Salvador.</li>
-                                                <li>Conexões: Transfer até Terminal Marítimo + Travessia + Van + Lancha.</li>
-                                                <li>Mala: 1 bagagem normal por pessoa.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Retirada: hotéis de Salvador (conforme região atendida).</li>
+                                            <li>Saídas: 05:30, 08:30, 11:30, 14:30.</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Semi-Terrestre)" data-price="205" data-times="05:15,08:15,11:15,14:40">Consultar <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Hotéis -> Morro (Semi-Terrestre)" data-price="180" data-times="05:30,08:30,11:30,14:30" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
                         </div>
                     </div>
+
+                    <!-- IDA 3: Semi-Terrestre Aeroporto (+ opção Via BR Madrugada) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--airport">
+                            <div class="price-tag">R$ 205</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Aeroporto SSA ➔ Morro</h3>
+                            <p>Semi-Terrestre oficial do Aeroporto + opção madrugada Via BR.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Semi-Terrestre: 05:15, 08:15, 11:15, 14:40 — <strong>R$ 205</strong>.</li>
+                                            <li>Madrugada Via BR: 03:30 — <strong>R$ 210</strong>.</li>
+                                            <li>Retirada no desembarque do Aeroporto de Salvador.</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Semi-Terrestre / Via BR)" data-price="205" data-times="03:30,05:15,08:15,11:15,14:40" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- IDA 4: Marítimo (Catamarã) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--catamaran">
+                            <div class="price-tag">A partir de R$ 149</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Catamarã ➔ Morro</h3>
+                            <p>Travessia marítima direta do Terminal de Salvador.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>09:00 — <strong>R$ 172,51</strong>.</li>
+                                            <li>10:30 — <strong>R$ 149,61</strong>.</li>
+                                            <li>14:30 — <strong>R$ 172,51</strong>.</li>
+                                            <li>Embarque no Terminal Marítimo (Mercado Modelo).</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito (sem assento próprio) · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Catamarã Terminal SSA -> Morro" data-price="149" data-times="09:00,10:30,14:30" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
                 </div>
-                <!-- Pagination -->
                 <div class="swiper-pagination carousel-pagination"></div>
             </div>
 
             <!-- CARROSSEL VOLTA -->
             <div class="swiper product-slider hidden" id="carousel-volta">
                 <div class="swiper-wrapper">
-                    <!-- Slide 1 (Volta Terminal) -->
+
+                    <!-- VOLTA 1: Semi-Terrestre Terminal SSA -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="card-image ticket-card-img ticket-card-img--terminal">
                             <div class="price-tag">R$ 145</div>
                         </div>
                         <div class="card-content">
                             <h3>Morro ➔ Terminal SSA</h3>
-                            <p>Ticket de Retorno Semi-Terrestre direto para a cidade.</p>
-                            
+                            <p>Retorno Semi-Terrestre para o Terminal de Salvador.</p>
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Apresentação: Píer Principal de Morro de SP.</li>
-                                                <li>Desembarque: Terminal Marítimo de Salvador (São Joaquim).</li>
-                                                <li>Recomendado chegar 30 min antes.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saídas: 06:20, 09:20, 12:20, 15:20.</li>
+                                            <li>Apresentação: Píer Principal de Morro de SP (30min antes).</li>
+                                            <li>Desembarque: Terminal Marítimo (Mercado Modelo).</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA" data-price="145" data-times="06:20,09:20,12:20,15:20">Consultar <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA (Semi-Terrestre)" data-price="145" data-times="06:20,09:20,12:20,15:20" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
                         </div>
                     </div>
 
-                    <!-- Slide 2 (Volta Aeroporto) -->
+                    <!-- VOLTA 2: Semi-Terrestre Hotéis -->
                     <div class="swiper-slide product-card">
-                        <div class="card-image" style="background-image: url('https://images.unsplash.com/photo-1436491865332-7a61a109cc05?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80')">
+                        <div class="card-image ticket-card-img ticket-card-img--hotels">
+                            <div class="price-tag">R$ 160</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Morro ➔ Hotéis Salvador</h3>
+                            <p>Retorno Semi-Terrestre com desembarque nos hotéis.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saídas: 06:20, 09:20, 12:20, 15:20.</li>
+                                            <li>Desembarque na rede hoteleira atendida de Salvador.</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Hotéis (Semi-Terrestre)" data-price="160" data-times="06:20,09:20,12:20,15:20" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- VOLTA 3: Semi-Terrestre Aeroporto -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--airport">
                             <div class="price-tag">R$ 185</div>
                         </div>
                         <div class="card-content">
                             <h3>Morro ➔ Aeroporto SSA</h3>
                             <p>Retorno Semi-Terrestre conectado diretamente ao Aeroporto.</p>
-                            
                             <div class="custom-accordion">
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span>Roteiro e Horários</span>
                                         <i data-lucide="chevron-down"></i>
                                     </div>
-                                    <div class="accordion-body">
-                                        <div class="accordion-inner">
-                                            <ul>
-                                                <li>Apresentação: Píer Principal de Morro de SP.</li>
-                                                <li>Desembarque final no Aeroporto de Salvador.</li>
-                                                <li>Duração média: ~4 horas. Planeje seu voo.</li>
-                                            </ul>
-                                        </div>
-                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>Saídas: 06:20, 09:20, 12:20, 15:20.</li>
+                                            <li>Duração: ~4h · planeje voo com margem de segurança.</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
                                 </div>
                             </div>
-                            
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA" data-price="185" data-times="06:20,09:20,12:20,15:20">Consultar <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA (Semi-Terrestre)" data-price="185" data-times="06:20,09:20,12:20,15:20" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
                         </div>
                     </div>
+
+                    <!-- VOLTA 4: Marítimo (Catamarã) -->
+                    <div class="swiper-slide product-card">
+                        <div class="card-image ticket-card-img ticket-card-img--catamaran">
+                            <div class="price-tag">A partir de R$ 138</div>
+                        </div>
+                        <div class="card-content">
+                            <h3>Catamarã ➔ Terminal SSA</h3>
+                            <p>Retorno marítimo direto para Salvador.</p>
+                            <div class="custom-accordion">
+                                <div class="accordion-item">
+                                    <div class="accordion-header" data-action="accordion">
+                                        <span>Roteiro e Horários</span>
+                                        <i data-lucide="chevron-down"></i>
+                                    </div>
+                                    <div class="accordion-body"><div class="accordion-inner">
+                                        <ul>
+                                            <li>11:30 — <strong>R$ 158,71</strong>.</li>
+                                            <li>13:30 — <strong>R$ 138,71</strong>.</li>
+                                            <li>15:00 — <strong>R$ 158,71</strong>.</li>
+                                            <li>Desembarque no Terminal Marítimo (Mercado Modelo).</li>
+                                        </ul>
+                                        <p class="fare-policy">👶 0–5 anos: gratuito (sem assento próprio) · 🧒 6–9 anos: 50%.</p>
+                                    </div></div>
+                                </div>
+                            </div>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Catamarã Morro -> Terminal SSA" data-price="138" data-times="11:30,13:30,15:00" data-child-policy="1">Consultar <i data-lucide="arrow-right"></i></button>
+                        </div>
+                    </div>
+
                 </div>
-                <!-- Pagination -->
                 <div class="swiper-pagination carousel-pagination"></div>
             </div>
         </section>
@@ -477,12 +814,44 @@
             </div>
 
             <div class="form-group">
-                <label><i data-lucide="users"></i> Quantidade de Pessoas</label>
+                <label><i data-lucide="users"></i> Adultos</label>
                 <div class="qty-selector">
-                    <button type="button" data-action="change-qty" data-delta="-1">-</button>
+                    <button type="button" data-action="change-qty" data-target="adults" data-delta="-1">-</button>
                     <input type="number" id="booking-qty" value="1" min="1" readonly>
-                    <button type="button" data-action="change-qty" data-delta="1">+</button>
+                    <button type="button" data-action="change-qty" data-target="adults" data-delta="1">+</button>
                 </div>
+            </div>
+
+            <div class="form-group pax-children" id="booking-children-group" hidden>
+                <div class="pax-row">
+                    <div class="pax-label">
+                        <i data-lucide="baby"></i>
+                        <div>
+                            <strong>Bebês (0–5 anos)</strong>
+                            <small>Gratuito</small>
+                        </div>
+                    </div>
+                    <div class="qty-selector qty-selector--mini">
+                        <button type="button" data-action="change-qty" data-target="babies" data-delta="-1">-</button>
+                        <input type="number" id="booking-babies" value="0" min="0" readonly>
+                        <button type="button" data-action="change-qty" data-target="babies" data-delta="1">+</button>
+                    </div>
+                </div>
+                <div class="pax-row">
+                    <div class="pax-label">
+                        <i data-lucide="user"></i>
+                        <div>
+                            <strong>Crianças (6–9 anos)</strong>
+                            <small>50% de desconto</small>
+                        </div>
+                    </div>
+                    <div class="qty-selector qty-selector--mini">
+                        <button type="button" data-action="change-qty" data-target="kids" data-delta="-1">-</button>
+                        <input type="number" id="booking-kids" value="0" min="0" readonly>
+                        <button type="button" data-action="change-qty" data-target="kids" data-delta="1">+</button>
+                    </div>
+                </div>
+                <p class="pax-hint">A idade é considerada na data do passeio. Confirmação sujeita a comprovação no embarque.</p>
             </div>
 
             <button class="btn btn-primary w-100 mt-20" id="confirm-booking-btn">
@@ -517,12 +886,44 @@
             </div>
 
             <div class="form-group">
-                <label><i data-lucide="users"></i> Quantidade de Pessoas</label>
+                <label><i data-lucide="users"></i> Adultos</label>
                 <div class="qty-selector">
-                    <button type="button" data-action="change-ticket-qty" data-delta="-1">-</button>
+                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="-1">-</button>
                     <input type="number" id="ticket-qty" value="1" min="1" readonly>
-                    <button type="button" data-action="change-ticket-qty" data-delta="1">+</button>
+                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="1">+</button>
                 </div>
+            </div>
+
+            <div class="form-group pax-children" id="ticket-children-group" hidden>
+                <div class="pax-row">
+                    <div class="pax-label">
+                        <i data-lucide="baby"></i>
+                        <div>
+                            <strong>Bebês (0–5 anos)</strong>
+                            <small>Gratuito (sem assento próprio)</small>
+                        </div>
+                    </div>
+                    <div class="qty-selector qty-selector--mini">
+                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="-1">-</button>
+                        <input type="number" id="ticket-babies" value="0" min="0" readonly>
+                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="1">+</button>
+                    </div>
+                </div>
+                <div class="pax-row">
+                    <div class="pax-label">
+                        <i data-lucide="user"></i>
+                        <div>
+                            <strong>Crianças (6–9 anos)</strong>
+                            <small>50% de desconto</small>
+                        </div>
+                    </div>
+                    <div class="qty-selector qty-selector--mini">
+                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="-1">-</button>
+                        <input type="number" id="ticket-kids" value="0" min="0" readonly>
+                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="1">+</button>
+                    </div>
+                </div>
+                <p class="pax-hint">A idade é considerada na data do embarque. Valor e disponibilidade confirmados pela operadora via WhatsApp.</p>
             </div>
 
             <button class="btn btn-primary w-100 mt-20 btn-whatsapp-confirm" id="confirm-ticket-btn">
@@ -544,18 +945,17 @@
             </p>
             <div class="urgent-buttons">
                 <button class="btn w-100 btn-urgent-back" id="close-urgent">Voltar</button>
-                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" class="btn w-100 btn-urgent-whatsapp">
+                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" rel="noopener noreferrer" class="btn w-100 btn-urgent-whatsapp">
                     <i data-lucide="message-circle" class="icon-whatsapp"></i> WhatsApp
                 </a>
             </div>
         </div>
     </div>
 
-    <!-- Scripts -->
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="https://npmcdn.com/flatpickr/dist/l10n/pt.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-    <!-- Lucide icons initialized inside the IIFE (script.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/pt.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.js"></script>
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js"></script>
     <script src="./js/script.js"></script>
 </body>
 </html>

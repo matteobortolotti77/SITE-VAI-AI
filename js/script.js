@@ -24,11 +24,15 @@ const routeMeta = {
         title: 'Volta à Ilha | Agência de Turismo em Morro de São Paulo', 
         desc: 'A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.' 
     },
-    'passeios': { 
-        title: 'Passeios e Reservas | Volta à Ilha', 
-        desc: 'Conheça os melhores roteiros: Passeio Volta à Ilha, Mergulho, Quadriciclo e mais. Agende online.' 
+    'passeios': {
+        title: 'Passeios e Reservas | Volta à Ilha',
+        desc: 'Conheça os melhores roteiros: Volta à Ilha, Garapuá 4X4, Gamboa e Quadriciclo. Agende online.'
     },
-    'passagens': { 
+    'atividades': {
+        title: 'Atividades em Morro de São Paulo | Volta à Ilha',
+        desc: 'Mergulho, cavalgada, tiroleza, banana boat, bike aquática e aluguel de bicicletas. Reserve sua atividade.'
+    },
+    'passagens': {
         title: 'Transfers e Passagens (Catamarã) | Volta à Ilha', 
         desc: 'Compre ingressos para transfer semi-terrestre ou catamarã para Morro de São Paulo com segurança e pontualidade.' 
     }
@@ -52,12 +56,15 @@ function navigateTo(targetId, pushHistory = true) {
 
         targetView.classList.add('active');
         window.scrollTo(0,0);
-        
+
         if (pushHistory) {
             history.pushState({ view: targetId }, '', `#${targetId}`);
         }
-        
+
         header.classList.toggle('on-section', targetId !== 'home');
+
+        if (targetId === 'passeios' && typeof swiperPasseios !== 'undefined') swiperPasseios.update();
+        if (targetId === 'atividades' && typeof swiperAtividades !== 'undefined') swiperAtividades.update();
     }
 }
 
@@ -119,9 +126,14 @@ const defaultSwiperOptions = {
     }
 };
 
-const swiperPasseios = new Swiper('#view-passeios .product-slider', {
+const swiperPasseios = new Swiper('#carousel-passeios', {
     ...defaultSwiperOptions,
-    pagination: { el: '#view-passeios .product-slider > .swiper-pagination', clickable: true }
+    pagination: { el: '#carousel-passeios > .swiper-pagination', clickable: true }
+});
+
+const swiperAtividades = new Swiper('#carousel-atividades', {
+    ...defaultSwiperOptions,
+    pagination: { el: '#carousel-atividades > .swiper-pagination', clickable: true }
 });
 
 const swiperIda = new Swiper('#carousel-ida', {
@@ -156,13 +168,13 @@ if (btnToggleRoute) {
     });
 }
 
-const innerSwipers = new Swiper('.inner-swiper', {
-    slidesPerView: 1,
-    nested: true, 
-    pagination: {
-        el: '.inner-pagination',
-        clickable: true,
-    },
+document.querySelectorAll('.inner-swiper').forEach((el) => {
+    const pagEl = el.querySelector('.inner-pagination');
+    new Swiper(el, {
+        slidesPerView: 1,
+        nested: true,
+        pagination: pagEl ? { el: pagEl, clickable: true } : false,
+    });
 });
 
 // 4. SISTEMA DE CARRINHO DE COMPRAS
@@ -208,33 +220,40 @@ const confirmBookingBtn = document.getElementById('confirm-booking-btn');
 let currentBookingProduct = null;
 let currentBookingPrice = 0;
 let currentBookingFullPrice = 0;
+let currentBookingChildPolicy = false;
 
-function openBookingModal(productName, price, timesArray, fullPrice = null) {
+function openBookingModal(productName, price, timesArray, fullPrice = null, childPolicy = false) {
     currentBookingProduct = productName;
     currentBookingPrice = parseFloat(price);
     currentBookingFullPrice = fullPrice ? parseFloat(fullPrice) : currentBookingPrice;
-    
+    currentBookingChildPolicy = !!childPolicy;
+
     document.getElementById('booking-title').textContent = productName;
+
+    const childGroup = document.getElementById('booking-children-group');
+    if (childGroup) childGroup.hidden = !currentBookingChildPolicy;
+    document.getElementById('booking-babies').value = 0;
+    document.getElementById('booking-kids').value = 0;
     
     const displayEl = document.getElementById('booking-price-display');
     while (displayEl.firstChild) displayEl.removeChild(displayEl.firstChild);
-    if (fullPrice && fullPrice > price) {
+    if (currentBookingFullPrice > currentBookingPrice) {
         const totalSpan = document.createElement('span');
         totalSpan.className = 'price-full';
-        totalSpan.textContent = 'Valor Total: R$ ' + fullPrice;
+        totalSpan.textContent = 'Valor Total: ' + BRL.format(currentBookingFullPrice);
         const br = document.createElement('br');
         const signalSpan = document.createElement('span');
         signalSpan.className = 'price-signal';
-        signalSpan.textContent = 'Sinal para Reserva: R$ ' + price + ' / pessoa';
+        signalSpan.textContent = 'Sinal para Reserva: ' + BRL.format(currentBookingPrice) + ' / pessoa';
         displayEl.appendChild(totalSpan);
         displayEl.appendChild(br);
         displayEl.appendChild(signalSpan);
     } else {
-        displayEl.textContent = 'R$ ' + price + ' por pessoa';
+        displayEl.textContent = BRL.format(currentBookingPrice) + ' por pessoa';
     }
     
     document.getElementById('booking-qty').value = 1;
-    document.getElementById('booking-total').textContent = price;
+    recalcBookingTotal();
     
     const timeSelect = document.getElementById('booking-time');
     while (timeSelect.firstChild) timeSelect.removeChild(timeSelect.firstChild);
@@ -274,14 +293,21 @@ const confirmTicketBtn = document.getElementById('confirm-ticket-btn');
 let currentTicketProduct = null;
 let currentTicketPrice = 0;
 let currentTicketTimes = [];
+let currentTicketChildPolicy = false;
 
-function openTicketModal(productName, price, timesArray) {
+function openTicketModal(productName, price, timesArray, childPolicy = false) {
     currentTicketProduct = productName;
     currentTicketPrice = parseFloat(price) || 0;
     currentTicketTimes = timesArray || [];
-    
+    currentTicketChildPolicy = !!childPolicy;
+
     document.getElementById('ticket-product-display').textContent = productName;
     document.getElementById('ticket-price-unit').textContent = currentTicketPrice;
+
+    const childGroup = document.getElementById('ticket-children-group');
+    if (childGroup) childGroup.hidden = !currentTicketChildPolicy;
+    document.getElementById('ticket-babies').value = 0;
+    document.getElementById('ticket-kids').value = 0;
     
     const timeSelect = document.getElementById('ticket-time');
     // Limpar opções existentes sem innerHTML
@@ -304,7 +330,7 @@ function openTicketModal(productName, price, timesArray) {
     }
 
     document.getElementById('ticket-qty').value = 1;
-    document.getElementById('ticket-total').textContent = currentTicketPrice;
+    recalcTicketTotal();
     document.getElementById('ticket-date').value = '';
     if(ticketModal) ticketModal.classList.add('open');
 }
@@ -369,51 +395,94 @@ if(document.getElementById('ticket-date')) {
     });
 }
 
-function changeQty(delta) {
-    const input = document.getElementById('booking-qty');
-    let newVal = parseInt(input.value) + delta;
-    if (newVal < 1) newVal = 1;
-    input.value = newVal;
-    
-    document.getElementById('booking-total').textContent = newVal * currentBookingPrice;
+function bookingPax() {
+    return {
+        adults: parseInt(document.getElementById('booking-qty').value) || 0,
+        kids: parseInt(document.getElementById('booking-kids').value) || 0,
+        babies: parseInt(document.getElementById('booking-babies').value) || 0
+    };
+}
+function ticketPax() {
+    return {
+        adults: parseInt(document.getElementById('ticket-qty').value) || 0,
+        kids: parseInt(document.getElementById('ticket-kids').value) || 0,
+        babies: parseInt(document.getElementById('ticket-babies').value) || 0
+    };
 }
 
-function changeTicketQty(delta) {
-    const input = document.getElementById('ticket-qty');
+function fmtNum(n) {
+    return n.toFixed(2).replace(/\.00$/, '').replace('.', ',');
+}
+function recalcBookingTotal() {
+    const p = bookingPax();
+    const total = p.adults * currentBookingPrice + p.kids * currentBookingPrice * 0.5;
+    document.getElementById('booking-total').textContent = fmtNum(total);
+}
+function recalcTicketTotal() {
+    const p = ticketPax();
+    const total = p.adults * currentTicketPrice + p.kids * currentTicketPrice * 0.5;
+    document.getElementById('ticket-total').textContent = fmtNum(total);
+}
+
+function changeQty(delta, target) {
+    target = target || 'adults';
+    const idMap = { adults: 'booking-qty', kids: 'booking-kids', babies: 'booking-babies' };
+    const input = document.getElementById(idMap[target]);
+    if (!input) return;
     let newVal = parseInt(input.value) + delta;
-    if (newVal < 1) newVal = 1;
+    const min = target === 'adults' ? 1 : 0;
+    if (newVal < min) newVal = min;
     input.value = newVal;
-    
-    document.getElementById('ticket-total').textContent = newVal * currentTicketPrice;
+    recalcBookingTotal();
+}
+
+function changeTicketQty(delta, target) {
+    target = target || 'adults';
+    const idMap = { adults: 'ticket-qty', kids: 'ticket-kids', babies: 'ticket-babies' };
+    const input = document.getElementById(idMap[target]);
+    if (!input) return;
+    let newVal = parseInt(input.value) + delta;
+    const min = target === 'adults' ? 1 : 0;
+    if (newVal < min) newVal = min;
+    input.value = newVal;
+    recalcTicketTotal();
 }
 
 if(confirmBookingBtn) {
     confirmBookingBtn.addEventListener('click', () => {
         const date = document.getElementById('booking-date').value;
         const time = document.getElementById('booking-time').value;
-        const qty = parseInt(document.getElementById('booking-qty').value);
-        
+        const pax = bookingPax();
+
         if (!date) {
             alert("Por favor, selecione uma data.");
             return;
         }
-        
+
+        const paxParts = [`${pax.adults} adulto${pax.adults > 1 ? 's' : ''}`];
+        if (pax.kids > 0) paxParts.push(`${pax.kids} criança${pax.kids > 1 ? 's' : ''} (6-9)`);
+        if (pax.babies > 0) paxParts.push(`${pax.babies} bebê${pax.babies > 1 ? 's' : ''} (0-5)`);
+
         let detailStr = `(Data: ${date}`;
         if (time !== 'A combinar' && time !== '') {
             detailStr += ` - ${time}`;
         }
+        detailStr += ` | ${paxParts.join(', ')}`;
+
         if (currentBookingFullPrice > currentBookingPrice) {
-            let restante = (currentBookingFullPrice - currentBookingPrice) * qty;
-            detailStr += ` | Pagar no embarque: R$ ${restante}`;
+            const restAdult = (currentBookingFullPrice - currentBookingPrice) * pax.adults;
+            const restKid = (currentBookingFullPrice - currentBookingPrice) * 0.5 * pax.kids;
+            const restante = restAdult + restKid;
+            detailStr += ` | Pagar no embarque: R$ ${fmtNum(restante)}`;
         }
-        detailStr += `) [x${qty}]`;
-        
+        detailStr += `)`;
+
         const finalProductName = `${currentBookingProduct} ${detailStr}`;
-        const finalPrice = currentBookingPrice * qty;
-        
+        const finalPrice = currentBookingPrice * pax.adults + currentBookingPrice * 0.5 * pax.kids;
+
         cart.push({ name: finalProductName, price: finalPrice });
         updateCartUI();
-        
+
         bookingModal.classList.remove('open');
         toggleCart();
     });
@@ -426,29 +495,36 @@ if(confirmTicketBtn) {
     confirmTicketBtn.addEventListener('click', () => {
         const date = document.getElementById('ticket-date').value;
         const selectEl = document.getElementById('ticket-time');
-        const qty = parseInt(document.getElementById('ticket-qty').value);
-        
+        const pax = ticketPax();
+
         if (!date) {
             alert("Por favor, selecione uma data para embarque.");
             return;
         }
-        
+
         const selectedTime = selectEl.value || 'Sob Consulta';
-        const total = qty * currentTicketPrice;
-        
+        const total = pax.adults * currentTicketPrice + pax.kids * currentTicketPrice * 0.5;
+        const totalFmt = fmtNum(total);
+
+        let paxLine = `${pax.adults} adulto${pax.adults > 1 ? 's' : ''}`;
+        if (pax.kids > 0) paxLine += `, ${pax.kids} criança${pax.kids > 1 ? 's' : ''} (6-9, 50%)`;
+        if (pax.babies > 0) paxLine += `, ${pax.babies} bebê${pax.babies > 1 ? 's' : ''} (0-5, grátis)`;
+
         let msg = `Olá! Gostaria de consultar a disponibilidade e reservar:\n\n`;
         msg += `🚍 *TICKET:* ${currentTicketProduct}\n`;
         msg += `📅 *DATA:* ${date}\n`;
         msg += `⏰ *HORÁRIO:* ${selectedTime}\n`;
-        msg += `👥 *PASSAGEIROS:* ${qty}\n`;
-        msg += `💰 *VALOR TOTAL APROX.*: R$ ${total},00\n\n`;
+        msg += `👥 *PASSAGEIROS:* ${paxLine}\n`;
+        msg += `💰 *VALOR TOTAL APROX.*: R$ ${totalFmt}\n\n`;
         msg += `Aguardo instruções e o link de pagamento!`;
-        
+
         const encMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank');
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank', 'noopener,noreferrer');
         ticketModal.classList.remove('open');
     });
 }
+
+const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function updateCartUI() {
     localStorage.setItem('voltaAilhaCart', JSON.stringify(cart));
@@ -459,42 +535,42 @@ function updateCartUI() {
     } else {
         badgeEl.style.display = 'flex';
     }
-    
+
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-value');
-    
+
     while (container.firstChild) container.removeChild(container.firstChild);
-    
+
     if(cart.length === 0) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'empty-cart-msg';
         emptyMsg.textContent = 'Seu carrinho está vazio.';
         container.appendChild(emptyMsg);
-        totalEl.textContent = 'R$ 0,00';
+        totalEl.textContent = BRL.format(0);
         return;
     }
 
     let total = 0;
     cart.forEach((item, index) => {
         total += item.price;
-        
+
         const row = document.createElement('div');
         row.className = 'cart-item-row';
-        
+
         const infoDiv = document.createElement('div');
         infoDiv.className = 'cart-item-info';
-        
+
         const nameDiv = document.createElement('div');
         nameDiv.className = 'cart-item-name';
-        nameDiv.textContent = item.name; 
-        
+        nameDiv.textContent = item.name;
+
         const priceDiv = document.createElement('strong');
         priceDiv.className = 'cart-item-price';
-        priceDiv.textContent = 'R$ ' + item.price;
-        
+        priceDiv.textContent = BRL.format(item.price);
+
         infoDiv.appendChild(nameDiv);
         infoDiv.appendChild(priceDiv);
-        
+
         const removeBtn = document.createElement('button');
         removeBtn.className = 'cart-item-remove';
         removeBtn.setAttribute('data-action', 'remove-cart-item');
@@ -504,17 +580,17 @@ function updateCartUI() {
         trashIcon.setAttribute('data-lucide', 'trash-2');
         trashIcon.className = 'icon-trash';
         removeBtn.appendChild(trashIcon);
-        
+
         row.appendChild(infoDiv);
         row.appendChild(removeBtn);
         container.appendChild(row);
     });
-    
+
     if (window.lucide) {
         lucide.createIcons({root: container});
     }
-    
-    totalEl.textContent = `R$ ${total},00`;
+
+    totalEl.textContent = BRL.format(total);
 }
 
 function removeFromCart(index) {
@@ -553,9 +629,10 @@ document.addEventListener('click', (e) => {
         const price = bookBtn.getAttribute('data-price');
         const timesStr = bookBtn.getAttribute('data-times');
         const fullprice = bookBtn.getAttribute('data-fullprice');
-        
+        const childPolicy = bookBtn.getAttribute('data-child-policy') === '1';
+
         const times = timesStr ? timesStr.split(',') : [];
-        openBookingModal(product, price, times, fullprice);
+        openBookingModal(product, price, times, fullprice, childPolicy);
     }
 
     // 6.2 Tratamento de Consultas WhatsApp (Passagens)
@@ -564,19 +641,20 @@ document.addEventListener('click', (e) => {
         const product = consultBtn.getAttribute('data-product');
         const price = consultBtn.getAttribute('data-price');
         const timesStr = consultBtn.getAttribute('data-times');
+        const childPolicy = consultBtn.getAttribute('data-child-policy') === '1';
         const times = timesStr ? timesStr.split(',') : [];
-        openTicketModal(product, price, times);
+        openTicketModal(product, price, times, childPolicy);
     }
-    
+
     // 6.3 Tratamento de alterar quantidade
     const changeQtyBtn = e.target.closest('[data-action="change-qty"]');
     if (changeQtyBtn) {
-        changeQty(parseInt(changeQtyBtn.getAttribute('data-delta')));
+        changeQty(parseInt(changeQtyBtn.getAttribute('data-delta')), changeQtyBtn.getAttribute('data-target'));
     }
 
     const changeTicketQtyBtn = e.target.closest('[data-action="change-ticket-qty"]');
     if (changeTicketQtyBtn) {
-        changeTicketQty(parseInt(changeTicketQtyBtn.getAttribute('data-delta')));
+        changeTicketQty(parseInt(changeTicketQtyBtn.getAttribute('data-delta')), changeTicketQtyBtn.getAttribute('data-target'));
     }
     
     // 6.4 Remoção do Carrinho
