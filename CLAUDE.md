@@ -320,4 +320,11 @@ FUNCIONALIDADES
 MULTI-IDIOMA
 [x] data-i18n attributes adicionados (Opção B — casca)
 [x] Seletor de idioma no header (PT/EN/ES/FR/IT/DE/HE)
+
+NO MOMENTO DA PUBLICAÇÃO (lembrar Matteo)
+[ ] Criar caixa de e-mail dpo@voltaailha.com.br (já citada na política
+    de privacidade — seção 7, Encarregado/DPO Matteo Bortolotti)
+[ ] Apontar DNS de voltaailha.com.br para o servidor de hospedagem
+[ ] Verificar HTTPS válido (cert Let's Encrypt ou equivalente)
+[ ] Submeter sitemap.xml ao Google Search Console
 ```
