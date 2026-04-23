@@ -40,16 +40,17 @@ volta-a-ilha/
 ├── css/
 │   └── style.css           # TODO o estilo. ?v=N para cache bust manual
 ├── js/
-│   └── script.js           # TODO o JS dentro de IIFE
+│   ├── script.js           # TODO o JS principal dentro de IIFE
+│   └── i18n.js             # Dicionário VAI_I18N (7 idiomas, casca apenas)
 ├── assets/
 │   ├── logo.png
 │   ├── Logo FX.png         # Marca d'água
 │   ├── hero.mp4
-│   ├── og-share.jpg        # 1200×630 — OG image (CRIAR)
-│   ├── favicon.ico         # (CRIAR)
+│   ├── og_share.jpg        # 1200×630 — OG image
+│   ├── favicon.ico
 │   └── volta_a_ilha_*.webp
-├── robots.txt              # (CRIAR)
-├── sitemap.xml             # (CRIAR)
+├── robots.txt
+├── sitemap.xml
 ├── CLAUDE.md               # Este arquivo
 ├── GEMINI.md               # Legado — mantido para histórico
 ├── PROMPT_BACKEND.md       # Legado
@@ -138,18 +139,28 @@ Componentes de produto (cards) usam fundo sólido/semi-sólido.
 
 ---
 
-## 7. MULTI-IDIOMA (i18n) — ARQUITETURA PLANEJADA
+## 7. MULTI-IDIOMA (i18n) — IMPLEMENTADO (Opção B "casca")
 
-A implementação de i18n **não usa nenhuma biblioteca**. Estratégia:
+Zero biblioteca. Todo o JS no `js/i18n.js` + helpers em `script.js`.
 
-1. Todo texto estático recebe `data-i18n="chave"` no HTML
-2. Um objeto de traduções em `js/i18n.js` (separado do script.js)
-3. Função `applyLocale(lang)` que itera os elementos e substitui `.textContent`
-4. Idiomas iniciais: `pt-BR`, `en`, `es`
-5. Preferência salva em `localStorage` sob a chave `vai_locale`
-6. Seletor de idioma no header (bandeiras ou dropdown)
+**Escopo (Opção B):** apenas a "casca" da SPA é traduzida — nav, títulos de seção, nomes/descrições curtas de produtos, headers de accordion, botões, modais, toast, dialog, footer. Conteúdo detalhado dos accordions (bullets, listas de horários, política infantil) **permanece em PT-BR**. Cliente que precisa de detalhes finais consulta WhatsApp.
 
-**Não implementar antes de terminar os carrosséis e o checkout.**
+**Arquitetura:**
+1. Texto estático no HTML: `data-i18n="chave"` (textContent), `data-i18n-html="chave"` (innerHTML, p/ markup), `data-i18n-aria="chave"` (aria-label), `data-i18n-placeholder="chave"`.
+2. Dicionário `window.VAI_I18N` em `js/i18n.js` — 7 idiomas, ~145 chaves cada.
+3. `applyLocale(lang)` em `script.js`: itera os atributos, substitui `<html lang>` e `dir`, persiste `localStorage.vai_locale`, atualiza locale do Flatpickr, dispara `updateRouteMeta()`.
+4. `t(key)` retorna a string traduzida (fallback PT-BR).
+5. `detectLocale()` lê `localStorage` → `navigator.language` → fallback PT-BR.
+6. Seletor: botão `.lang-btn` no header (globe + código), dropdown com 7 opções.
+
+**Idiomas:** `pt-BR`, `en`, `es`, `fr`, `it`, `de`, `he` (RTL — overrides em `[dir="rtl"]`).
+
+**WhatsApp message:** sempre em PT (operacional). Quando locale ≠ PT, prepend de `🌐 *Idioma do cliente:* English` para a equipe responder no idioma certo.
+
+**Onde adicionar uma chave nova:**
+1. `data-i18n="ns.chave"` no HTML
+2. Adicionar a chave nos 7 dicionários em `js/i18n.js`
+3. Se for string usada via JS, chamar `t('ns.chave')`
 
 ---
 
@@ -182,30 +193,31 @@ Esta validação **deve ser replicada no backend** — nunca depender só do fro
 > Ordenados por prioridade. Resolver antes de publicar em produção.
 
 ### Bloqueadores absolutos
-- [ ] Favicon ausente → toda aba mostra 404 e ícone genérico
-- [ ] `og-share.jpg` inexistente → compartilhamentos no WhatsApp/Insta ficam sem imagem
-- [ ] Botão "Finalizar Reserva" sem funcionalidade → carrinho é um beco sem saída
-- [ ] Schema.org com telefone placeholder (`+5575999999999`)
+- [x] Favicon ausente → toda aba mostra 404 e ícone genérico
+- [x] `og-share.jpg` inexistente → compartilhamentos no WhatsApp/Insta ficam sem imagem
+- [x] Botão "Finalizar Reserva" sem funcionalidade → envia resumo do carrinho pelo WhatsApp
+- [x] Schema.org com telefone placeholder (`+5575999999999`)
 
 ### Alta prioridade
-- [ ] Imagens das passagens são URLs do Unsplash → dependência externa, quebrará
-- [ ] `npmcdn.com` para Flatpickr locale → CDN diferente do principal (vulnerabilidade de supply chain)
-- [ ] Lucide carregado em `<head>` sem `defer` → bloqueia render
-- [ ] `window.open()` sem `noopener` → tabnapping vulnerability
-- [ ] `alert()` / `confirm()` no script → bloqueados em alguns contextos mobile
+- [x] Imagens das passagens são URLs do Unsplash → substituídas por ativos locais
+- [x] `npmcdn.com` para Flatpickr locale → consolidado em `cdn.jsdelivr.net`
+- [x] Lucide carregado em `<head>` sem `defer` → todos os scripts agora com `defer`
+- [x] `window.open()` sem `noopener` → todas as chamadas usam `noopener,noreferrer`
+- [x] `alert()` / `confirm()` no script → substituídos por toast e dialog próprios
 
 ### Média prioridade
-- [ ] Inner Swipers: `new Swiper('.inner-swiper', {...})` com pagination selector `.inner-pagination` → só funciona para o primeiro card; demais cards com imagens não terão paginação funcional
-- [ ] Carrinho sem TTL → itens antigos persistem indefinidamente no localStorage
-- [ ] Modais sem focus trap e sem Escape key handler
-- [ ] Preço no carrinho sem formatação BRL correta (hardcoded `,00`)
-- [ ] Carrossel "Atividades" no view-passeios não existe ainda
-- [ ] i18n não implementado
+- [x] Inner Swipers: cada card resolve seu `.inner-pagination` localmente via `el.querySelector` → paginação funcional em todos os cards
+- [x] Carrinho com TTL de 24h → formato `{ts, items}`, descarta entrada >24h ou em formato antigo
+- [x] Modais sem focus trap e sem Escape key handler → `openOverlay`/`closeOverlay` com stack + Escape global + Tab cycling
+- [x] Preço no carrinho sem formatação BRL correta (hardcoded `,00`) → usa `Intl.NumberFormat` BRL
+- [x] Carrossel "Atividades" existe como view própria
+- [x] i18n implementado (Opção B "casca"): 7 idiomas (PT-BR, EN, ES, FR, IT, DE, HE com RTL), detecção automática, persistência em `localStorage.vai_locale`
 
 ### Baixa prioridade / pré-launch
-- [ ] `canonical` tag ausente no `<head>`
-- [ ] `robots.txt` e `sitemap.xml` ausentes
-- [ ] Footer com dados legais, CNPJ, política de privacidade ausente
+- [x] `canonical` tag — presente no `<head>`
+- [x] `robots.txt` na raiz
+- [x] `sitemap.xml` na raiz
+- [ ] Footer legal completo (CNPJ, endereço, política de privacidade) — atual é minimalista (logo + WhatsApp + Instagram + copyright)
 - [ ] Vídeo hero sem `<link rel="preload">` e sem poster frame
 - [ ] Imagens de fundo via `style=""` inline não são lazy-loadable
 
@@ -218,7 +230,7 @@ Esta validação **deve ser replicada no backend** — nunca depender só do fro
 | IIFE — zero global scope | ✅ |
 | Event delegation com data-attributes | ✅ |
 | `.textContent` / `createElement` (sem innerHTML+variável) | ✅ |
-| `noopener noreferrer` em target=_blank | ❌ Faltando |
+| `noopener noreferrer` em target=_blank | ✅ |
 | CSP headers | ❌ (configurar no servidor) |
 | Sem dados de cartão no frontend | ✅ (arquitetural) |
 | PCI-DSS: gateway via iframe/token | Futuro (backend) |
@@ -276,34 +288,34 @@ Esta validação **deve ser replicada no backend** — nunca depender só do fro
 
 ```
 ASSETS
-[ ] favicon.ico criado e linkado no <head>
-[ ] og-share.jpg criado (1200×630px) e URL atualizada nas meta tags
-[ ] Todas imagens de placeholder (Unsplash) substituídas por ativos próprios
+[x] favicon.ico criado e linkado no <head>
+[x] og-share.jpg criado (1200×630px) e URL atualizada nas meta tags
+[x] Todas imagens de placeholder (Unsplash) substituídas por ativos próprios
 [ ] hero.mp4 otimizado (max 5MB para mobile)
 
 SEO/META
-[ ] Schema.org telefone real
-[ ] <link rel="canonical"> adicionado
-[ ] robots.txt na raiz
-[ ] sitemap.xml na raiz
+[x] Schema.org telefone real
+[x] <link rel="canonical"> adicionado
+[x] robots.txt na raiz
+[x] sitemap.xml na raiz
 
 SEGURANÇA
-[ ] rel="noopener noreferrer" em todos target="_blank"
+[x] rel="noopener noreferrer" em todos target="_blank"
 [ ] CSP configurado no servidor (Nginx/Cloudflare)
-[ ] Lucide com versão fixa e defer
+[x] Lucide com versão fixa e defer
 
 UX
-[ ] alert() e confirm() removidos e substituídos
-[ ] Modais com Escape key handler
-[ ] Modais com focus trap
-[ ] Carrinho com TTL de 24h no localStorage
+[x] alert() e confirm() removidos e substituídos
+[x] Modais com Escape key handler
+[x] Modais com focus trap
+[x] Carrinho com TTL de 24h no localStorage
 
 FUNCIONALIDADES
-[ ] Carrossel "Atividades" implementado
-[ ] "Finalizar Reserva" com fluxo mínimo (coleta nome/tel → WhatsApp)
+[x] Carrossel "Atividades" implementado
+[x] "Finalizar Reserva" com fluxo mínimo (envia carrinho via WhatsApp)
 [ ] Footer com CNPJ, endereço, política de privacidade
 
 MULTI-IDIOMA
-[ ] data-i18n attributes adicionados (pode ser pós-launch)
-[ ] Seletor de idioma no header (pode ser pós-launch)
+[x] data-i18n attributes adicionados (Opção B — casca)
+[x] Seletor de idioma no header (PT/EN/ES/FR/IT/DE/HE)
 ```

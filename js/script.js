@@ -5,6 +5,102 @@
 // 0. INICIALIZAÇÃO DE ÍCONES (movido do HTML inline para dentro da IIFE)
 if (window.lucide) lucide.createIcons();
 
+const footerYearEl = document.getElementById('footer-year');
+if (footerYearEl) footerYearEl.textContent = new Date().getFullYear();
+
+// 0.1 i18n — Detecção, aplicação, helper t()
+const SUPPORTED_LOCALES = ['pt-BR', 'en', 'es', 'fr', 'it', 'de', 'he'];
+const DEFAULT_LOCALE = 'pt-BR';
+let currentLocale = DEFAULT_LOCALE;
+
+function detectLocale() {
+    const saved = localStorage.getItem('vai_locale');
+    if (saved && SUPPORTED_LOCALES.includes(saved)) return saved;
+    const nav = (navigator.language || 'pt-BR');
+    if (SUPPORTED_LOCALES.includes(nav)) return nav;
+    const short = nav.split('-')[0];
+    const match = SUPPORTED_LOCALES.find(l => l.split('-')[0] === short);
+    return match || DEFAULT_LOCALE;
+}
+
+function t(key) {
+    const dict = (window.VAI_I18N && window.VAI_I18N[currentLocale]) || {};
+    if (key in dict) return dict[key];
+    const fallback = (window.VAI_I18N && window.VAI_I18N[DEFAULT_LOCALE]) || {};
+    return fallback[key] || key;
+}
+
+function applyLocale(locale) {
+    if (!SUPPORTED_LOCALES.includes(locale)) locale = DEFAULT_LOCALE;
+    currentLocale = locale;
+    localStorage.setItem('vai_locale', locale);
+
+    const isRtl = (window.VAI_I18N_RTL || []).includes(locale);
+    document.documentElement.lang = (window.VAI_I18N_LANG_TAGS || {})[locale] || locale;
+    document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
+
+    document.querySelectorAll('[data-i18n]').forEach(el => {
+        const key = el.getAttribute('data-i18n');
+        el.textContent = t(key);
+    });
+    document.querySelectorAll('[data-i18n-html]').forEach(el => {
+        const key = el.getAttribute('data-i18n-html');
+        el.innerHTML = t(key);
+    });
+    document.querySelectorAll('[data-i18n-aria]').forEach(el => {
+        const key = el.getAttribute('data-i18n-aria');
+        el.setAttribute('aria-label', t(key));
+    });
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+        const key = el.getAttribute('data-i18n-placeholder');
+        el.setAttribute('placeholder', t(key));
+    });
+
+    const langCodeEl = document.getElementById('lang-code');
+    if (langCodeEl) langCodeEl.textContent = locale === 'pt-BR' ? 'PT' : locale.toUpperCase();
+
+    document.querySelectorAll('.lang-option').forEach(opt => {
+        opt.classList.toggle('active', opt.getAttribute('data-lang') === locale);
+    });
+
+    if (typeof flatpickr !== 'undefined' && flatpickr.l10ns) {
+        const fpMap = { 'pt-BR': 'pt', 'en': 'default', 'es': 'es', 'fr': 'fr', 'it': 'it', 'de': 'de', 'he': 'he' };
+        const fpKey = fpMap[locale];
+        if (fpKey && (fpKey === 'default' || flatpickr.l10ns[fpKey])) {
+            flatpickr.localize(fpKey === 'default' ? flatpickr.l10ns.default : flatpickr.l10ns[fpKey]);
+        }
+    }
+
+    if (typeof updateRouteMeta === 'function') updateRouteMeta();
+}
+
+// 0.2 LANGUAGE SELECTOR — dropdown
+const langBtn = document.getElementById('lang-btn');
+const langDropdown = document.getElementById('lang-dropdown');
+function closeLangDropdown() {
+    if (!langDropdown) return;
+    langDropdown.classList.remove('open');
+    if (langBtn) langBtn.setAttribute('aria-expanded', 'false');
+}
+if (langBtn && langDropdown) {
+    langBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const isOpen = langDropdown.classList.toggle('open');
+        langBtn.setAttribute('aria-expanded', String(isOpen));
+    });
+    document.addEventListener('click', (e) => {
+        if (!langDropdown.contains(e.target) && e.target !== langBtn && !langBtn.contains(e.target)) {
+            closeLangDropdown();
+        }
+    });
+    langDropdown.querySelectorAll('.lang-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            applyLocale(opt.getAttribute('data-lang'));
+            closeLangDropdown();
+        });
+    });
+}
+
 // 1. EFEITO DO HEADER (Glassmorphism)
 const header = document.querySelector('.glass-header');
 window.addEventListener('scroll', () => {
@@ -15,32 +111,116 @@ window.addEventListener('scroll', () => {
     }
 });
 
+// 1.1 UI UTILS — Toast, Confirm Dialog, Modal Stack (focus trap + Escape)
+const toastEl = document.getElementById('toast');
+let toastTimer = null;
+function showToast(message, kind = 'info') {
+    if (!toastEl) return;
+    toastEl.textContent = message;
+    toastEl.classList.toggle('toast--error', kind === 'error');
+    toastEl.classList.add('show');
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+}
+
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+const modalStack = [];
+
+function getFocusable(container) {
+    return Array.from(container.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null);
+}
+
+function openOverlay(overlayEl) {
+    if (!overlayEl || overlayEl.classList.contains('open')) return;
+    const entry = { el: overlayEl, previousFocus: document.activeElement };
+    modalStack.push(entry);
+    overlayEl.classList.add('open');
+    const focusables = getFocusable(overlayEl);
+    if (focusables.length) focusables[0].focus();
+}
+
+function closeOverlay(overlayEl) {
+    if (!overlayEl || !overlayEl.classList.contains('open')) return;
+    overlayEl.classList.remove('open');
+    const idx = modalStack.findIndex(e => e.el === overlayEl);
+    if (idx !== -1) {
+        const entry = modalStack.splice(idx, 1)[0];
+        if (entry.previousFocus && typeof entry.previousFocus.focus === 'function') {
+            entry.previousFocus.focus();
+        }
+    }
+}
+
+document.addEventListener('keydown', (e) => {
+    if (modalStack.length === 0) return;
+    const top = modalStack[modalStack.length - 1].el;
+
+    if (e.key === 'Escape') {
+        e.preventDefault();
+        closeOverlay(top);
+        return;
+    }
+
+    if (e.key === 'Tab') {
+        const focusables = getFocusable(top);
+        if (focusables.length === 0) { e.preventDefault(); return; }
+        const first = focusables[0];
+        const last = focusables[focusables.length - 1];
+        if (e.shiftKey && document.activeElement === first) {
+            e.preventDefault();
+            last.focus();
+        } else if (!e.shiftKey && document.activeElement === last) {
+            e.preventDefault();
+            first.focus();
+        }
+    }
+});
+
+const confirmDialogEl = document.getElementById('confirm-dialog');
+const confirmDialogTitle = document.getElementById('confirm-dialog-title');
+const confirmDialogText = document.getElementById('confirm-dialog-text');
+const confirmDialogOk = document.getElementById('confirm-dialog-ok');
+const confirmDialogCancel = document.getElementById('confirm-dialog-cancel');
+
+function openConfirmDialog(title, message) {
+    return new Promise((resolve) => {
+        confirmDialogTitle.textContent = title;
+        confirmDialogText.textContent = message;
+
+        const finish = (result) => {
+            confirmDialogOk.removeEventListener('click', onOk);
+            confirmDialogCancel.removeEventListener('click', onCancel);
+            confirmDialogEl.removeEventListener('click', onBackdrop);
+            closeOverlay(confirmDialogEl);
+            resolve(result);
+        };
+        const onOk = () => finish(true);
+        const onCancel = () => finish(false);
+        const onBackdrop = (e) => { if (e.target === confirmDialogEl) finish(false); };
+
+        confirmDialogOk.addEventListener('click', onOk);
+        confirmDialogCancel.addEventListener('click', onCancel);
+        confirmDialogEl.addEventListener('click', onBackdrop);
+
+        openOverlay(confirmDialogEl);
+    });
+}
+
 // 2. SISTEMA DE SPA (Troca de Telas com SEO Dinâmico)
 const navItems = document.querySelectorAll('.nav-item');
 const spaViews = document.querySelectorAll('.spa-view');
 
-const routeMeta = {
-    'home': { 
-        title: 'Volta à Ilha | Agência de Turismo em Morro de São Paulo', 
-        desc: 'A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.' 
-    },
-    'passeios': {
-        title: 'Passeios e Reservas | Volta à Ilha',
-        desc: 'Conheça os melhores roteiros: Volta à Ilha, Garapuá 4X4, Gamboa e Quadriciclo. Agende online.'
-    },
-    'atividades': {
-        title: 'Atividades em Morro de São Paulo | Volta à Ilha',
-        desc: 'Mergulho, cavalgada, tiroleza, banana boat, bike aquática e aluguel de bicicletas. Reserve sua atividade.'
-    },
-    'passagens': {
-        title: 'Transfers e Passagens (Catamarã) | Volta à Ilha', 
-        desc: 'Compre ingressos para transfer semi-terrestre ou catamarã para Morro de São Paulo com segurança e pontualidade.' 
-    }
-};
+let currentRoute = 'home';
+
+function updateRouteMeta() {
+    document.title = t(`route.${currentRoute}.title`);
+    const metaDesc = document.querySelector('meta[name="description"]');
+    if (metaDesc) metaDesc.setAttribute('content', t(`route.${currentRoute}.desc`));
+}
 
 function navigateTo(targetId, pushHistory = true) {
     spaViews.forEach(view => view.classList.remove('active'));
-    
+
     document.querySelectorAll('.nav-links a').forEach(link => {
         link.classList.remove('active');
         if(link.dataset.target === targetId) link.classList.add('active');
@@ -48,11 +228,8 @@ function navigateTo(targetId, pushHistory = true) {
 
     const targetView = document.getElementById(`view-${targetId}`);
     if(targetView) {
-        if (routeMeta[targetId]) {
-            document.title = routeMeta[targetId].title;
-            const metaDesc = document.querySelector('meta[name="description"]');
-            if (metaDesc) metaDesc.setAttribute('content', routeMeta[targetId].desc);
-        }
+        currentRoute = targetId;
+        updateRouteMeta();
 
         targetView.classList.add('active');
         window.scrollTo(0,0);
@@ -183,11 +360,20 @@ const closeCartBtn = document.querySelector('.close-cart');
 const cartDrawer = document.querySelector('.cart-drawer');
 const cartOverlay = document.querySelector('.cart-drawer-overlay');
 
+const CART_TTL_MS = 24 * 60 * 60 * 1000;
 let cart = [];
 try {
-    const savedCart = localStorage.getItem('voltaAilhaCart');
-    if (savedCart) {
-        cart = JSON.parse(savedCart);
+    const raw = localStorage.getItem('voltaAilhaCart');
+    if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
+            const fresh = typeof parsed.ts === 'number' && (Date.now() - parsed.ts) < CART_TTL_MS;
+            if (fresh) cart = parsed.items;
+            else localStorage.removeItem('voltaAilhaCart');
+        } else if (Array.isArray(parsed)) {
+            // formato antigo (sem ts) — descarta
+            localStorage.removeItem('voltaAilhaCart');
+        }
     }
 } catch(e) {
     console.error("Erro ao ler carrinho:", e);
@@ -275,12 +461,12 @@ function openBookingModal(productName, price, timesArray, fullPrice = null, chil
     }
 
     document.getElementById('booking-date').value = '';
-    bookingModal.classList.add('open');
+    openOverlay(bookingModal);
 }
 
 if(closeBookingBtn) {
     closeBookingBtn.addEventListener('click', () => {
-        bookingModal.classList.remove('open');
+        closeOverlay(bookingModal);
     });
 }
 
@@ -332,12 +518,12 @@ function openTicketModal(productName, price, timesArray, childPolicy = false) {
     document.getElementById('ticket-qty').value = 1;
     recalcTicketTotal();
     document.getElementById('ticket-date').value = '';
-    if(ticketModal) ticketModal.classList.add('open');
+    if(ticketModal) openOverlay(ticketModal);
 }
 
 if(closeTicketBtn) {
     closeTicketBtn.addEventListener('click', () => {
-        ticketModal.classList.remove('open');
+        closeOverlay(ticketModal);
     });
 }
 
@@ -368,7 +554,7 @@ if(document.getElementById('booking-date')) {
                 
                 if (hours > 8 || (hours === 8 && minutes >= 30)) {
                     instance.clear();
-                    document.getElementById('urgent-modal').classList.add('open');
+                    openOverlay(document.getElementById('urgent-modal'));
                 }
             }
         }
@@ -377,7 +563,7 @@ if(document.getElementById('booking-date')) {
     const closeUrgentBtn = document.getElementById('close-urgent');
     if (closeUrgentBtn) {
         closeUrgentBtn.addEventListener('click', () => {
-            document.getElementById('urgent-modal').classList.remove('open');
+            closeOverlay(document.getElementById('urgent-modal'));
         });
     }
 }
@@ -455,7 +641,7 @@ if(confirmBookingBtn) {
         const pax = bookingPax();
 
         if (!date) {
-            alert("Por favor, selecione uma data.");
+            showToast(t('toast.select_date'), 'error');
             return;
         }
 
@@ -483,13 +669,40 @@ if(confirmBookingBtn) {
         cart.push({ name: finalProductName, price: finalPrice });
         updateCartUI();
 
-        bookingModal.classList.remove('open');
+        closeOverlay(bookingModal);
         toggleCart();
     });
 }
 
 // Whatsapp Generator Inteligente e Dinâmico
 const WHATSAPP_NUMBER = '5575998240043';
+
+function waLanguageHeader() {
+    if (currentLocale === 'pt-BR') return '';
+    const names = { 'en': 'English', 'es': 'Español', 'fr': 'Français', 'it': 'Italiano', 'de': 'Deutsch', 'he': 'עברית' };
+    return `🌐 *Idioma do cliente:* ${names[currentLocale] || currentLocale}\n\n`;
+}
+
+// 4.X Finalizar Reserva — envia o carrinho para o WhatsApp
+const checkoutBtn = document.querySelector('.checkout-btn');
+if (checkoutBtn) {
+    checkoutBtn.addEventListener('click', () => {
+        if (cart.length === 0) return;
+
+        let msg = waLanguageHeader();
+        msg += `Olá! Gostaria de finalizar a reserva dos itens abaixo:\n\n`;
+        let total = 0;
+        cart.forEach((item, i) => {
+            total += item.price;
+            msg += `${i + 1}. ${item.name}\n   Sinal: ${BRL.format(item.price)}\n\n`;
+        });
+        msg += `💰 *TOTAL DO SINAL:* ${BRL.format(total)}\n\n`;
+        msg += `Aguardo confirmação de disponibilidade e o link de pagamento.`;
+
+        const encMsg = encodeURIComponent(msg);
+        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank', 'noopener,noreferrer');
+    });
+}
 
 if(confirmTicketBtn) {
     confirmTicketBtn.addEventListener('click', () => {
@@ -498,7 +711,7 @@ if(confirmTicketBtn) {
         const pax = ticketPax();
 
         if (!date) {
-            alert("Por favor, selecione uma data para embarque.");
+            showToast(t('toast.select_date_ticket'), 'error');
             return;
         }
 
@@ -510,7 +723,8 @@ if(confirmTicketBtn) {
         if (pax.kids > 0) paxLine += `, ${pax.kids} criança${pax.kids > 1 ? 's' : ''} (6-9, 50%)`;
         if (pax.babies > 0) paxLine += `, ${pax.babies} bebê${pax.babies > 1 ? 's' : ''} (0-5, grátis)`;
 
-        let msg = `Olá! Gostaria de consultar a disponibilidade e reservar:\n\n`;
+        let msg = waLanguageHeader();
+        msg += `Olá! Gostaria de consultar a disponibilidade e reservar:\n\n`;
         msg += `🚍 *TICKET:* ${currentTicketProduct}\n`;
         msg += `📅 *DATA:* ${date}\n`;
         msg += `⏰ *HORÁRIO:* ${selectedTime}\n`;
@@ -520,14 +734,18 @@ if(confirmTicketBtn) {
 
         const encMsg = encodeURIComponent(msg);
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank', 'noopener,noreferrer');
-        ticketModal.classList.remove('open');
+        closeOverlay(ticketModal);
     });
 }
 
 const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
 
 function updateCartUI() {
-    localStorage.setItem('voltaAilhaCart', JSON.stringify(cart));
+    if (cart.length === 0) {
+        localStorage.removeItem('voltaAilhaCart');
+    } else {
+        localStorage.setItem('voltaAilhaCart', JSON.stringify({ ts: Date.now(), items: cart }));
+    }
     const badgeEl = document.querySelector('.cart-badge');
     badgeEl.textContent = cart.length;
     if(cart.length === 0) {
@@ -593,8 +811,9 @@ function updateCartUI() {
     totalEl.textContent = BRL.format(total);
 }
 
-function removeFromCart(index) {
-    if (confirm("Deseja remover este item do carrinho?")) {
+async function removeFromCart(index) {
+    const ok = await openConfirmDialog(t('confirm.remove_title'), t('confirm.remove_text'));
+    if (ok) {
         cart.splice(index, 1);
         updateCartUI();
     }
@@ -669,5 +888,8 @@ document.addEventListener('click', (e) => {
         toggleAccordion(accordionHeader);
     }
 });
+
+// 7. APLICA LOCALE INICIAL
+applyLocale(detectLocale());
 
 })(); // Fim da IIFE
