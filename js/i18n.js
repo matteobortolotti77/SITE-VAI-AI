@@ -118,6 +118,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Agência de turismo em Morro de São Paulo',
         'footer.rights': 'Todos os direitos reservados',
+        'footer.privacy': 'Política de Privacidade',
 
         'aria.open_cart': 'Abrir carrinho',
         'aria.close_cart': 'Fechar carrinho',
@@ -253,6 +254,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Tourism agency in Morro de São Paulo',
         'footer.rights': 'All rights reserved',
+        'footer.privacy': 'Privacy Policy',
 
         'aria.open_cart': 'Open cart',
         'aria.close_cart': 'Close cart',
@@ -387,6 +389,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Agencia de turismo en Morro de São Paulo',
         'footer.rights': 'Todos los derechos reservados',
+        'footer.privacy': 'Política de Privacidad',
 
         'aria.open_cart': 'Abrir carrito',
         'aria.close_cart': 'Cerrar carrito',
@@ -521,6 +524,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Agence de tourisme à Morro de São Paulo',
         'footer.rights': 'Tous droits réservés',
+        'footer.privacy': 'Politique de Confidentialité',
 
         'aria.open_cart': 'Ouvrir le panier',
         'aria.close_cart': 'Fermer le panier',
@@ -655,6 +659,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Agenzia di turismo a Morro de São Paulo',
         'footer.rights': 'Tutti i diritti riservati',
+        'footer.privacy': 'Informativa sulla Privacy',
 
         'aria.open_cart': 'Apri carrello',
         'aria.close_cart': 'Chiudi carrello',
@@ -789,6 +794,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'Reisebüro in Morro de São Paulo',
         'footer.rights': 'Alle Rechte vorbehalten',
+        'footer.privacy': 'Datenschutzerklärung',
 
         'aria.open_cart': 'Warenkorb öffnen',
         'aria.close_cart': 'Warenkorb schließen',
@@ -923,6 +929,7 @@ window.VAI_I18N = {
 
         'footer.tagline': 'סוכנות תיירות במורו דה סאו פאולו',
         'footer.rights': 'כל הזכויות שמורות',
+        'footer.privacy': 'מדיניות פרטיות',
 
         'aria.open_cart': 'פתח עגלה',
         'aria.close_cart': 'סגור עגלה',

@@ -36,7 +36,8 @@ Fluxo principal: vitrine de produtos → reserva/consulta → WhatsApp/pagamento
 
 ```
 volta-a-ilha/
-├── index.html              # Único ponto de entrada — toda a SPA
+├── index.html              # Ponto de entrada principal — toda a SPA
+├── politica-privacidade.html  # Página LGPD standalone
 ├── css/
 │   └── style.css           # TODO o estilo. ?v=N para cache bust manual
 ├── js/
@@ -217,7 +218,8 @@ Esta validação **deve ser replicada no backend** — nunca depender só do fro
 - [x] `canonical` tag — presente no `<head>`
 - [x] `robots.txt` na raiz
 - [x] `sitemap.xml` na raiz
-- [ ] Footer legal completo (CNPJ, endereço, política de privacidade) — atual é minimalista (logo + WhatsApp + Instagram + copyright)
+- [x] Footer legal completo: razão social, CNPJ, endereço, link política de privacidade
+- [x] Página `politica-privacidade.html` (LGPD, em PT-BR)
 - [ ] Vídeo hero sem `<link rel="preload">` e sem poster frame
 - [ ] Imagens de fundo via `style=""` inline não são lazy-loadable
 
@@ -234,7 +236,7 @@ Esta validação **deve ser replicada no backend** — nunca depender só do fro
 | CSP headers | ❌ (configurar no servidor) |
 | Sem dados de cartão no frontend | ✅ (arquitetural) |
 | PCI-DSS: gateway via iframe/token | Futuro (backend) |
-| LGPD: privacy policy | ❌ Faltando |
+| LGPD: privacy policy | ✅ |
 
 **Lei de Ouro:** Nenhum dado financeiro sensível passa pelo servidor da agência. O processamento de pagamento é 100% delegado ao gateway (MercadoPago/Stripe) via tokenização ou redirect.
 
@@ -313,7 +315,7 @@ UX
 FUNCIONALIDADES
 [x] Carrossel "Atividades" implementado
 [x] "Finalizar Reserva" com fluxo mínimo (envia carrinho via WhatsApp)
-[ ] Footer com CNPJ, endereço, política de privacidade
+[x] Footer com CNPJ, endereço, política de privacidade
 
 MULTI-IDIOMA
 [x] data-i18n attributes adicionados (Opção B — casca)
