@@ -52,6 +52,11 @@ volta-a-ilha/
 │   └── volta_a_ilha_*.webp
 ├── robots.txt
 ├── sitemap.xml
+├── backend/                # API Fastify + Supabase + MercadoPago (em construção)
+│   ├── package.json
+│   ├── README.md           # passo-a-passo do setup
+│   ├── db/schema.sql       # rodar no SQL Editor do Supabase
+│   └── src/                # server.js, config.js, routes/, db/
 ├── CLAUDE.md               # Este arquivo
 ├── GEMINI.md               # Legado — mantido para histórico
 ├── PROMPT_BACKEND.md       # Legado
