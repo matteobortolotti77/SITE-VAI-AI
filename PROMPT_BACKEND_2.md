@@ -14,7 +14,7 @@
 - Gestão de vagas/disponibilidade
 - Emissão automática de vouchers
 - Notificações (cliente + operadores)
-- Painel administrativo mínimo viável
+- **Painel administrativo completo** (Matteo confirmou em 2026-04-23 que precisa criar/editar TUDO pelo painel: accordions, fotos, horários, valores, política infantil específica por produto, etc — sem editar HTML manualmente)
 
 **Restrição financeira assumida:** Startup de turismo regional. Custo mensal de infra deve ficar abaixo de R$ 300/mês até atingir escala.
 
@@ -68,7 +68,7 @@ CREATE TABLE products (
     id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     provider_id     UUID REFERENCES providers(id),
     type            product_type NOT NULL,
-    name            TEXT NOT NULL,
+    name            TEXT NOT NULL,            -- pt-BR (texto-base p/ traduções)
     description     TEXT,
     price_full      NUMERIC(10,2) NOT NULL,
     price_deposit   NUMERIC(10,2),           -- NULL = paga tudo online
@@ -76,6 +76,18 @@ CREATE TABLE products (
     departure_times TEXT[] NOT NULL,          -- ex: {'09:30','14:00'}
     cutoff_hour     SMALLINT DEFAULT 8,       -- hora de corte D-0
     cutoff_minute   SMALLINT DEFAULT 30,
+    -- Política infantil ESPECÍFICA deste produto (pode variar)
+    child_min_age   SMALLINT,                 -- ex: 6 (Banana Boat); NULL = aceita qualquer idade
+    child_discount  NUMERIC(4,2),             -- ex: 0.50 (50% off); NULL = sem desconto
+    infant_max_age  SMALLINT DEFAULT 5,       -- até essa idade é gratuito
+    requires_cnh    BOOLEAN DEFAULT false,    -- ex: Quadriciclo
+    -- Accordions/conteúdo editável via painel
+    accordion_data  JSONB DEFAULT '[]'::jsonb,  -- [{title, body_html}, ...] em pt-BR
+    -- Mídia
+    photos          TEXT[] DEFAULT '{}',      -- URLs (Supabase Storage)
+    bg_gradient     TEXT,                     -- ex: 'ticket-card-img--catamaran'; alternativa a photos
+    -- Traduções (override opcional do auto-tradutor)
+    translations    JSONB DEFAULT '{}'::jsonb,  -- {en: {name, description}, es: {...}}
     active          BOOLEAN DEFAULT true,
     sort_order      SMALLINT DEFAULT 0,
     created_at      TIMESTAMPTZ DEFAULT now(),
@@ -202,6 +214,10 @@ GET  /admin/products                    → CRUD de produtos
 POST /admin/products
 PATCH /admin/products/:id
 DELETE /admin/products/:id
+POST /admin/products/:id/photos         → upload de fotos (multipart)
+DELETE /admin/products/:id/photos/:idx  → remover foto
+PATCH /admin/products/:id/accordions    → editar conteúdo dos accordions
+PATCH /admin/products/:id/child-policy  → política infantil específica deste produto
 GET  /admin/analytics/sales             → dados para dashboard
 GET  /admin/notifications/send-daily    → disparo manual da lista diária
 ```

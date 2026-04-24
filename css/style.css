@@ -151,7 +151,8 @@ body {
 .hero {
     position: relative;
     width: 100vw;
-    height: 72vh;
+    height: 100vh;
+    height: 100dvh;
     min-height: 520px;
     display: flex;
     align-items: center;
@@ -651,7 +652,7 @@ body {
     .nav-links { display: none; }
     .hamburger { display: block; }
     .hero-content h2 { font-size: 2.1rem; }
-    .hero { height: 65vh; min-height: 460px; }
+    .hero { height: 100vh; height: 100dvh; min-height: 460px; }
     .cart-drawer { width: 100%; right: -100%; }
 
     .flatpickr-calendar {
@@ -1229,9 +1230,9 @@ body {
     align-items: center;
     gap: 6px;
     background: transparent;
-    border: 1px solid rgba(255,255,255,0.25);
-    color: #fff;
-    padding: 6px 10px;
+    border: 1.5px solid var(--secondary-color);
+    color: var(--secondary-color);
+    padding: 6px 14px;
     border-radius: 999px;
     cursor: pointer;
     font-weight: 600;
@@ -1240,15 +1241,13 @@ body {
     margin-right: 8px;
 }
 .lang-btn i { width: 16px; height: 16px; }
-.lang-btn:hover { background: rgba(255,255,255,0.08); }
-.glass-header.scrolled .lang-btn,
-.glass-header.on-section .lang-btn {
-    color: var(--text-main);
-    border-color: rgba(0,0,0,0.15);
+.lang-btn:hover {
+    background: rgba(0, 91, 171, 0.08);
 }
-.glass-header.scrolled .lang-btn:hover,
-.glass-header.on-section .lang-btn:hover {
-    background: rgba(0,0,0,0.05);
+.lang-btn[aria-expanded="true"] {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+    color: #fff;
 }
 
 .lang-dropdown {
@@ -1343,8 +1342,12 @@ body {
     background: #0d0d0f;
     padding: 16px 24px;
     border-bottom: 1px solid rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
-.legal-back {
+.legal-logo {
     display: inline-flex;
     align-items: center;
     text-decoration: none;
@@ -1353,6 +1356,21 @@ body {
     height: 40px;
     width: auto;
 }
+.legal-back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--primary-color);
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-decoration: none;
+    transition: background 0.2s;
+    white-space: nowrap;
+}
+.legal-back-btn:hover { background: #008c31; color: #fff; }
 .legal-main {
     background: #f8f8fa;
     padding: 40px 20px;
