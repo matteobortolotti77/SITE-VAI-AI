@@ -49,11 +49,15 @@ CREATE TABLE IF NOT EXISTS products (
     description     TEXT,                         -- subtítulo curto
 
     -- Preço
-    price_full      NUMERIC(10,2) NOT NULL,
-    price_deposit   NUMERIC(10,2),                -- NULL = paga tudo online
+    price_full        NUMERIC(10,2) NOT NULL,
+    price_deposit     NUMERIC(10,2),              -- NULL = paga tudo online
+    pricing_mode      TEXT NOT NULL DEFAULT 'per_person'
+                      CHECK (pricing_mode IN ('per_person', 'per_vehicle')),
+    vehicle_capacity  SMALLINT,                   -- só usado se pricing_mode='per_vehicle' (ex: Buggy=4, Quadriciclo=2)
+    insurance_per_pax NUMERIC(10,2),              -- seguro adicional por passageiro (ex: R$ 5 Buggy/Quadriciclo)
 
     -- Capacidade
-    capacity        SMALLINT NOT NULL,            -- vagas por horário
+    capacity        SMALLINT NOT NULL,            -- vagas (per_person) OU veículos (per_vehicle) por horário/dia
     departure_times TEXT[] NOT NULL DEFAULT '{}', -- ex: {'09:30','14:00'}; vazio = 'A combinar'
     cutoff_hour     SMALLINT DEFAULT 8,           -- D-0: corte hora local (America/Bahia)
     cutoff_minute   SMALLINT DEFAULT 30,
@@ -164,16 +168,24 @@ SELECT
     p.id AS product_id,
     p.slug,
     p.name,
+    p.pricing_mode,
     p.capacity,
     r.travel_date,
     r.departure_time,
-    p.capacity - COALESCE(SUM(r.qty_adults + r.qty_children), 0)::SMALLINT AS seats_left
+    p.capacity - COALESCE(
+        SUM(
+            CASE
+                WHEN p.pricing_mode = 'per_vehicle' THEN 1
+                ELSE r.qty_adults + r.qty_children
+            END
+        ), 0
+    )::SMALLINT AS seats_left
 FROM products p
 LEFT JOIN reservations r
     ON r.product_id = p.id
    AND r.status IN ('pending_payment', 'deposit_paid', 'fully_paid')
 WHERE p.active = true
-GROUP BY p.id, p.slug, p.name, p.capacity, r.travel_date, r.departure_time;
+GROUP BY p.id, p.slug, p.name, p.pricing_mode, p.capacity, r.travel_date, r.departure_time;
 
 -- ==========================================================
 -- TRIGGERS — updated_at automático

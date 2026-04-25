@@ -47,6 +47,25 @@ Auth, Row Level Security e Realtime prontos. Free tier aguenta até ~500 MAU per
 
 ---
 
+## MODOS DE PRICING
+
+A agência opera **100% via fornecedores terceirizados** — `capacity` representa quanto vendemos, não limite físico. Existem dois modos de cobrança:
+
+### `per_person` (default)
+Cliente reserva por pessoa. Total = `price_full × pax`. Aplica `child_discount` para 6-9 anos e gratuidade para infants ≤ `infant_max_age`.
+
+### `per_vehicle` (Buggy, Quadriciclo)
+Cliente reserva o **veículo inteiro**, não vagas dentro dele. Total = `price_full + (insurance_per_pax × pax_no_veículo)`. Validações:
+- `pax_no_veículo` não pode exceder `vehicle_capacity`
+- `qty_adults + qty_children` no payload representa pessoas no veículo (para cálculo de seguro)
+- `availability` conta 1 reserva = 1 veículo (não a soma de pax)
+- Quadriciclo exige CNH (`requires_cnh = true`) — frontend deve mostrar aviso
+
+Exemplo Buggy:
+- 4 pessoas no veículo: R$ 700 + (R$ 5 × 4) = **R$ 720 total**, sinal R$ 200, restante R$ 520
+
+---
+
 ## MODELO DE DADOS
 
 ```sql
@@ -70,12 +89,16 @@ CREATE TABLE products (
     type            product_type NOT NULL,
     name            TEXT NOT NULL,            -- pt-BR (texto-base p/ traduções)
     description     TEXT,
-    price_full      NUMERIC(10,2) NOT NULL,
-    price_deposit   NUMERIC(10,2),           -- NULL = paga tudo online
-    capacity        SMALLINT NOT NULL,        -- vagas por horário
-    departure_times TEXT[] NOT NULL,          -- ex: {'09:30','14:00'}
-    cutoff_hour     SMALLINT DEFAULT 8,       -- hora de corte D-0
-    cutoff_minute   SMALLINT DEFAULT 30,
+    price_full        NUMERIC(10,2) NOT NULL,
+    price_deposit     NUMERIC(10,2),           -- NULL = paga tudo online
+    pricing_mode      TEXT NOT NULL DEFAULT 'per_person'
+                      CHECK (pricing_mode IN ('per_person', 'per_vehicle')),
+    vehicle_capacity  SMALLINT,                -- só para per_vehicle (Buggy=4, Quadriciclo=2)
+    insurance_per_pax NUMERIC(10,2),           -- ex: R$ 5 para Buggy/Quadriciclo
+    capacity          SMALLINT NOT NULL,        -- vagas (per_person) OU veículos (per_vehicle) por horário/dia
+    departure_times   TEXT[] NOT NULL,          -- ex: {'09:30','14:00'}
+    cutoff_hour       SMALLINT DEFAULT 8,       -- hora de corte D-0
+    cutoff_minute     SMALLINT DEFAULT 30,
     -- Política infantil ESPECÍFICA deste produto (pode variar)
     child_min_age   SMALLINT,                 -- ex: 6 (Banana Boat); NULL = aceita qualquer idade
     child_discount  NUMERIC(4,2),             -- ex: 0.50 (50% off); NULL = sem desconto
