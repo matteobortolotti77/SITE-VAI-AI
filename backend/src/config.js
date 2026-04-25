@@ -2,14 +2,6 @@
 // Em dev: passar via `node --env-file=.env src/server.js` (Node 22+)
 // Em prod: setar no provedor (Railway/Render)
 
-function required(name) {
-    const value = process.env[name];
-    if (!value) {
-        throw new Error(`Variável de ambiente faltando: ${name}`);
-    }
-    return value;
-}
-
 function optional(name, fallback) {
     return process.env[name] || fallback;
 }
@@ -31,6 +23,15 @@ export const config = {
     },
 
     isReady() {
-        return !!(this.supabase.url && this.supabase.serviceRoleKey && this.mp.accessToken);
+        // Read-only: precisa só de SUPABASE_URL + (service_role OU anon)
+        return !!(this.supabase.url && (this.supabase.serviceRoleKey || this.supabase.anonKey));
+    },
+    canWrite() {
+        // Writes (POST /reservations etc) exigem service_role
+        return !!(this.supabase.url && this.supabase.serviceRoleKey);
+    },
+    canCharge() {
+        // Pagamentos exigem MercadoPago
+        return !!this.mp.accessToken;
     }
 };
