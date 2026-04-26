@@ -101,6 +101,195 @@ if (langBtn && langDropdown) {
     });
 }
 
+// 0.3 PRODUTOS DINÂMICOS — fetch /v1/products e re-renderiza carrosséis
+// Progressive enhancement: HTML estático aparece primeiro; se backend responder
+// em ≤2s, sobrescreve com dados frescos do DB. Se falhar, mantém estático.
+const API_BASE = 'http://localhost:3000/v1';
+
+// Mapping accordion title (pt-BR base) → chave i18n
+const ACCORDION_KEYS = {
+    'Roteiro e Horários': 'accordion.roteiro',
+    'O que está incluso': 'accordion.incluso',
+    'O que levar': 'accordion.levar',
+    'Formas de Pagamento': 'accordion.pagamento',
+    'Requisitos': 'accordion.requisitos',
+    'Detalhes': 'accordion.detalhes'
+};
+
+// Map slug → chave i18n base (já existem em i18n.js)
+const PRODUCT_I18N_PREFIX = {
+    'volta-a-ilha': 'product.volta_a_ilha',
+    'garapua-4x4': 'product.garapua_4x4',
+    'gamboa-full': 'product.gamboa_full',
+    'gamboa-convencional': 'product.gamboa_conv',
+    'quadriciclo': 'product.quadriciclo',
+    'buggy': 'product.buggy',
+    'mergulho-cilindro': 'product.mergulho',
+    'cavalgada': 'product.cavalgada',
+    'tiroleza': 'product.tiroleza',
+    'banana-boat': 'product.banana_boat',
+    'bike-aquatica': 'product.bike_aquatica',
+    'aluguel-bicicleta': 'product.bicicletas',
+    'ida-terminal': 'product.ida_terminal',
+    'ida-hoteis': 'product.ida_hoteis',
+    'ida-aeroporto': 'product.ida_aeroporto',
+    'ida-catamara': 'product.ida_catamara',
+    'volta-terminal': 'product.volta_terminal',
+    'volta-hoteis': 'product.volta_hoteis',
+    'volta-aeroporto': 'product.volta_aeroporto',
+    'volta-catamara': 'product.volta_catamara'
+};
+
+function escapeHTML(str) {
+    if (str == null) return '';
+    return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#39;');
+}
+
+function priceTagText(p) {
+    // Catamarãs originais usavam "A partir de R$ X" — replicamos para 'ida-catamara' e 'volta-catamara'
+    if (p.slug === 'ida-catamara' || p.slug === 'volta-catamara') {
+        return `A partir de R$ ${p.price_full}`;
+    }
+    return `R$ ${p.price_full}`;
+}
+
+function cardImageHTML(p) {
+    if (Array.isArray(p.photos) && p.photos.length > 0) {
+        const slides = p.photos.map(url =>
+            `<div class="swiper-slide" style="background-image: url('${escapeHTML(url)}'); background-size: cover; background-position: center;"></div>`
+        ).join('');
+        return `<div class="card-image swiper inner-swiper">
+            <div class="swiper-wrapper">${slides}</div>
+            <div class="swiper-pagination inner-pagination"></div>
+            <div class="price-tag">${escapeHTML(priceTagText(p))}</div>
+        </div>`;
+    }
+    const cls = p.bg_gradient ? `ticket-card-img ${p.bg_gradient}` : '';
+    return `<div class="card-image ${cls}">
+        <div class="price-tag">${escapeHTML(priceTagText(p))}</div>
+    </div>`;
+}
+
+function accordionHTML(items) {
+    if (!Array.isArray(items) || items.length === 0) return '';
+    const itemsHTML = items.map(it => {
+        const i18nKey = ACCORDION_KEYS[it.title];
+        const titleAttr = i18nKey ? ` data-i18n="${i18nKey}"` : '';
+        return `<div class="accordion-item">
+            <div class="accordion-header" data-action="accordion">
+                <span${titleAttr}>${escapeHTML(it.title)}</span>
+                <i data-lucide="chevron-down"></i>
+            </div>
+            <div class="accordion-body"><div class="accordion-inner">${it.body_html || ''}</div></div>
+        </div>`;
+    }).join('');
+    return `<div class="custom-accordion">${itemsHTML}</div>`;
+}
+
+function buyButtonHTML(p) {
+    const isPassagem = p.type === 'passagem_ida' || p.type === 'passagem_volta';
+    const action = isPassagem ? 'consult-ticket' : 'book';
+    const labelKey = isPassagem ? 'btn.consultar' : 'btn.adicionar';
+    const labelText = isPassagem ? 'Consultar' : 'Adicionar';
+    const icon = isPassagem ? 'arrow-right' : 'plus';
+    const times = (p.departure_times && p.departure_times.length > 0)
+        ? p.departure_times.join(',')
+        : 'A combinar';
+    const childPolicy = (p.child_discount != null && p.infant_max_age != null) ? ' data-child-policy="1"' : '';
+    const fullprice = p.price_deposit ? ` data-fullprice="${p.price_full}"` : '';
+    const price = p.price_deposit != null ? p.price_deposit : p.price_full;
+    return `<button class="btn-buy" data-action="${action}" data-product="${escapeHTML(p.name)}" data-price="${price}" data-times="${escapeHTML(times)}"${fullprice}${childPolicy}>
+        <span data-i18n="${labelKey}">${labelText}</span>
+        <i data-lucide="${icon}"></i>
+    </button>`;
+}
+
+function productCardHTML(p) {
+    const prefix = PRODUCT_I18N_PREFIX[p.slug] || '';
+    const nameAttr = prefix ? ` data-i18n="${prefix}.name"` : '';
+    const descAttr = prefix ? ` data-i18n="${prefix}.desc"` : '';
+    return `<div class="swiper-slide product-card">
+        ${cardImageHTML(p)}
+        <div class="card-content">
+            <h3${nameAttr}>${escapeHTML(p.name)}</h3>
+            <p${descAttr}>${escapeHTML(p.description || '')}</p>
+            ${accordionHTML(p.accordion_data)}
+            ${buyButtonHTML(p)}
+        </div>
+    </div>`;
+}
+
+async function fetchProducts() {
+    const ctrl = new AbortController();
+    const timer = setTimeout(() => ctrl.abort(), 5000);
+    try {
+        const res = await fetch(`${API_BASE}/products`, { signal: ctrl.signal });
+        if (!res.ok) return null;
+        const data = await res.json();
+        return Array.isArray(data.products) ? data.products : null;
+    } catch {
+        return null;
+    } finally {
+        clearTimeout(timer);
+    }
+}
+
+function renderInnerSwipers(rootEl) {
+    rootEl.querySelectorAll('.inner-swiper').forEach(el => {
+        if (el.dataset.swiperInited === '1') return;
+        const pagEl = el.querySelector('.inner-pagination');
+        new Swiper(el, {
+            slidesPerView: 1,
+            nested: true,
+            pagination: pagEl ? { el: pagEl, clickable: true } : false
+        });
+        el.dataset.swiperInited = '1';
+    });
+}
+
+function repopulateCarousel(swiper, products) {
+    if (!swiper) return;
+    // Limpa DOM diretamente (Swiper.removeAllSlides às vezes deixa
+    // resíduos de slides que vieram do HTML inicial)
+    const wrapper = swiper.el && swiper.el.querySelector('.swiper-wrapper');
+    if (wrapper) {
+        while (wrapper.firstChild) wrapper.removeChild(wrapper.firstChild);
+    }
+    products.forEach(p => swiper.appendSlide(productCardHTML(p)));
+    swiper.update();
+}
+
+async function applyDynamicProducts() {
+    const products = await fetchProducts();
+    if (!products) return;  // backend offline → mantém HTML estático
+
+    const byType = {
+        passeio: [],
+        atividade: [],
+        passagem_ida: [],
+        passagem_volta: []
+    };
+    products.forEach(p => {
+        if (byType[p.type]) byType[p.type].push(p);
+    });
+    Object.values(byType).forEach(arr => arr.sort((a, b) => a.sort_order - b.sort_order));
+
+    repopulateCarousel(swiperPasseios, byType.passeio);
+    repopulateCarousel(swiperAtividades, byType.atividade);
+    repopulateCarousel(swiperIda, byType.passagem_ida);
+    repopulateCarousel(swiperVolta, byType.passagem_volta);
+
+    // Pós-render: i18n + ícones + inner swipers
+    if (window.lucide) lucide.createIcons();
+    if (typeof applyLocale === 'function') applyLocale(currentLocale);
+    renderInnerSwipers(document.body);
+}
+
 // 1. EFEITO DO HEADER (Glassmorphism)
 const header = document.querySelector('.glass-header');
 window.addEventListener('scroll', () => {
@@ -891,5 +1080,8 @@ document.addEventListener('click', (e) => {
 
 // 7. APLICA LOCALE INICIAL
 applyLocale(detectLocale());
+
+// 8. CARREGA PRODUTOS DINÂMICOS (overlay sobre HTML estático)
+applyDynamicProducts();
 
 })(); // Fim da IIFE
