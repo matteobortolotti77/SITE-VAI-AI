@@ -1,3 +1,9 @@
+> ⚠ **DEPRECATED — 2026-04-27**
+> Este arquivo foi consolidado em [`CLAUDE.md`](../../CLAUDE.md), agora master único do projeto (seções 2–7).
+> Mantido apenas para histórico. **Não usar como referência em novas implementações.**
+
+---
+
 # PROMPT_BACKEND_2.md — Especificação Técnica de Backend
 
 > Versão 2 — Revisão crítica e pragmática.

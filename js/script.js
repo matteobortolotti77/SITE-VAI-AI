@@ -45,7 +45,7 @@ function applyLocale(locale) {
     });
     document.querySelectorAll('[data-i18n-html]').forEach(el => {
         const key = el.getAttribute('data-i18n-html');
-        el.innerHTML = t(key);
+        setTrustedHTML(el, t(key));
     });
     document.querySelectorAll('[data-i18n-aria]').forEach(el => {
         const key = el.getAttribute('data-i18n-aria');
@@ -87,10 +87,30 @@ if (langBtn && langDropdown) {
         e.stopPropagation();
         const isOpen = langDropdown.classList.toggle('open');
         langBtn.setAttribute('aria-expanded', String(isOpen));
+        if (isOpen) {
+            const first = langDropdown.querySelector('.lang-option');
+            if (first) first.focus();
+        }
     });
     document.addEventListener('click', (e) => {
         if (!langDropdown.contains(e.target) && e.target !== langBtn && !langBtn.contains(e.target)) {
             closeLangDropdown();
+        }
+    });
+    langDropdown.addEventListener('keydown', (e) => {
+        const items = Array.from(langDropdown.querySelectorAll('.lang-option'));
+        const idx = items.indexOf(document.activeElement);
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            const next = items[(idx + 1) % items.length];
+            if (next) next.focus();
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            const prev = items[(idx - 1 + items.length) % items.length];
+            if (prev) prev.focus();
+        } else if (e.key === 'Escape') {
+            closeLangDropdown();
+            langBtn.focus();
         }
     });
     langDropdown.querySelectorAll('.lang-option').forEach(opt => {
@@ -150,6 +170,49 @@ function escapeHTML(str) {
         .replaceAll("'", '&#39;');
 }
 
+// Sanitizer com allow-list para HTML proveniente de i18n e accordion_data.
+// Defesa em profundidade: mesmo que o dicionário/backend sejam confiáveis,
+// nunca permitimos <script>, event handlers ou atributos arbitrários.
+const SANITIZE_ALLOWED_TAGS = new Set(['SPAN', 'STRONG', 'EM', 'B', 'I', 'BR', 'P', 'UL', 'OL', 'LI', 'A']);
+const SANITIZE_ALLOWED_CLASSES = new Set(['highlight', 'highlight--blue', 'fare-policy']);
+function sanitizeNode(node) {
+    for (let i = node.childNodes.length - 1; i >= 0; i--) {
+        const child = node.childNodes[i];
+        if (child.nodeType === 1) { // ELEMENT_NODE
+            if (!SANITIZE_ALLOWED_TAGS.has(child.tagName)) {
+                node.replaceChild(document.createTextNode(child.textContent || ''), child);
+                continue;
+            }
+            for (const attr of Array.from(child.attributes)) {
+                if (attr.name === 'class') {
+                    const cls = attr.value.split(/\s+/).filter(c => SANITIZE_ALLOWED_CLASSES.has(c));
+                    if (cls.length) child.setAttribute('class', cls.join(' '));
+                    else child.removeAttribute('class');
+                } else if (child.tagName === 'A' && attr.name === 'href' && /^https?:|^mailto:|^tel:/i.test(attr.value)) {
+                    child.setAttribute('rel', 'noopener noreferrer');
+                    child.setAttribute('target', '_blank');
+                } else {
+                    child.removeAttribute(attr.name);
+                }
+            }
+            sanitizeNode(child);
+        } else if (child.nodeType === 8) { // COMMENT_NODE
+            node.removeChild(child);
+        }
+    }
+}
+function sanitizeHTML(html) {
+    if (html == null) return '';
+    const tpl = document.createElement('template');
+    tpl.innerHTML = String(html);
+    sanitizeNode(tpl.content);
+    return tpl.innerHTML;
+}
+function setTrustedHTML(el, html) {
+    // Defesa em profundidade: sempre passa por sanitizeHTML antes de innerHTML.
+    el.innerHTML = sanitizeHTML(html);
+}
+
 function priceTagText(p) {
     // Catamarãs originais usavam "A partir de R$ X" — replicamos para 'ida-catamara' e 'volta-catamara'
     if (p.slug === 'ida-catamara' || p.slug === 'volta-catamara') {
@@ -183,9 +246,9 @@ function accordionHTML(items) {
         return `<div class="accordion-item">
             <div class="accordion-header" data-action="accordion">
                 <span${titleAttr}>${escapeHTML(it.title)}</span>
-                <i data-lucide="chevron-down"></i>
+                <i data-lucide="chevron-down" aria-hidden="true"></i>
             </div>
-            <div class="accordion-body"><div class="accordion-inner">${it.body_html || ''}</div></div>
+            <div class="accordion-body"><div class="accordion-inner">${sanitizeHTML(it.body_html || '')}</div></div>
         </div>`;
     }).join('');
     return `<div class="custom-accordion">${itemsHTML}</div>`;
@@ -203,9 +266,11 @@ function buyButtonHTML(p) {
     const childPolicy = (p.child_discount != null && p.infant_max_age != null) ? ' data-child-policy="1"' : '';
     const fullprice = p.price_deposit ? ` data-fullprice="${p.price_full}"` : '';
     const price = p.price_deposit != null ? p.price_deposit : p.price_full;
-    return `<button class="btn-buy" data-action="${action}" data-product="${escapeHTML(p.name)}" data-price="${price}" data-times="${escapeHTML(times)}"${fullprice}${childPolicy}>
+    const ch = (p.cutoff_hour != null) ? ` data-cutoff-hour="${p.cutoff_hour}"` : '';
+    const cm = (p.cutoff_minute != null) ? ` data-cutoff-minute="${p.cutoff_minute}"` : '';
+    return `<button class="btn-buy" data-action="${action}" data-product="${escapeHTML(p.name)}" data-price="${price}" data-times="${escapeHTML(times)}"${fullprice}${childPolicy}${ch}${cm}>
         <span data-i18n="${labelKey}">${labelText}</span>
-        <i data-lucide="${icon}"></i>
+        <i data-lucide="${icon}" aria-hidden="true"></i>
     </button>`;
 }
 
@@ -224,9 +289,14 @@ function productCardHTML(p) {
     </div>`;
 }
 
+// Named constants (L-15 — replaces magic numbers)
+const FETCH_TIMEOUT_MS = 12000;
+const SCROLL_THRESHOLD_PX = 50;
+const TOAST_DURATION_MS = 3000;
+
 async function fetchProducts() {
     const ctrl = new AbortController();
-    const timer = setTimeout(() => ctrl.abort(), 5000);
+    const timer = setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS);
     try {
         const res = await fetch(`${API_BASE}/products`, { signal: ctrl.signal });
         if (!res.ok) return null;
@@ -291,14 +361,17 @@ async function applyDynamicProducts() {
 }
 
 // 1. EFEITO DO HEADER (Glassmorphism)
+// Throttle via rAF para evitar layout thrashing em scroll de 60+ fps em mobile.
 const header = document.querySelector('.glass-header');
+let scrollTick = false;
 window.addEventListener('scroll', () => {
-    if (window.scrollY > 50) {
-        header.classList.add('scrolled');
-    } else {
-        header.classList.remove('scrolled');
-    }
-});
+    if (scrollTick) return;
+    scrollTick = true;
+    requestAnimationFrame(() => {
+        header.classList.toggle('scrolled', window.scrollY > SCROLL_THRESHOLD_PX);
+        scrollTick = false;
+    });
+}, { passive: true });
 
 // 1.1 UI UTILS — Toast, Confirm Dialog, Modal Stack (focus trap + Escape)
 const toastEl = document.getElementById('toast');
@@ -307,9 +380,12 @@ function showToast(message, kind = 'info') {
     if (!toastEl) return;
     toastEl.textContent = message;
     toastEl.classList.toggle('toast--error', kind === 'error');
+    // H-7: error toasts use role="alert" (assertive) for immediate screen reader announcement
+    toastEl.setAttribute('role', kind === 'error' ? 'alert' : 'status');
+    toastEl.setAttribute('aria-live', kind === 'error' ? 'assertive' : 'polite');
     toastEl.classList.add('show');
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => toastEl.classList.remove('show'), 3000);
+    toastTimer = setTimeout(() => toastEl.classList.remove('show'), TOAST_DURATION_MS);
 }
 
 const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]):not([type="hidden"]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
@@ -319,11 +395,29 @@ function getFocusable(container) {
     return Array.from(container.querySelectorAll(FOCUSABLE)).filter(el => el.offsetParent !== null);
 }
 
+// Esconde header/main/footer da árvore de acessibilidade enquanto um modal está aberto.
+// Usa `inert` (bloqueia foco + interação) e `aria-hidden` (esconde do screen reader).
+const BACKGROUND_SELECTORS = ['header.glass-header', 'main#app-container', 'footer.site-footer'];
+function setBackgroundInert(active) {
+    BACKGROUND_SELECTORS.forEach(sel => {
+        const el = document.querySelector(sel);
+        if (!el) return;
+        if (active) {
+            el.setAttribute('aria-hidden', 'true');
+            el.setAttribute('inert', '');
+        } else {
+            el.removeAttribute('aria-hidden');
+            el.removeAttribute('inert');
+        }
+    });
+}
+
 function openOverlay(overlayEl) {
     if (!overlayEl || overlayEl.classList.contains('open')) return;
     const entry = { el: overlayEl, previousFocus: document.activeElement };
     modalStack.push(entry);
     overlayEl.classList.add('open');
+    if (modalStack.length === 1) setBackgroundInert(true);
     const focusables = getFocusable(overlayEl);
     if (focusables.length) focusables[0].focus();
 }
@@ -334,7 +428,8 @@ function closeOverlay(overlayEl) {
     const idx = modalStack.findIndex(e => e.el === overlayEl);
     if (idx !== -1) {
         const entry = modalStack.splice(idx, 1)[0];
-        if (entry.previousFocus && typeof entry.previousFocus.focus === 'function') {
+        if (modalStack.length === 0) setBackgroundInert(false);
+        if (entry.previousFocus && typeof entry.previousFocus.focus === 'function' && document.contains(entry.previousFocus)) {
             entry.previousFocus.focus();
         }
     }
@@ -551,21 +646,36 @@ const cartOverlay = document.querySelector('.cart-drawer-overlay');
 
 const CART_TTL_MS = 24 * 60 * 60 * 1000;
 let cart = [];
+// Aceita apenas itens com shape conhecido. Strings limitadas e sem caracteres de controle
+// (defesa em profundidade caso o localStorage tenha sido manipulado).
+function sanitizeCartItem(it) {
+    if (!it || typeof it !== 'object') return null;
+    const name = typeof it.name === 'string'
+        ? it.name.replace(/[ -]/g, '').slice(0, 120).trim()
+        : '';
+    const price = Number(it.price);
+    if (!name || !Number.isFinite(price) || price < 0 || price > 100000) return null;
+    return { name, price };
+}
 try {
     const raw = localStorage.getItem('voltaAilhaCart');
     if (raw) {
         const parsed = JSON.parse(raw);
         if (parsed && typeof parsed === 'object' && Array.isArray(parsed.items)) {
             const fresh = typeof parsed.ts === 'number' && (Date.now() - parsed.ts) < CART_TTL_MS;
-            if (fresh) cart = parsed.items;
-            else localStorage.removeItem('voltaAilhaCart');
+            if (fresh) {
+                cart = parsed.items.map(sanitizeCartItem).filter(Boolean);
+            } else {
+                localStorage.removeItem('voltaAilhaCart');
+            }
         } else if (Array.isArray(parsed)) {
             // formato antigo (sem ts) — descarta
             localStorage.removeItem('voltaAilhaCart');
         }
     }
-} catch(e) {
-    console.error("Erro ao ler carrinho:", e);
+} catch {
+    // Carrinho corrompido (JSON inválido) — ignora silenciosamente, mantém cart=[].
+    localStorage.removeItem('voltaAilhaCart');
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -597,6 +707,10 @@ let currentBookingSlug = null;
 let currentBookingPrice = 0;
 let currentBookingFullPrice = 0;
 let currentBookingChildPolicy = false;
+// Cutoff D-0 per-product (default 08:30 se não informado pelo HTML/API).
+// Frontend faz heurística rápida; servidor é a fonte de verdade (422 CUTOFF_EXCEEDED).
+let currentBookingCutoffHour = 8;
+let currentBookingCutoffMinute = 30;
 
 function toSlug(name) {
     return name.toLowerCase()
@@ -605,12 +719,16 @@ function toSlug(name) {
         .replace(/^-|-$/g, '');
 }
 
-function openBookingModal(productName, price, timesArray, fullPrice = null, childPolicy = false) {
+function openBookingModal(productName, price, timesArray, fullPrice = null, childPolicy = false, cutoffHour = null, cutoffMinute = null) {
     currentBookingProduct = productName;
     currentBookingSlug = toSlug(productName);
     currentBookingPrice = parseFloat(price);
     currentBookingFullPrice = fullPrice ? parseFloat(fullPrice) : currentBookingPrice;
     currentBookingChildPolicy = !!childPolicy;
+    const ch = parseInt(cutoffHour);
+    const cm = parseInt(cutoffMinute);
+    currentBookingCutoffHour = Number.isFinite(ch) && ch >= 0 && ch <= 23 ? ch : 8;
+    currentBookingCutoffMinute = Number.isFinite(cm) && cm >= 0 && cm <= 59 ? cm : 30;
 
     document.getElementById('booking-title').textContent = productName;
 
@@ -746,12 +864,15 @@ if(document.getElementById('booking-date')) {
             const selected = selectedDates[0];
             
             if (selected.getTime() === today.getTime()) {
+                // Heurística client-side com cutoff per-product (servidor é fonte de verdade — 422 CUTOFF_EXCEEDED).
                 const brTimeStr = new Date().toLocaleString("en-US", {timeZone: "America/Bahia", hour12: false});
                 const brTime = new Date(brTimeStr);
                 const hours = brTime.getHours();
                 const minutes = brTime.getMinutes();
-                
-                if (hours > 8 || (hours === 8 && minutes >= 30)) {
+                const cutH = currentBookingCutoffHour;
+                const cutM = currentBookingCutoffMinute;
+                const exceeded = (hours > cutH) || (hours === cutH && minutes >= cutM);
+                if (exceeded) {
                     instance.clear();
                     openOverlay(document.getElementById('urgent-modal'));
                 }
@@ -780,58 +901,46 @@ if(document.getElementById('ticket-date')) {
     });
 }
 
-function bookingPax() {
+// Helper genérico para ler/alterar quantidades (M-12 — deduplica booking/ticket)
+function readPax(prefix) {
     return {
-        adults: parseInt(document.getElementById('booking-qty').value) || 0,
-        kids: parseInt(document.getElementById('booking-kids').value) || 0,
-        babies: parseInt(document.getElementById('booking-babies').value) || 0
+        adults: parseInt(document.getElementById(`${prefix}-qty`).value) || 0,
+        kids: parseInt(document.getElementById(`${prefix}-kids`).value) || 0,
+        babies: parseInt(document.getElementById(`${prefix}-babies`).value) || 0
     };
 }
-function ticketPax() {
-    return {
-        adults: parseInt(document.getElementById('ticket-qty').value) || 0,
-        kids: parseInt(document.getElementById('ticket-kids').value) || 0,
-        babies: parseInt(document.getElementById('ticket-babies').value) || 0
-    };
-}
+function bookingPax() { return readPax('booking'); }
+function ticketPax() { return readPax('ticket'); }
 
-function fmtNum(n) {
-    return n.toFixed(2).replace(/\.00$/, '').replace('.', ',');
-}
+// Formatter pt-BR sem prefixo R$ (o prefixo já está no HTML para os labels dos botões).
+// Mantém BRL.format() como fonte única para valores no carrinho e mensagens WhatsApp.
+const NUM_BR = new Intl.NumberFormat('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+let currentBookingTotal = 0;
+let currentTicketTotal = 0;
 function recalcBookingTotal() {
     const p = bookingPax();
-    const total = p.adults * currentBookingPrice + p.kids * currentBookingPrice * 0.5;
-    document.getElementById('booking-total').textContent = fmtNum(total);
+    currentBookingTotal = Math.round((p.adults * currentBookingPrice + p.kids * currentBookingPrice * 0.5) * 100) / 100;
+    document.getElementById('booking-total').textContent = NUM_BR.format(currentBookingTotal);
 }
 function recalcTicketTotal() {
     const p = ticketPax();
-    const total = p.adults * currentTicketPrice + p.kids * currentTicketPrice * 0.5;
-    document.getElementById('ticket-total').textContent = fmtNum(total);
+    currentTicketTotal = Math.round((p.adults * currentTicketPrice + p.kids * currentTicketPrice * 0.5) * 100) / 100;
+    document.getElementById('ticket-total').textContent = NUM_BR.format(currentTicketTotal);
 }
 
-function changeQty(delta, target) {
+function changePaxQty(prefix, delta, target, recalcFn) {
     target = target || 'adults';
-    const idMap = { adults: 'booking-qty', kids: 'booking-kids', babies: 'booking-babies' };
+    const idMap = { adults: `${prefix}-qty`, kids: `${prefix}-kids`, babies: `${prefix}-babies` };
     const input = document.getElementById(idMap[target]);
     if (!input) return;
     let newVal = parseInt(input.value) + delta;
     const min = target === 'adults' ? 1 : 0;
     if (newVal < min) newVal = min;
     input.value = newVal;
-    recalcBookingTotal();
+    recalcFn();
 }
-
-function changeTicketQty(delta, target) {
-    target = target || 'adults';
-    const idMap = { adults: 'ticket-qty', kids: 'ticket-kids', babies: 'ticket-babies' };
-    const input = document.getElementById(idMap[target]);
-    if (!input) return;
-    let newVal = parseInt(input.value) + delta;
-    const min = target === 'adults' ? 1 : 0;
-    if (newVal < min) newVal = min;
-    input.value = newVal;
-    recalcTicketTotal();
-}
+function changeQty(delta, target) { changePaxQty('booking', delta, target, recalcBookingTotal); }
+function changeTicketQty(delta, target) { changePaxQty('ticket', delta, target, recalcTicketTotal); }
 
 // ── Step 1 → Step 2 (dados do responsável) ──
 const bookingStep1 = document.querySelector('#booking-modal .booking-modal-content > *:not(.booking-modal-step)');
@@ -841,18 +950,11 @@ const payBookingBtn = document.getElementById('pay-booking-btn');
 const countrySelect = document.getElementById('booking-country-code');
 
 function showBookingStep(n) {
+    const s1 = document.getElementById('booking-step-1');
     const s2 = document.getElementById('booking-step-2');
-    const content = bookingModal.querySelector('.booking-modal-content');
-    if (!content) return;
-    Array.from(content.children).forEach(el => {
-        if (el.classList.contains('close-modal')) return; // sempre visível
-        if (el.id === 'booking-step-2') {
-            el.hidden = (n !== 2);
-        } else {
-            el.hidden = (n !== 1);
-        }
-    });
-    if (n === 2) lucide.createIcons();
+    if (s1) s1.hidden = (n !== 1);
+    if (s2) s2.hidden = (n !== 2);
+    if (n === 2 && window.lucide) lucide.createIcons();
 }
 
 function buildStep2Summary() {
@@ -865,8 +967,7 @@ function buildStep2Summary() {
     if (pax.kids > 0) paxParts.push(`${pax.kids} criança${pax.kids > 1 ? 's' : ''}`);
     if (pax.babies > 0) paxParts.push(`${pax.babies} bebê${pax.babies > 1 ? 's' : ''}`);
     parts.push(`👥 ${paxParts.join(', ')}`);
-    const total = parseFloat(document.getElementById('booking-total').textContent.replace(',', '.'));
-    parts.push(`💳 Sinal: ${BRL.format(total)}`);
+    parts.push(`💳 Sinal: ${BRL.format(currentBookingTotal)}`);
     document.getElementById('booking-step2-summary').textContent = parts.join(' · ');
 }
 
@@ -900,7 +1001,9 @@ if (bookingBackBtn) {
 
 // ── Step 2 → POST /v1/reservations → redirect MP ──
 function parseDateBR(dateBR) {
+    if (!dateBR || !dateBR.includes('/')) return null;
     const [d, m, y] = dateBR.split('/');
+    if (!d || !m || !y) return null;
     return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
 }
 
@@ -925,6 +1028,7 @@ if (payBookingBtn) {
         const whatsapp = countryCode + whatsappNum;
         const dateBR = document.getElementById('booking-date').value;
         const travelDate = parseDateBR(dateBR);
+        if (!travelDate) { showToast(t('toast.select_date'), 'error'); return; }
         const departureTime = document.getElementById('booking-time').value || 'A combinar';
         const pax = bookingPax();
 
@@ -956,9 +1060,15 @@ if (payBookingBtn) {
             });
             const data = await res.json();
             if (!res.ok) {
-                showToast(data.message || 'Erro ao processar reserva', 'error');
                 payBookingBtn.disabled = false;
                 payBookingBtn.querySelector('span').textContent = t('booking.pay_btn') || 'Pagar Sinal com Segurança';
+                // 422 CUTOFF_EXCEEDED: o produto bateu o cutoff D-0 server-side. Mostrar modal urgente.
+                if (res.status === 422 && data && data.code === 'CUTOFF_EXCEEDED') {
+                    closeOverlay(bookingModal);
+                    openOverlay(document.getElementById('urgent-modal'));
+                    return;
+                }
+                showToast(data.message || 'Erro ao processar reserva', 'error');
                 return;
             }
             window.location.href = data.sandbox_init_point || data.init_point;
@@ -984,6 +1094,11 @@ const checkoutBtn = document.querySelector('.checkout-btn');
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', () => {
         if (cart.length === 0) return;
+        // L-17: prevent double-click
+        if (checkoutBtn.disabled) return;
+        checkoutBtn.disabled = true;
+        const origText = checkoutBtn.textContent;
+        checkoutBtn.textContent = 'Abrindo WhatsApp…';
 
         let msg = waLanguageHeader();
         msg += `Olá! Gostaria de finalizar a reserva dos itens abaixo:\n\n`;
@@ -997,6 +1112,11 @@ if (checkoutBtn) {
 
         const encMsg = encodeURIComponent(msg);
         window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank', 'noopener,noreferrer');
+        // Re-enable after brief delay
+        setTimeout(() => {
+            checkoutBtn.disabled = false;
+            checkoutBtn.textContent = origText;
+        }, 2000);
     });
 }
 
@@ -1012,8 +1132,6 @@ if(confirmTicketBtn) {
         }
 
         const selectedTime = selectEl.value || 'Sob Consulta';
-        const total = pax.adults * currentTicketPrice + pax.kids * currentTicketPrice * 0.5;
-        const totalFmt = fmtNum(total);
 
         let paxLine = `${pax.adults} adulto${pax.adults > 1 ? 's' : ''}`;
         if (pax.kids > 0) paxLine += `, ${pax.kids} criança${pax.kids > 1 ? 's' : ''} (6-9, 50%)`;
@@ -1025,7 +1143,7 @@ if(confirmTicketBtn) {
         msg += `📅 *DATA:* ${date}\n`;
         msg += `⏰ *HORÁRIO:* ${selectedTime}\n`;
         msg += `👥 *PASSAGEIROS:* ${paxLine}\n`;
-        msg += `💰 *VALOR TOTAL APROX.*: R$ ${totalFmt}\n\n`;
+        msg += `💰 *VALOR TOTAL APROX.*: ${BRL.format(currentTicketTotal)}\n\n`;
         msg += `Aguardo instruções e o link de pagamento!`;
 
         const encMsg = encodeURIComponent(msg);
@@ -1145,9 +1263,11 @@ document.addEventListener('click', (e) => {
         const timesStr = bookBtn.getAttribute('data-times');
         const fullprice = bookBtn.getAttribute('data-fullprice');
         const childPolicy = bookBtn.getAttribute('data-child-policy') === '1';
+        const cutoffH = bookBtn.getAttribute('data-cutoff-hour');
+        const cutoffM = bookBtn.getAttribute('data-cutoff-minute');
 
         const times = timesStr ? timesStr.split(',') : [];
-        openBookingModal(product, price, times, fullprice, childPolicy);
+        openBookingModal(product, price, times, fullprice, childPolicy, cutoffH, cutoffM);
     }
 
     // 6.2 Tratamento de Consultas WhatsApp (Passagens)
@@ -1189,6 +1309,6 @@ document.addEventListener('click', (e) => {
 applyLocale(detectLocale());
 
 // 8. CARREGA PRODUTOS DINÂMICOS (overlay sobre HTML estático)
-applyDynamicProducts();
+applyDynamicProducts().catch(() => {}); // L-10: silencia erros de rede (fallback = HTML estático)
 
 })(); // Fim da IIFE

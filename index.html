@@ -3,9 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Volta à Ilha | Agência de Turismo</title>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https:; media-src 'self'; connect-src 'self' https://site-vai-ai-production.up.railway.app https://api.voltaailha.com.br; frame-ancestors 'none'; base-uri 'self'; form-action 'self'">
+    <title>Volta à Ilha | Agência de Turismo em Morro de São Paulo</title>
 
     <link rel="icon" type="image/x-icon" href="./assets/favicon.ico">
+    <link rel="apple-touch-icon" href="./assets/logo.png">
+    <link rel="manifest" href="./manifest.json">
     <link rel="canonical" href="https://voltaailha.com.br/">
 
     <meta name="description" content="A melhor agência de turismo de Morro de São Paulo. Reserve agora seus passeios, transfers e passagens com segurança e facilidade.">
@@ -17,10 +20,13 @@
     <meta property="og:title" content="Volta à Ilha | Agência de Turismo em Morro de São Paulo">
     <meta property="og:description" content="Reserve passeios inesquecíveis, transfers e passagens para explorar o paraíso.">
     <meta property="og:image" content="https://voltaailha.com.br/assets/og_share.jpg">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:type" content="image/jpeg">
 
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://voltaailha.com.br/">
-    <meta property="twitter:title" content="Volta à Ilha | Turismo em Morro">
+    <meta property="twitter:title" content="Volta à Ilha | Agência de Turismo em Morro de São Paulo">
     <meta property="twitter:description" content="Reserve agora passagens e passeios em Morro de São Paulo.">
     <meta property="twitter:image" content="https://voltaailha.com.br/assets/og_share.jpg">
 
@@ -31,10 +37,19 @@
       "name": "Volta à Ilha",
       "legalName": "VOLTA A ILHA LTDA",
       "taxID": "13.510.711/0001-58",
-      "image": "https://voltaailha.com.br/assets/logo.png",
+      "image": "https://voltaailha.com.br/assets/og_share.jpg",
+      "logo": "https://voltaailha.com.br/assets/logo.png",
       "@id": "https://voltaailha.com.br/",
       "url": "https://voltaailha.com.br/",
       "telephone": "+5575998240043",
+      "sameAs": [
+        "https://www.instagram.com/voltaailha.com.br/",
+        "https://wa.me/5575998240043"
+      ],
+      "areaServed": {
+        "@type": "Place",
+        "name": "Morro de São Paulo, Bahia, Brazil"
+      },
       "address": {
         "@type": "PostalAddress",
         "streetAddress": "Rua Nova, Segunda Praia",
@@ -51,11 +66,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=24">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.css" integrity="sha384-IFb872aCXZQb6BKRUHmGn0YHKnFl4ylZjkgVRRyMTEQ5bjo/H6xFUiLJm6opOO66" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css" integrity="sha384-RkASv+6KfBMW9eknReJIJ6b3UnjKOKC5bOUaNgIY778NFbQ8MtWq9Lr/khUgqtTt" crossorigin="anonymous">
+    <link rel="stylesheet" href="./css/style.css?v=29">
 </head>
 <body>
+
+    <!-- Skip to main content (L-1 WCAG A11y) -->
+    <a href="#main-content" class="skip-link">Pular para o conteúdo principal</a>
 
     <!-- Menu SPA (Links de navegação no header) -->
     <header class="glass-header">
@@ -71,15 +89,15 @@
             <a href="#" class="nav-item" data-target="passagens" data-i18n="nav.passagens">Passagens</a>
         </nav>
         <button class="lang-btn" id="lang-btn" aria-label="Idioma" aria-haspopup="true" aria-expanded="false">
-            <i data-lucide="globe"></i>
+            <i data-lucide="globe" aria-hidden="true"></i>
             <span class="lang-code" id="lang-code">PT</span>
         </button>
         <button class="cart-btn" aria-label="Abrir carrinho" data-i18n-aria="aria.open_cart">
-            <i data-lucide="shopping-cart"></i>
+            <i data-lucide="shopping-cart" aria-hidden="true"></i>
             <span class="cart-badge">0</span>
         </button>
         <button class="hamburger" aria-label="Menu" id="hamburger-btn">
-            <i data-lucide="menu"></i>
+            <i data-lucide="menu" aria-hidden="true"></i>
         </button>
     </header>
 
@@ -98,7 +116,7 @@
     <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
     <nav class="mobile-nav" id="mobile-nav">
         <button class="close-mobile-nav" id="close-mobile-nav" aria-label="Fechar menu">
-            <i data-lucide="x"></i>
+            <i data-lucide="x" aria-hidden="true"></i>
         </button>
         <a href="#" class="nav-item" data-target="home" data-i18n="nav.home">Início</a>
         <a href="#" class="nav-item" data-target="passeios" data-i18n="nav.passeios">Passeios</a>
@@ -107,7 +125,7 @@
     </nav>
 
     <!-- Contêiner SPA (Onde as views vão alternar) -->
-    <main id="app-container">
+    <main id="main-content">
         
         <!-- ================= VIEW: HOME ================= -->
         <section class="spa-view active" id="view-home">
@@ -158,7 +176,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -171,7 +189,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.incluso">O que está incluso</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ Lancha rápida com tripulação credenciada.<br>✔️ Guia local durante todo o passeio.<br>✔️ Paradas em piscinas naturais e banco de areia.</p>
@@ -180,7 +198,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.levar">O que levar</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>🎒 Protetor solar e repelente.<br>🩱 Roupas de banho e toalha.<br>💧 Dinheiro para almoço em Boipeba e despesas extras.</p>
@@ -189,7 +207,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Sinal pelo site:</strong> R$ 100 para garantir a reserva.<br>✔️ <strong>Restante:</strong> R$ 250 no embarque.</p>
@@ -197,7 +215,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Volta à Ilha" data-price="100" data-times="09:30" data-fullprice="350" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Volta à Ilha" data-price="100" data-times="09:30" data-fullprice="350" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -220,7 +238,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -233,7 +251,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Sinal:</strong> R$ 30 · <strong>Restante:</strong> R$ 100 no embarque.</p>
@@ -241,7 +259,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Garapuá 4X4" data-price="30" data-times="A combinar" data-fullprice="130" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Garapuá 4X4" data-price="30" data-times="A combinar" data-fullprice="130" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -257,7 +275,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -269,7 +287,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Sinal:</strong> R$ 80 · <strong>Restante:</strong> R$ 180 no embarque.</p>
@@ -277,7 +295,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Gamboa Full" data-price="80" data-times="A combinar" data-fullprice="260" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Gamboa Full" data-price="80" data-times="A combinar" data-fullprice="260" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -293,7 +311,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -305,7 +323,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Sinal:</strong> R$ 20 · <strong>Restante:</strong> R$ 80 no embarque.</p>
@@ -313,7 +331,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Gamboa Convencional" data-price="20" data-times="A combinar" data-fullprice="100" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Gamboa Convencional" data-price="20" data-times="A combinar" data-fullprice="100" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -329,7 +347,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.requisitos">Requisitos</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>⚠️ <strong>Obrigatório apresentar CNH</strong> válida para pilotar.</p>
@@ -338,14 +356,14 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Valor por veículo:</strong> R$ 700 (até 2 pessoas).<br>✔️ <strong>Sinal:</strong> R$ 200 · <strong>Restante:</strong> R$ 500 no local.<br>✔️ <strong>Seguro:</strong> R$ 5 por pessoa.</p>
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Quadriciclo" data-price="200" data-times="A combinar" data-fullprice="700"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Quadriciclo" data-price="200" data-times="A combinar" data-fullprice="700"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -361,7 +379,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.pagamento">Formas de Pagamento</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>✔️ <strong>Valor por veículo:</strong> R$ 700 (até 4 pessoas).<br>✔️ <strong>Sinal:</strong> R$ 200 · <strong>Restante:</strong> R$ 500 no local.<br>✔️ <strong>Seguro:</strong> R$ 5 por pessoa.</p>
@@ -369,7 +387,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Buggy" data-price="200" data-times="A combinar" data-fullprice="700" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Buggy" data-price="200" data-times="A combinar" data-fullprice="700" data-child-policy="1"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -400,7 +418,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -410,7 +428,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Mergulho com Cilindro" data-price="180" data-times="08:00,13:00"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Mergulho com Cilindro" data-price="180" data-times="08:00,13:00"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -426,7 +444,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.detalhes">Detalhes</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>Duração: ~1h30 · Nível: iniciante · Guia experiente.</p>
@@ -434,7 +452,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Cavalgada" data-price="150" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Cavalgada" data-price="150" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -450,7 +468,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.detalhes">Detalhes</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>Equipamento completo · Instrutor credenciado.</p>
@@ -458,7 +476,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Tiroleza" data-price="80" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Tiroleza" data-price="80" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -474,7 +492,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.detalhes">Detalhes</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>Duração: ~20 min · Saídas conforme condição do mar.</p>
@@ -482,7 +500,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Banana Boat" data-price="60" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Banana Boat" data-price="60" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -498,14 +516,14 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.detalhes">Detalhes</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>Aluguel por hora · Equipamento de flutuação incluso.</p>
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Bike Aquática" data-price="70" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Bike Aquática" data-price="70" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -521,14 +539,14 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.detalhes">Detalhes</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <p>Aluguel por dia · Cadeado incluso.</p>
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="book" data-product="Aluguel de Bicicleta" data-price="50" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus"></i></button>
+                            <button class="btn-buy" data-action="book" data-product="Aluguel de Bicicleta" data-price="50" data-times="A combinar"><span data-i18n="btn.adicionar">Adicionar</span> <i data-lucide="plus" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -546,7 +564,7 @@
 
             <div class="route-toggle">
                 <button class="active" id="btn-toggle-route">
-                    <i data-lucide="arrow-right-left"></i><span class="toggle-label" data-i18n="toggle.to_volta"> Trocar para: VOLTA (Salvador)</span>
+                    <i data-lucide="arrow-right-left" aria-hidden="true"></i><span class="toggle-label" data-i18n="toggle.to_volta"> Trocar para: VOLTA (Salvador)</span>
                 </button>
             </div>
 
@@ -566,7 +584,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -578,7 +596,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro (Semi-Terrestre)" data-price="165" data-times="06:30,09:30,12:30,15:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Terminal SSA -> Morro (Semi-Terrestre)" data-price="165" data-times="06:30,09:30,12:30,15:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -594,7 +612,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -605,7 +623,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Hotéis -> Morro (Semi-Terrestre)" data-price="180" data-times="05:30,08:30,11:30,14:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Hotéis -> Morro (Semi-Terrestre)" data-price="180" data-times="05:30,08:30,11:30,14:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -621,7 +639,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -633,7 +651,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Semi-Terrestre / Via BR)" data-price="205" data-times="03:30,05:15,08:15,11:15,14:40" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Aeroporto -> Morro (Semi-Terrestre / Via BR)" data-price="205" data-times="03:30,05:15,08:15,11:15,14:40" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -649,7 +667,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -662,7 +680,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Catamarã Terminal SSA -> Morro" data-price="149" data-times="09:00,10:30,14:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Ida: Catamarã Terminal SSA -> Morro" data-price="149" data-times="09:00,10:30,14:30" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -686,7 +704,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -698,7 +716,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA (Semi-Terrestre)" data-price="145" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Terminal SSA (Semi-Terrestre)" data-price="145" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -714,7 +732,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -725,7 +743,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Hotéis (Semi-Terrestre)" data-price="160" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Hotéis (Semi-Terrestre)" data-price="160" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -741,7 +759,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -752,7 +770,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA (Semi-Terrestre)" data-price="185" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Morro -> Aeroporto SSA (Semi-Terrestre)" data-price="185" data-times="06:20,09:20,12:20,15:20" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -768,7 +786,7 @@
                                 <div class="accordion-item">
                                     <div class="accordion-header" data-action="accordion">
                                         <span data-i18n="accordion.roteiro">Roteiro e Horários</span>
-                                        <i data-lucide="chevron-down"></i>
+                                        <i data-lucide="chevron-down" aria-hidden="true"></i>
                                     </div>
                                     <div class="accordion-body"><div class="accordion-inner">
                                         <ul>
@@ -781,7 +799,7 @@
                                     </div></div>
                                 </div>
                             </div>
-                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Catamarã Morro -> Terminal SSA" data-price="138" data-times="11:30,13:30,15:00" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right"></i></button>
+                            <button class="btn-buy" data-action="consult-ticket" data-product="Volta: Catamarã Morro -> Terminal SSA" data-price="138" data-times="11:30,13:30,15:00" data-child-policy="1"><span data-i18n="btn.consultar">Consultar</span> <i data-lucide="arrow-right" aria-hidden="true"></i></button>
                         </div>
                     </div>
 
@@ -805,10 +823,10 @@
                 <p class="footer-legal-line">Morro de São Paulo — Cairu/BA · 45428-000</p>
             </div>
             <div class="footer-contact">
-                <a href="https://wa.me/5575998240043" target="_blank" rel="noopener noreferrer" class="footer-link">
+                <a href="https://wa.me/5575998240043" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" class="footer-link">
                     <i data-lucide="message-circle" aria-hidden="true"></i> +55 75 99824-0043
                 </a>
-                <a href="https://www.instagram.com/voltaailha.com.br/" target="_blank" rel="noopener noreferrer" class="footer-link" aria-label="Instagram">
+                <a href="https://www.instagram.com/voltaailha.com.br/" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" class="footer-link" aria-label="Instagram">
                     <i data-lucide="instagram" aria-hidden="true"></i> @voltaailha.com.br
                 </a>
                 <a href="./politica-privacidade.html" class="footer-link footer-link--legal" data-i18n="footer.privacy">Política de Privacidade</a>
@@ -824,7 +842,7 @@
     <div class="cart-drawer">
         <div class="cart-header">
             <h3 data-i18n="cart.title">Seu Carrinho</h3>
-            <button class="close-cart" aria-label="Fechar carrinho" data-i18n-aria="aria.close_cart"><i data-lucide="x"></i></button>
+            <button class="close-cart" aria-label="Fechar carrinho" data-i18n-aria="aria.close_cart"><i data-lucide="x" aria-hidden="true"></i></button>
         </div>
         <div class="cart-items" id="cart-items-container">
             <!-- Itens do carrinho serão inseridos via JS vazio por padrão -->
@@ -839,122 +857,125 @@
     <!-- Modal de Agendamento -->
     <div class="booking-modal-overlay" id="booking-modal" role="dialog" aria-modal="true" aria-labelledby="booking-title">
         <div class="booking-modal-content">
-            <button class="close-modal" id="close-booking" aria-label="Fechar" data-i18n-aria="aria.close"><i data-lucide="x"></i></button>
-            <h3 id="booking-title" class="modal-title">Nome do Passeio</h3>
-            <div id="booking-price-display" class="booking-price">
-                R$ <span id="booking-price-unit">0</span> <span data-i18n="booking.per_person">por pessoa</span>
-            </div>
+            <button class="close-modal" id="close-booking" aria-label="Fechar" data-i18n-aria="aria.close"><i data-lucide="x" aria-hidden="true"></i></button>
 
-            <div class="form-group">
-                <label><i data-lucide="calendar"></i> <span data-i18n="booking.label_date">Data do Passeio</span></label>
-                <input type="text" id="booking-date" data-i18n-placeholder="booking.date_placeholder" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
-            </div>
-
-            <div class="form-group" id="booking-time-group">
-                <label><i data-lucide="clock"></i> <span data-i18n="booking.label_time">Horário de Saída</span></label>
-                <select id="booking-time">
-                    <!-- Opções dinâmicas -->
-                </select>
-            </div>
-
-            <div class="form-group">
-                <label><i data-lucide="users"></i> <span data-i18n="booking.label_adults">Adultos</span></label>
-                <div class="qty-selector">
-                    <button type="button" data-action="change-qty" data-target="adults" data-delta="-1">-</button>
-                    <input type="number" id="booking-qty" value="1" min="1" readonly>
-                    <button type="button" data-action="change-qty" data-target="adults" data-delta="1">+</button>
+            <!-- Etapa 1: Configuração da reserva -->
+            <div class="booking-step" id="booking-step-1">
+                <h3 id="booking-title" class="modal-title">Nome do Passeio</h3>
+                <div id="booking-price-display" class="booking-price">
+                    R$ <span id="booking-price-unit">0</span> <span data-i18n="booking.per_person">por pessoa</span>
                 </div>
-            </div>
 
-            <div class="form-group pax-children" id="booking-children-group" hidden>
-                <div class="pax-row">
-                    <div class="pax-label">
-                        <i data-lucide="baby"></i>
-                        <div>
-                            <strong data-i18n="booking.babies_title">Bebês (0–5 anos)</strong>
-                            <small data-i18n="booking.babies_sub">Gratuito</small>
+                <div class="form-group">
+                    <label for="booking-date"><i data-lucide="calendar" aria-hidden="true"></i> <span data-i18n="booking.label_date">Data do Passeio</span></label>
+                    <input type="text" id="booking-date" name="booking-date" data-i18n-placeholder="booking.date_placeholder" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
+                </div>
+
+                <div class="form-group" id="booking-time-group">
+                    <label for="booking-time"><i data-lucide="clock" aria-hidden="true"></i> <span data-i18n="booking.label_time">Horário de Saída</span></label>
+                    <select id="booking-time" name="booking-time"></select>
+                </div>
+
+                <div class="form-group">
+                    <label for="booking-qty"><i data-lucide="users" aria-hidden="true"></i> <span data-i18n="booking.label_adults">Adultos</span></label>
+                    <div class="qty-selector">
+                        <button type="button" data-action="change-qty" data-target="adults" data-delta="-1" aria-label="Diminuir adultos">-</button>
+                        <input type="number" id="booking-qty" name="booking-qty" value="1" min="1" readonly>
+                        <button type="button" data-action="change-qty" data-target="adults" data-delta="1" aria-label="Aumentar adultos">+</button>
+                    </div>
+                </div>
+
+                <div class="form-group pax-children" id="booking-children-group" hidden>
+                    <div class="pax-row">
+                        <label class="pax-label" for="booking-babies">
+                            <i data-lucide="baby" aria-hidden="true"></i>
+                            <span>
+                                <strong data-i18n="booking.babies_title">Bebês (0–5 anos)</strong>
+                                <small data-i18n="booking.babies_sub">Gratuito</small>
+                            </span>
+                        </label>
+                        <div class="qty-selector qty-selector--mini">
+                            <button type="button" data-action="change-qty" data-target="babies" data-delta="-1" aria-label="Diminuir bebês">-</button>
+                            <input type="number" id="booking-babies" name="booking-babies" value="0" min="0" readonly>
+                            <button type="button" data-action="change-qty" data-target="babies" data-delta="1" aria-label="Aumentar bebês">+</button>
                         </div>
                     </div>
-                    <div class="qty-selector qty-selector--mini">
-                        <button type="button" data-action="change-qty" data-target="babies" data-delta="-1">-</button>
-                        <input type="number" id="booking-babies" value="0" min="0" readonly>
-                        <button type="button" data-action="change-qty" data-target="babies" data-delta="1">+</button>
-                    </div>
-                </div>
-                <div class="pax-row">
-                    <div class="pax-label">
-                        <i data-lucide="user"></i>
-                        <div>
-                            <strong data-i18n="booking.kids_title">Crianças (6–9 anos)</strong>
-                            <small data-i18n="booking.kids_sub">50% de desconto</small>
+                    <div class="pax-row">
+                        <label class="pax-label" for="booking-kids">
+                            <i data-lucide="user" aria-hidden="true"></i>
+                            <span>
+                                <strong data-i18n="booking.kids_title">Crianças (6–9 anos)</strong>
+                                <small data-i18n="booking.kids_sub">50% de desconto</small>
+                            </span>
+                        </label>
+                        <div class="qty-selector qty-selector--mini">
+                            <button type="button" data-action="change-qty" data-target="kids" data-delta="-1" aria-label="Diminuir crianças">-</button>
+                            <input type="number" id="booking-kids" name="booking-kids" value="0" min="0" readonly>
+                            <button type="button" data-action="change-qty" data-target="kids" data-delta="1" aria-label="Aumentar crianças">+</button>
                         </div>
                     </div>
-                    <div class="qty-selector qty-selector--mini">
-                        <button type="button" data-action="change-qty" data-target="kids" data-delta="-1">-</button>
-                        <input type="number" id="booking-kids" value="0" min="0" readonly>
-                        <button type="button" data-action="change-qty" data-target="kids" data-delta="1">+</button>
-                    </div>
+                    <p class="pax-hint" data-i18n="booking.pax_hint">A idade é considerada na data do passeio. Confirmação sujeita a comprovação no embarque.</p>
                 </div>
-                <p class="pax-hint" data-i18n="booking.pax_hint">A idade é considerada na data do passeio. Confirmação sujeita a comprovação no embarque.</p>
+
+                <button class="btn btn-primary w-100 mt-20" id="confirm-booking-btn">
+                    <span data-i18n="booking.confirm_prefix">Continuar</span> — <span data-i18n="booking.total_label">Sinal:</span> R$ <span id="booking-total">0</span>
+                </button>
+
+                <p class="modal-disclaimer" data-i18n="booking.disclaimer">
+                    *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
+                </p>
             </div>
-
-            <button class="btn btn-primary w-100 mt-20" id="confirm-booking-btn">
-                <span data-i18n="booking.confirm_prefix">Continuar</span> — <span data-i18n="booking.total_label">Sinal:</span> R$ <span id="booking-total">0</span>
-            </button>
-
-            <p class="modal-disclaimer" data-i18n="booking.disclaimer">
-                *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
-            </p>
 
             <!-- Etapa 2: Dados do responsável -->
-            <div class="booking-modal-step" id="booking-step-2" hidden>
-            <button class="booking-back-btn" id="booking-back-btn" aria-label="Voltar">
-                <i data-lucide="arrow-left"></i> <span data-i18n="booking.back">Voltar</span>
-            </button>
-            <h3 class="modal-title" data-i18n="booking.step2_title">Seus dados</h3>
-            <p class="booking-step2-summary" id="booking-step2-summary"></p>
+            <div class="booking-step" id="booking-step-2" hidden>
+                <button class="booking-back-btn" id="booking-back-btn" aria-label="Voltar">
+                    <i data-lucide="arrow-left" aria-hidden="true"></i> <span data-i18n="booking.back">Voltar</span>
+                </button>
+                <h3 class="modal-title" data-i18n="booking.step2_title">Seus dados</h3>
+                <p class="booking-step2-summary" id="booking-step2-summary"></p>
 
-            <div class="form-group">
-                <label for="booking-name"><i data-lucide="user"></i> <span data-i18n="booking.label_name">Nome completo</span> *</label>
-                <input type="text" id="booking-name" autocomplete="name" placeholder="Como consta no documento" data-i18n-placeholder="booking.name_placeholder">
-            </div>
-
-            <div class="form-group">
-                <label for="booking-whatsapp"><i data-lucide="phone"></i> <span data-i18n="booking.label_whatsapp">WhatsApp</span> *</label>
-                <div class="phone-field">
-                    <select id="booking-country-code" class="country-select">
-                        <option value="+55">🇧🇷 +55</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+44">🇬🇧 +44</option>
-                        <option value="+34">🇪🇸 +34</option>
-                        <option value="+33">🇫🇷 +33</option>
-                        <option value="+39">🇮🇹 +39</option>
-                        <option value="+49">🇩🇪 +49</option>
-                        <option value="+972">🇮🇱 +972</option>
-                        <option value="+54">🇦🇷 +54</option>
-                        <option value="+351">🇵🇹 +351</option>
-                    </select>
-                    <input type="tel" id="booking-whatsapp" autocomplete="tel" placeholder="99999-9999" data-i18n-placeholder="booking.whatsapp_placeholder">
+                <div class="form-group">
+                    <label for="booking-name"><i data-lucide="user" aria-hidden="true"></i> <span data-i18n="booking.label_name">Nome completo</span> *</label>
+                    <input type="text" id="booking-name" name="booking-name" autocomplete="name" placeholder="Como consta no documento" data-i18n-placeholder="booking.name_placeholder" required minlength="2">
                 </div>
+
+                <div class="form-group">
+                    <label for="booking-whatsapp"><i data-lucide="phone" aria-hidden="true"></i> <span data-i18n="booking.label_whatsapp">WhatsApp</span> *</label>
+                    <div class="phone-field">
+                        <select id="booking-country-code" class="country-select">
+                            <option value="+55">🇧🇷 +55</option>
+                            <option value="+1">🇺🇸 +1</option>
+                            <option value="+44">🇬🇧 +44</option>
+                            <option value="+34">🇪🇸 +34</option>
+                            <option value="+33">🇫🇷 +33</option>
+                            <option value="+39">🇮🇹 +39</option>
+                            <option value="+49">🇩🇪 +49</option>
+                            <option value="+972">🇮🇱 +972</option>
+                            <option value="+54">🇦🇷 +54</option>
+                            <option value="+351">🇵🇹 +351</option>
+                        </select>
+                        <input type="tel" id="booking-whatsapp" name="booking-whatsapp" autocomplete="tel" placeholder="99999-9999" data-i18n-placeholder="booking.whatsapp_placeholder" required inputmode="tel" pattern="[0-9\-\s]+" minlength="7">
+                    </div>
+                </div>
+
+                <div class="form-group" id="booking-email-group">
+                    <label for="booking-email"><i data-lucide="mail" aria-hidden="true"></i> <span data-i18n="booking.label_email">E-mail</span> <span id="booking-email-required-mark">*</span></label>
+                    <input type="email" id="booking-email" name="booking-email" autocomplete="email" placeholder="seu@email.com" inputmode="email">
+                </div>
+
+                <button class="btn btn-primary w-100 mt-20" id="pay-booking-btn">
+                    <i data-lucide="lock" aria-hidden="true"></i> <span data-i18n="booking.pay_btn">Pagar Sinal com Segurança</span>
+                </button>
+                <p class="booking-mp-badge" data-i18n="booking.mp_badge">Processado pelo MercadoPago · Pix ou Cartão</p>
             </div>
 
-            <div class="form-group" id="booking-email-group">
-                <label for="booking-email"><i data-lucide="mail"></i> <span data-i18n="booking.label_email">E-mail</span> <span id="booking-email-required-mark">*</span></label>
-                <input type="email" id="booking-email" autocomplete="email" placeholder="seu@email.com">
-            </div>
-
-            <button class="btn btn-primary w-100 mt-20" id="pay-booking-btn">
-                <i data-lucide="lock"></i> <span data-i18n="booking.pay_btn">Pagar Sinal com Segurança</span>
-            </button>
-            <p class="booking-mp-badge" data-i18n="booking.mp_badge">Processado pelo MercadoPago · Pix ou Cartão</p>
-        </div>
         </div>
     </div>
 
     <!-- Modal Secundário Exclusivo para Transfers Third-Party -->
     <div class="booking-modal-overlay" id="ticket-modal" role="dialog" aria-modal="true" aria-labelledby="ticket-title">
         <div class="booking-modal-content theme-blue-modal">
-            <button class="close-modal" id="close-ticket-modal" aria-label="Fechar" data-i18n-aria="aria.close"><i data-lucide="x"></i></button>
+            <button class="close-modal" id="close-ticket-modal" aria-label="Fechar" data-i18n-aria="aria.close"><i data-lucide="x" aria-hidden="true"></i></button>
             <h3 id="ticket-title" class="modal-title modal-title--blue" data-i18n="ticket.title">Solicitação de Passagem</h3>
             <p id="ticket-product-display" class="ticket-product-name"></p>
             <div class="booking-price booking-price--blue">
@@ -962,59 +983,59 @@
             </div>
 
             <div class="form-group">
-                <label><i data-lucide="calendar"></i> <span data-i18n="ticket.label_date">Data Desejada</span></label>
-                <input type="text" id="ticket-date" data-i18n-placeholder="booking.date_placeholder" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
+                <label for="ticket-date"><i data-lucide="calendar" aria-hidden="true"></i> <span data-i18n="ticket.label_date">Data Desejada</span></label>
+                <input type="text" id="ticket-date" name="ticket-date" data-i18n-placeholder="booking.date_placeholder" placeholder="Selecione uma data" readonly autocomplete="off" inputmode="none">
             </div>
 
             <div class="form-group" id="ticket-time-group">
-                <label><i data-lucide="clock"></i> <span data-i18n="ticket.label_time">Horário Disponível</span></label>
-                <select id="ticket-time">
+                <label for="ticket-time"><i data-lucide="clock" aria-hidden="true"></i> <span data-i18n="ticket.label_time">Horário Disponível</span></label>
+                <select id="ticket-time" name="ticket-time">
                 </select>
             </div>
 
             <div class="form-group">
-                <label><i data-lucide="users"></i> <span data-i18n="booking.label_adults">Adultos</span></label>
+                <label for="ticket-qty"><i data-lucide="users" aria-hidden="true"></i> <span data-i18n="booking.label_adults">Adultos</span></label>
                 <div class="qty-selector">
-                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="-1">-</button>
-                    <input type="number" id="ticket-qty" value="1" min="1" readonly>
-                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="1">+</button>
+                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="-1" aria-label="Diminuir adultos">-</button>
+                    <input type="number" id="ticket-qty" name="ticket-qty" value="1" min="1" readonly>
+                    <button type="button" data-action="change-ticket-qty" data-target="adults" data-delta="1" aria-label="Aumentar adultos">+</button>
                 </div>
             </div>
 
             <div class="form-group pax-children" id="ticket-children-group" hidden>
                 <div class="pax-row">
-                    <div class="pax-label">
-                        <i data-lucide="baby"></i>
-                        <div>
+                    <label class="pax-label" for="ticket-babies">
+                        <i data-lucide="baby" aria-hidden="true"></i>
+                        <span>
                             <strong data-i18n="booking.babies_title">Bebês (0–5 anos)</strong>
                             <small data-i18n="ticket.babies_sub">Gratuito (sem assento próprio)</small>
-                        </div>
-                    </div>
+                        </span>
+                    </label>
                     <div class="qty-selector qty-selector--mini">
-                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="-1">-</button>
-                        <input type="number" id="ticket-babies" value="0" min="0" readonly>
-                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="1">+</button>
+                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="-1" aria-label="Diminuir bebês">-</button>
+                        <input type="number" id="ticket-babies" name="ticket-babies" value="0" min="0" readonly>
+                        <button type="button" data-action="change-ticket-qty" data-target="babies" data-delta="1" aria-label="Aumentar bebês">+</button>
                     </div>
                 </div>
                 <div class="pax-row">
-                    <div class="pax-label">
-                        <i data-lucide="user"></i>
-                        <div>
+                    <label class="pax-label" for="ticket-kids">
+                        <i data-lucide="user" aria-hidden="true"></i>
+                        <span>
                             <strong data-i18n="booking.kids_title">Crianças (6–9 anos)</strong>
                             <small data-i18n="booking.kids_sub">50% de desconto</small>
-                        </div>
-                    </div>
+                        </span>
+                    </label>
                     <div class="qty-selector qty-selector--mini">
-                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="-1">-</button>
-                        <input type="number" id="ticket-kids" value="0" min="0" readonly>
-                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="1">+</button>
+                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="-1" aria-label="Diminuir crianças">-</button>
+                        <input type="number" id="ticket-kids" name="ticket-kids" value="0" min="0" readonly>
+                        <button type="button" data-action="change-ticket-qty" data-target="kids" data-delta="1" aria-label="Aumentar crianças">+</button>
                     </div>
                 </div>
                 <p class="pax-hint" data-i18n="ticket.pax_hint">A idade é considerada na data do embarque. Valor e disponibilidade confirmados pela operadora via WhatsApp.</p>
             </div>
 
             <button class="btn btn-primary w-100 mt-20 btn-whatsapp-confirm" id="confirm-ticket-btn">
-                <i data-lucide="message-circle"></i> <span data-i18n="ticket.confirm_prefix">Solicitar no WhatsApp</span> (R$ <span id="ticket-total">0</span>)
+                <i data-lucide="message-circle" aria-hidden="true"></i> <span data-i18n="ticket.confirm_prefix">Solicitar no WhatsApp</span> (R$ <span id="ticket-total">0</span>)
             </button>
 
             <p class="modal-disclaimer" data-i18n="ticket.disclaimer">
@@ -1032,8 +1053,8 @@
             </p>
             <div class="urgent-buttons">
                 <button class="btn w-100 btn-urgent-back" id="close-urgent" data-i18n="urgent.back">Voltar</button>
-                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" rel="noopener noreferrer" class="btn w-100 btn-urgent-whatsapp">
-                    <i data-lucide="message-circle" class="icon-whatsapp"></i> WhatsApp
+                <a href="https://wa.me/5575998240043?text=Ol%C3%A1%2C%20gostaria%20de%20verificar%20a%20disponibilidade%20para%20passeio%20hoje!" target="_blank" rel="noopener noreferrer" referrerpolicy="no-referrer" class="btn w-100 btn-urgent-whatsapp">
+                    <i data-lucide="message-circle" class="icon-whatsapp" aria-hidden="true"></i> WhatsApp
                 </a>
             </div>
         </div>
@@ -1054,15 +1075,15 @@
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/pt.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fr.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/it.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/de.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/he.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13" integrity="sha384-5JqMv4L/Xa0hfvtF06qboNdhvuYXUku9ZrhZh3bSk8VXF0A/RuSLHpLsSV9Zqhl6" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/pt.js" integrity="sha384-agbVpcY312cNMSL1b3CUo060bj9FmbwUX8HUCNSE17+jOU/en4yz3w9ro9IWVusF" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/es.js" integrity="sha384-j/aEP2b+3OKmGqank2qCSosSrlrF9jpIpdgApXq2ryJYBpLSbEi63/PDdL+rKmcQ" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/fr.js" integrity="sha384-G+W4MJlWkqyxrTEDGqlYx0mcjIOCc60/SvgTHEM8GSs85gMIzcJ2FERdERxhEJ88" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/it.js" integrity="sha384-XmcRqh+m1SV0CoktEURItyTPYrm018EIiFIZnaIFP1lRvHRna9DduiTvO+TQzcTJ" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/de.js" integrity="sha384-yD6dlpesNBZIZV0gfeLiuO80i+vOIxc912ljzvZhRljuVNYEaCoKHCFzbOX0ALBT" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/l10n/he.js" integrity="sha384-1I090oEz5AdBuhI3qyH1OVvFk6SQrWNzNfYPqNig9SKDebtaLcmRBKrQvAAMhBZ9" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.js" integrity="sha384-JiF4eFN9V3I2Fry7TzFM3XKdq0P3abiVxpOeHjGz4cwvas+uNg6pFWVmuD6MKXqG" crossorigin="anonymous" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@0.468.0/dist/umd/lucide.min.js" integrity="sha384-uTYyvsSSUZeaPhb5RbKlQa0zY/WpX/QHfvg2mczXyBQOpkWPEDy9lczyp+w7SKXu" crossorigin="anonymous" defer></script>
     <script src="./js/i18n.js" defer></script>
     <script src="./js/script.js" defer></script>
 </body>

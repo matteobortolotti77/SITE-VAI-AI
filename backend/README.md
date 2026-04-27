@@ -1,11 +1,14 @@
-# Volta à Ilha — Backend
+# Volta à Ilha — Backend (Quick-start)
 
 API de reservas, pagamentos e vouchers.
 Stack: **Node.js 22 + Fastify 5 + Supabase (Postgres) + MercadoPago**.
 
+> 📘 **Especificação completa, regras de negócio, roadmap e decisões pendentes** vivem em [`../CLAUDE.md`](../CLAUDE.md) (master).
+> Este arquivo cobre **apenas o setup operativo local** do backend.
+
 ---
 
-## 0. Estado atual
+## Estado atual
 
 ✅ Estrutura de pastas
 ✅ Schema SQL (`db/schema.sql`)
@@ -16,21 +19,21 @@ Sem credentials, o servidor sobe normalmente mas todas as rotas (exceto `/health
 
 ---
 
-## 1. Setup (ordem obrigatória)
+## Setup (ordem obrigatória)
 
-### 1.1 Instalar Node 22
+### 1. Instalar Node 22
 ```bash
 brew install node@22
 node --version  # deve dizer v22.x.x
 ```
 
-### 1.2 Instalar dependências
+### 2. Instalar dependências
 ```bash
 cd backend
 npm install
 ```
 
-### 1.3 Criar projeto Supabase
+### 3. Criar projeto Supabase
 1. https://supabase.com → Login com GitHub → **New project**
 2. Nome: `volta-a-ilha` · Region: `South America (São Paulo)` · Password: anote num gerenciador
 3. Aguarde ~2 min até "Project is ready"
@@ -39,26 +42,26 @@ npm install
    - **anon public** key (publica)
    - **service_role** key (SECRETA — não compartilhe)
 
-### 1.4 Rodar o schema
+### 4. Rodar o schema
 1. Supabase → **SQL Editor** → **New query**
 2. Cole o conteúdo inteiro de [`db/schema.sql`](./db/schema.sql)
 3. Clique **RUN** — deve dizer "Success"
-4. Verifique em **Table Editor**: devem aparecer 6 tabelas (providers, products, customers, reservations, payments, notifications) e 1 view (availability)
+4. Verifique em **Table Editor**: devem aparecer 8 tabelas (providers, products, customers, reservations, passengers, payments, notifications, fleet_reallocations) e 1 view (availability)
 
-### 1.5 Criar conta MercadoPago PJ
-1. https://www.mercadopago.com.br/developers → cadastro com CNPJ 13.510.711/0001-58
-2. Aguarde aprovação (1-2 dias úteis)
+### 5. Criar conta MercadoPago PJ
+1. https://www.mercadopago.com.br/developers → cadastro com CNPJ `13.510.711/0001-58`
+2. Aguarde aprovação (1–2 dias úteis)
 3. Após aprovado: **Suas integrações → Criar aplicação** → escolha "Pagamentos online"
 4. **Credenciais** → copie **Access Token de TESTE** (`TEST-...`)
-5. Configure webhook (será detalhado quando integrarmos)
+5. Configure webhook (será detalhado na Fase 3 — ver `CLAUDE.md` §9)
 
-### 1.6 Configurar `.env`
+### 6. Configurar `.env`
 ```bash
 cp .env.example .env
 # Edite .env e cole os valores reais
 ```
 
-### 1.7 Subir servidor em dev
+### 7. Subir servidor em dev
 ```bash
 npm run dev
 ```
@@ -79,20 +82,14 @@ curl http://localhost:3000/v1/products
 
 ---
 
-## 2. Popular produtos iniciais
-
-Após o schema rodar e antes de qualquer reserva, vamos inserir os 16 produtos atuais (passeios + atividades + passagens). Isso será feito via script `db/seed.sql` — **será criado quando você passar as capacidades**.
-
----
-
-## 3. Estrutura de pastas
+## Estrutura de pastas
 
 ```
 backend/
 ├── package.json
 ├── .env.example          # template — copie p/ .env
 ├── .env                  # NUNCA committar (no .gitignore)
-├── README.md             # este arquivo
+├── README.md             # este arquivo (setup)
 ├── db/
 │   └── schema.sql        # rodar no Supabase SQL Editor
 └── src/
@@ -103,46 +100,16 @@ backend/
     ├── routes/
     │   ├── health.js     # GET /v1/health
     │   └── products.js   # GET /v1/products, /:slug, /availability
-    ├── services/         # (futuro) lógica de negócio
-    └── utils/            # (futuro) helpers
+    ├── services/         # pricing.js, cutoff.js, ...
+    └── utils/
 ```
 
 ---
 
-## 4. Próximas fases (ordem)
+## Próximos passos
 
-| Fase | O que entra | Bloqueador |
-|------|-------------|-----------|
-| **1 ✅** | Estrutura, schema, /products read-only | Nada — está aqui |
-| **2** | Seed inicial dos 16 produtos | Capacidades reais |
-| **3** | POST /reservations + integração MercadoPago | Conta MP aprovada |
-| **4** | Webhook de pagamento + atualização de status | MP webhook secret |
-| **5** | Geração de voucher PDF + envio (email) | Resend.com account |
-| **6** | Painel admin (CRUD completo) | — |
-| **7** | Migrar frontend para consumir API | Backend deployado |
-
----
-
-## 5. Deploy (futuro — não fazer ainda)
-
-Plano: **Railway.app** (~R$ 50/mês, deploy direto do GitHub).
-
-```bash
-# Variáveis a configurar no Railway:
-SUPABASE_URL=...
-SUPABASE_SERVICE_ROLE_KEY=...
-MP_ACCESS_TOKEN=APP_USR-...   # produção
-MP_WEBHOOK_SECRET=...
-CORS_ORIGIN=https://voltaailha.com.br
-NODE_ENV=production
-PORT=3000
-```
-
----
-
-## 6. Decisões pendentes (lembrar Matteo)
-
-- [ ] Criar conta MercadoPago PJ (CNPJ 13.510.711/0001-58)
-- [ ] Criar projeto Supabase + rodar `schema.sql`
-- [ ] Definir capacidade de cada produto (passou amanhã)
-- [ ] Criar `dpo@voltaailha.com.br` antes do launch (LGPD — já citado em politica-privacidade.html)
+Roadmap, bloqueadores e TBDs estão centralizados em [`../CLAUDE.md`](../CLAUDE.md):
+- Fases de implementação: `CLAUDE.md` §9
+- Estado atual + backlog: `CLAUDE.md` §10
+- Decisões pendentes (PDF lib, WhatsApp provider, Email provider): `CLAUDE.md` §2.2 + §10.1
+- Variáveis de ambiente para deploy Railway: ver `.env.example` + `CLAUDE.md` §2.2

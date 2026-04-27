@@ -1,3 +1,9 @@
+> ⚠ **DEPRECATED — 2026-04-27**
+> Este arquivo foi superseduto por [`CLAUDE.md`](../../CLAUDE.md), agora master único do projeto.
+> Mantido apenas para histórico. **Não usar como referência em novas implementações.**
+
+---
+
 # Regras e Contexto do Projeto (GEMINI)
 
 Este arquivo serve como **contexto e manual de regras** para futuros assistentes de IA (como eu, Gemini) não perderem o escopo da aplicação ao te auxiliar com código.

@@ -1,3 +1,9 @@
+> ⚠ **DEPRECATED — 2026-04-27**
+> Este arquivo foi superseduto por [`CLAUDE.md`](../../CLAUDE.md) (master) e por `PROMPT_BACKEND_2.md` (que por sua vez também foi consolidado no master).
+> Mantido apenas para histórico. **Não usar como referência em novas implementações.**
+
+---
+
 # Prompt para Implementação de Banco de Dados e Backend
 
 **Utilize o texto abaixo como prompt (instrução) para a IA ou desenvolvedor que for planejar e implementar o backend do seu sistema.**

@@ -12,6 +12,21 @@
     --glass-bg: rgba(255, 255, 255, 0.4);
     --glass-border: rgba(255, 255, 255, 0.5);
     --glass-blur: blur(16px);
+
+    /* Z-index scale (L-4) */
+    --z-hero-bg: -2;
+    --z-hero-overlay: -1;
+    --z-card-element: 10;
+    --z-mobile-overlay: 999;
+    --z-header: 1000;
+    --z-hamburger: 1001;
+    --z-cart-overlay: 1999;
+    --z-cart-drawer: 2000;
+    --z-modal: 3000;
+    --z-lang-dropdown: 4000;
+    --z-urgent-modal: 4000;
+    --z-confirm-dialog: 4500;
+    --z-toast: 5000;
 }
 
 * {
@@ -25,10 +40,57 @@ html {
     scroll-behavior: smooth;
 }
 
+/* =========================================
+   FOCUS VISIBLE (H-5 — WCAG 2.1 AA keyboard focus)
+   ========================================= */
+:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+.theme-blue-modal :focus-visible,
+#view-passagens :focus-visible {
+    outline-color: var(--secondary-color);
+}
+
+/* =========================================
+   REDUCED MOTION (H-8 — prefers-reduced-motion)
+   ========================================= */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+    html { scroll-behavior: auto; }
+    .bg-video { display: none; }
+}
+
 body {
     background-color: var(--light-bg);
     color: var(--text-main);
     overflow-x: hidden;
+}
+
+/* =========================================
+   SKIP LINK (L-1 — WCAG A11y)
+   ========================================= */
+.skip-link {
+    position: absolute;
+    top: -100%;
+    left: 16px;
+    z-index: calc(var(--z-toast) + 1);
+    background: var(--primary-color);
+    color: #fff;
+    padding: 12px 24px;
+    border-radius: 0 0 8px 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: top 0.2s;
+}
+.skip-link:focus {
+    top: 0;
 }
 
 /* =========================================
@@ -44,7 +106,7 @@ body {
     justify-content: space-between;
     align-items: center;
     padding: 0 5%;
-    z-index: 1000;
+    z-index: var(--z-header);
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -86,6 +148,11 @@ body {
     font-size: 1rem;
     position: relative;
     transition: opacity 0.3s, color 0.3s;
+    text-shadow: 0 1px 3px rgba(0,0,0,0.5);
+}
+.glass-header.scrolled .nav-links a,
+.glass-header.on-section .nav-links a {
+    text-shadow: none;
 }
 
 .nav-links a.active::after {
@@ -178,7 +245,7 @@ body {
     min-width: 100%;
     min-height: 100%;
     transform: translate(-50%, -50%);
-    z-index: -2;
+    z-index: var(--z-hero-bg);
     object-fit: cover;
 }
 
@@ -194,7 +261,7 @@ body {
         rgba(0,0,0,0.2) 50%, 
         rgba(0,0,0,0.6) 100%
     );
-    z-index: -1;
+    z-index: var(--z-hero-overlay);
 }
 
 .hero-content {
@@ -335,7 +402,7 @@ body {
     width: 400px;
     height: 100vh;
     background: white;
-    z-index: 2000;
+    z-index: var(--z-cart-drawer);
     box-shadow: -10px 0 30px rgba(0,0,0,0.1);
     transition: right 0.4s cubic-bezier(0.77, 0, 0.175, 1);
     display: flex;
@@ -353,7 +420,7 @@ body {
     width: 100vw;
     height: 100vh;
     background: rgba(0,0,0,0.5);
-    z-index: 1999;
+    z-index: var(--z-cart-overlay);
     opacity: 0;
     visibility: hidden;
     transition: all 0.4s;
@@ -394,7 +461,7 @@ body {
     height: 100vh;
     background: rgba(0,0,0,0.6);
     backdrop-filter: blur(5px);
-    z-index: 3000;
+    z-index: var(--z-modal);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -735,7 +802,7 @@ body {
     cursor: pointer;
     color: var(--secondary-color);
     padding: 5px;
-    z-index: 1001;
+    z-index: var(--z-hamburger);
     transition: color 0.3s;
 }
 
@@ -747,7 +814,7 @@ body {
     height: 100vh;
     background: rgba(0,0,0,0.5);
     backdrop-filter: blur(4px);
-    z-index: 999;
+    z-index: var(--z-mobile-overlay);
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s;
@@ -765,7 +832,7 @@ body {
     width: 280px;
     height: 100vh;
     background: white;
-    z-index: 1000;
+    z-index: var(--z-header);
     padding: 100px 30px 30px;
     display: flex;
     flex-direction: column;
@@ -864,7 +931,7 @@ body {
 .highlight--blue { color: var(--secondary-color); }
 
 /* Inner Swiper price tag elevation */
-.inner-swiper .price-tag { z-index: 10; }
+.inner-swiper .price-tag { z-index: var(--z-card-element); }
 
 /* Carousel pagination with spacing (replaces inline style) */
 .carousel-pagination {
@@ -925,7 +992,7 @@ body {
 .booking-back-btn {
     background: none;
     border: none;
-    color: var(--color-primary);
+    color: var(--primary-color);
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -972,7 +1039,7 @@ body {
     -moz-appearance: none;
     appearance: none;
 }
-.country-select:focus { outline: none; border-color: var(--color-primary); }
+.country-select:focus { outline: none; border-color: var(--primary-color); }
 .phone-field input[type="tel"] {
     flex: 1 1 100%;
     padding: 12px 14px;
@@ -986,7 +1053,7 @@ body {
 }
 .phone-field input[type="tel"]:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--primary-color);
 }
 
 /* Email field — always visible, * toggles */
@@ -1003,7 +1070,7 @@ body {
 }
 .form-group input[type="email"]:focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--primary-color);
 }
 .form-group input[type="text"]:not(#booking-date):not(#ticket-date) {
     padding: 12px 14px;
@@ -1018,9 +1085,9 @@ body {
 }
 .form-group input[type="text"]:not(#booking-date):not(#ticket-date):focus {
     outline: none;
-    border-color: var(--color-primary);
+    border-color: var(--primary-color);
 }
-#booking-email-required-mark { color: var(--color-primary); }
+#booking-email-required-mark { color: var(--primary-color); }
 
 /* MercadoPago badge */
 .booking-mp-badge {
@@ -1069,7 +1136,7 @@ body {
 .icon-trash { width: 20px; height: 20px; }
 
 /* Urgent/Same-day modal */
-.urgent-modal-overlay { z-index: 4000; }
+.urgent-modal-overlay { z-index: var(--z-urgent-modal); }
 .urgent-modal-content { text-align: center; }
 .urgent-title { margin-bottom: 15px; color: var(--primary-color); }
 .urgent-text { margin-bottom: 20px; line-height: 1.5; color: #555; }
@@ -1222,7 +1289,7 @@ body {
     border-radius: 12px;
     font-weight: 600;
     font-size: 0.95rem;
-    z-index: 5000;
+    z-index: var(--z-toast);
     opacity: 0;
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
@@ -1238,7 +1305,7 @@ body {
 /* =========================================
    CONFIRM DIALOG (substitui confirm)
    ========================================= */
-.confirm-dialog-overlay { z-index: 4500; }
+.confirm-dialog-overlay { z-index: var(--z-confirm-dialog); }
 .confirm-dialog-content { text-align: center; max-width: 400px; }
 .confirm-dialog-title {
     margin: 0 0 12px;
@@ -1386,7 +1453,7 @@ body {
     border-radius: 12px;
     box-shadow: 0 12px 32px rgba(0,0,0,0.18);
     padding: 8px;
-    z-index: 4000;
+    z-index: var(--z-lang-dropdown);
     min-width: 200px;
     display: none;
     flex-direction: column;
@@ -1542,4 +1609,27 @@ body {
 
 @media (min-width: 720px) {
     .legal-article { padding: 56px 56px; }
+}
+
+/* =========================================
+   DISABLED STATES (L-16)
+   ========================================= */
+.btn-buy:disabled,
+.btn-buy[disabled],
+.qty-selector button:disabled,
+.checkout-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+}
+
+/* =========================================
+   EMPTY CART VISUAL (L-18)
+   ========================================= */
+.empty-cart-msg {
+    text-align: center;
+    color: #999;
+    padding: 40px 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
