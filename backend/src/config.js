@@ -9,7 +9,7 @@ function optional(name, fallback) {
 export const config = {
     port: Number(optional('PORT', 3000)),
     env: optional('NODE_ENV', 'development'),
-    corsOrigin: optional('CORS_ORIGIN', 'http://localhost:8765'),
+    corsOrigin: optional('CORS_ORIGIN', 'http://localhost:8765').split(',').map(s => s.trim()),
 
     supabase: {
         url: optional('SUPABASE_URL', ''),

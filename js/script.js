@@ -104,7 +104,7 @@ if (langBtn && langDropdown) {
 // 0.3 PRODUTOS DINÂMICOS — fetch /v1/products e re-renderiza carrosséis
 // Progressive enhancement: HTML estático aparece primeiro; se backend responder
 // em ≤2s, sobrescreve com dados frescos do DB. Se falhar, mantém estático.
-const API_BASE = 'http://localhost:3000/v1';
+const API_BASE = 'https://site-vai-ai-production.up.railway.app/v1';
 
 // Mapping accordion title (pt-BR base) → chave i18n
 const ACCORDION_KEYS = {
@@ -946,7 +946,7 @@ if (payBookingBtn) {
         payBookingBtn.querySelector('span').textContent = 'Processando…';
 
         try {
-            const res = await fetch('http://localhost:3000/v1/reservations', {
+            const res = await fetch(`${API_BASE}/reservations`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
