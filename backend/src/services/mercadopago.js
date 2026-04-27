@@ -44,8 +44,7 @@ export async function createPreference({ cartId, items, payer, urls }) {
             success: urls.success,
             failure: urls.failure,
             pending: urls.pending
-        },
-        auto_return: 'approved'
+        }
     };
 
     if (payer && payer.name) {

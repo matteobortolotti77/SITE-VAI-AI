@@ -842,14 +842,17 @@ const countrySelect = document.getElementById('booking-country-code');
 
 function showBookingStep(n) {
     const s2 = document.getElementById('booking-step-2');
-    const step1Els = bookingModal.querySelectorAll('.booking-modal-content > :not(#booking-step-2):not(.close-modal)');
-    if (n === 1) {
-        step1Els.forEach(el => { el.hidden = false; });
-        if (s2) s2.hidden = true;
-    } else {
-        step1Els.forEach(el => { el.hidden = true; });
-        if (s2) { s2.hidden = false; lucide.createIcons(); }
-    }
+    const content = bookingModal.querySelector('.booking-modal-content');
+    if (!content) return;
+    Array.from(content.children).forEach(el => {
+        if (el.classList.contains('close-modal')) return; // sempre visível
+        if (el.id === 'booking-step-2') {
+            el.hidden = (n !== 2);
+        } else {
+            el.hidden = (n !== 1);
+        }
+    });
+    if (n === 2) lucide.createIcons();
 }
 
 function buildStep2Summary() {
@@ -936,9 +939,9 @@ if (payBookingBtn) {
                 qty_infants: pax.babies
             }],
             return_urls: {
-                success: `${window.location.origin}/sucesso.html`,
-                failure: `${window.location.origin}/falha.html`,
-                pending: `${window.location.origin}/pendente.html`
+                success: 'https://voltaailha.com.br/sucesso.html',
+                failure: 'https://voltaailha.com.br/falha.html',
+                pending: 'https://voltaailha.com.br/pendente.html'
             }
         };
 
