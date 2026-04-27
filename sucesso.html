@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reserva Confirmada | Volta à Ilha</title>
+    <meta name="robots" content="noindex">
+    <link rel="icon" href="./assets/favicon.ico">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@0.468.0/dist/umd/lucide.min.js" defer></script>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --color-primary: #00A33A;
+            --color-secondary: #005BAB;
+            --color-dark: #1A1A1D;
+            --color-light: #F7F7F9;
+            --font-main: 'Outfit', sans-serif;
+            --radius: 16px;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background: var(--color-light);
+            color: var(--color-dark);
+            min-height: 100vh;
+            padding: 24px 16px 60px;
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+        .page-header img { height: 36px; }
+        .page-header span {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--color-primary);
+        }
+
+        .container { max-width: 600px; margin: 0 auto; }
+
+        /* Estado de carregamento */
+        #state-loading, #state-error, #state-paid, #state-pending, #state-form, #state-done {
+            display: none;
+        }
+        #state-loading.active, #state-error.active, #state-paid.active,
+        #state-pending.active, #state-form.active, #state-done.active {
+            display: block;
+        }
+
+        .status-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 32px 24px;
+            text-align: center;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+            margin-bottom: 24px;
+        }
+        .status-card .icon-circle {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 16px;
+        }
+        .icon-circle--green { background: #e6f9ee; color: var(--color-primary); }
+        .icon-circle--orange { background: #fff3e0; color: #e65100; }
+        .icon-circle--red { background: #fdecea; color: #c62828; }
+        .icon-circle--gray { background: #f5f5f5; color: #666; }
+        .icon-circle i { width: 32px; height: 32px; }
+
+        .status-card h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 8px; }
+        .status-card p { color: #555; line-height: 1.6; }
+
+        .cart-summary {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .cart-summary h2 { font-size: 1rem; font-weight: 600; margin-bottom: 14px; color: #333; }
+        .reservation-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            gap: 12px;
+        }
+        .reservation-row:last-child { border-bottom: none; }
+        .reservation-info { flex: 1; }
+        .reservation-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 4px; }
+        .reservation-meta { font-size: 0.82rem; color: #777; }
+        .reservation-price { font-weight: 700; color: var(--color-primary); white-space: nowrap; }
+
+        /* Formulário de passageiros */
+        .passenger-card {
+            background: #fff;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+        }
+        .passenger-card h3 {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--color-dark);
+        }
+        .passenger-card h3 .badge {
+            background: var(--color-primary);
+            color: #fff;
+            font-size: 0.72rem;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+        .passenger-card h3 .badge--child {
+            background: var(--color-secondary);
+        }
+
+        .form-group { margin-bottom: 14px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+        }
+        .form-group input[type="text"] {
+            width: 100%;
+            padding: 11px 14px;
+            border: 1.5px solid #ddd;
+            border-radius: 10px;
+            font-family: var(--font-main);
+            font-size: 0.95rem;
+            background: #fff;
+            transition: border-color 0.2s;
+        }
+        .form-group input[type="text"]:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+        .doc-toggle {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+        .doc-toggle button {
+            flex: 1;
+            padding: 9px;
+            border: 1.5px solid #ddd;
+            border-radius: 8px;
+            font-family: var(--font-main);
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: #fff;
+            cursor: pointer;
+            transition: all 0.15s;
+            color: #555;
+        }
+        .doc-toggle button.active {
+            border-color: var(--color-primary);
+            background: #e6f9ee;
+            color: var(--color-primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            background: var(--color-primary);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius);
+            font-family: var(--font-main);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: opacity 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 8px;
+        }
+        .btn-submit:disabled { opacity: 0.65; cursor: not-allowed; }
+        .btn-submit i { width: 20px; height: 20px; }
+
+        .submit-note {
+            text-align: center;
+            font-size: 0.78rem;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid #e0e0e0;
+            border-top-color: var(--color-primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 32px auto;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            background: #25D366;
+            color: #fff;
+            padding: 14px 24px;
+            border-radius: var(--radius);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1rem;
+            margin-top: 16px;
+        }
+        .wa-btn i { width: 20px; height: 20px; }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div class="page-header">
+        <img src="./assets/logo.png" alt="Volta à Ilha">
+        <span>Volta à Ilha</span>
+    </div>
+
+    <!-- Carregando -->
+    <div id="state-loading" class="active">
+        <div class="status-card">
+            <div class="spinner"></div>
+            <p>Verificando pagamento…</p>
+        </div>
+    </div>
+
+    <!-- Erro genérico -->
+    <div id="state-error">
+        <div class="status-card">
+            <div class="icon-circle icon-circle--red">
+                <i data-lucide="alert-circle"></i>
+            </div>
+            <h1>Algo deu errado</h1>
+            <p id="error-msg">Não conseguimos verificar sua reserva. Entre em contato pelo WhatsApp.</p>
+        </div>
+        <a href="https://wa.me/5575998240043" class="wa-btn" target="_blank" rel="noopener noreferrer">
+            <i data-lucide="message-circle"></i> Falar no WhatsApp
+        </a>
+    </div>
+
+    <!-- Pagamento pendente / processando -->
+    <div id="state-pending">
+        <div class="status-card">
+            <div class="icon-circle icon-circle--orange">
+                <i data-lucide="clock"></i>
+            </div>
+            <h1>Pagamento em processamento</h1>
+            <p>Seu pagamento está sendo analisado. Assim que confirmado, você receberá uma mensagem no WhatsApp.</p>
+        </div>
+        <a href="https://wa.me/5575998240043" class="wa-btn" target="_blank" rel="noopener noreferrer">
+            <i data-lucide="message-circle"></i> Dúvidas? Fale conosco
+        </a>
+    </div>
+
+    <!-- Pagamento aprovado mas passageiros já foram preenchidos -->
+    <div id="state-done">
+        <div class="status-card">
+            <div class="icon-circle icon-circle--green">
+                <i data-lucide="check-circle-2"></i>
+            </div>
+            <h1>Tudo certo! 🎉</h1>
+            <p>Sua reserva está confirmada. Você receberá o voucher pelo WhatsApp.</p>
+        </div>
+        <a href="https://wa.me/5575998240043" class="wa-btn" target="_blank" rel="noopener noreferrer">
+            <i data-lucide="message-circle"></i> Falar com a equipe
+        </a>
+    </div>
+
+    <!-- Formulário de passageiros -->
+    <div id="state-form">
+        <div class="status-card">
+            <div class="icon-circle icon-circle--green">
+                <i data-lucide="check-circle-2"></i>
+            </div>
+            <h1>Pagamento confirmado!</h1>
+            <p>Agora preencha os dados dos passageiros para liberar o embarque.</p>
+        </div>
+
+        <div class="cart-summary" id="cart-summary">
+            <h2>Resumo da reserva</h2>
+            <div id="cart-rows"></div>
+        </div>
+
+        <form id="passengers-form" novalidate>
+            <div id="passenger-fields"></div>
+
+            <button type="submit" class="btn-submit" id="submit-btn">
+                <i data-lucide="send"></i>
+                <span>Confirmar Passageiros</span>
+            </button>
+            <p class="submit-note">Você pode corrigir os dados até 24h antes do embarque.</p>
+        </form>
+    </div>
+
+</div>
+
+<script>
+(() => {
+    const API = 'http://localhost:3000/v1';
+    const BRL = new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' });
+
+    function showState(id) {
+        ['state-loading','state-error','state-pending','state-done','state-form']
+            .forEach(s => {
+                const el = document.getElementById(s);
+                if (el) el.classList.toggle('active', s === id);
+            });
+        lucide.createIcons();
+    }
+
+    function setError(msg) {
+        const el = document.getElementById('error-msg');
+        if (el && msg) el.textContent = msg;
+        showState('state-error');
+    }
+
+    // Pega cart_id da URL (?cart_id=... ou #...)
+    function getCartId() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('cart_id')) return params.get('cart_id');
+        // MP às vezes passa como external_reference na query
+        if (params.get('external_reference')) return params.get('external_reference');
+        return null;
+    }
+
+    // Monta os formulários de passageiros
+    function buildPassengerForms(reservations) {
+        const container = document.getElementById('passenger-fields');
+        const cartRows = document.getElementById('cart-rows');
+        container.innerHTML = '';
+        cartRows.innerHTML = '';
+
+        let passengerIndex = 0;
+
+        reservations.forEach(res => {
+            const product = res.products;
+            const paxTotal = res.qty_adults + res.qty_children;
+
+            // Linha do resumo
+            const row = document.createElement('div');
+            row.className = 'reservation-row';
+            row.innerHTML = `
+                <div class="reservation-info">
+                    <div class="reservation-name">${product?.name || 'Passeio'}</div>
+                    <div class="reservation-meta">
+                        ${res.travel_date} · ${res.departure_time} ·
+                        ${res.qty_adults} adulto${res.qty_adults > 1 ? 's' : ''}
+                        ${res.qty_children > 0 ? ` · ${res.qty_children} criança${res.qty_children > 1 ? 's' : ''}` : ''}
+                        ${res.qty_infants > 0 ? ` · ${res.qty_infants} bebê${res.qty_infants > 1 ? 's' : ''}` : ''}
+                    </div>
+                </div>
+                <div class="reservation-price">${BRL.format(res.amount_deposit)}</div>
+            `;
+            cartRows.appendChild(row);
+
+            // Campos por adulto
+            for (let i = 0; i < res.qty_adults; i++) {
+                passengerIndex++;
+                container.appendChild(buildPassengerCard(passengerIndex, res.id, 'adult'));
+            }
+            // Campos por criança
+            for (let i = 0; i < res.qty_children; i++) {
+                passengerIndex++;
+                container.appendChild(buildPassengerCard(passengerIndex, res.id, 'child'));
+            }
+            // Bebês: sem documento
+        });
+    }
+
+    function buildPassengerCard(index, reservationId, ageGroup) {
+        const card = document.createElement('div');
+        card.className = 'passenger-card';
+        card.dataset.reservationId = reservationId;
+        card.dataset.ageGroup = ageGroup;
+
+        const label = ageGroup === 'child' ? 'Criança' : 'Adulto';
+        const badgeClass = ageGroup === 'child' ? 'badge badge--child' : 'badge';
+
+        card.innerHTML = `
+            <h3>
+                <span>Passageiro ${index}</span>
+                <span class="${badgeClass}">${label}</span>
+            </h3>
+            <div class="form-group">
+                <label>Nome completo *</label>
+                <input type="text" class="pax-name" placeholder="Como consta no documento" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label>Documento *</label>
+                <div class="doc-toggle">
+                    <button type="button" class="doc-btn active" data-doc="cpf">CPF</button>
+                    <button type="button" class="doc-btn" data-doc="passport">Passaporte</button>
+                </div>
+                <input type="text" class="pax-doc" placeholder="000.000.000-00" maxlength="18" required>
+            </div>
+        `;
+
+        // Toggle CPF / Passaporte
+        const btns = card.querySelectorAll('.doc-btn');
+        const docInput = card.querySelector('.pax-doc');
+        btns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                btns.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                if (btn.dataset.doc === 'cpf') {
+                    docInput.placeholder = '000.000.000-00';
+                    docInput.maxLength = 18;
+                } else {
+                    docInput.placeholder = 'AB123456';
+                    docInput.maxLength = 20;
+                }
+                docInput.value = '';
+            });
+        });
+
+        // Máscara CPF enquanto digita
+        docInput.addEventListener('input', () => {
+            const activeDoc = card.querySelector('.doc-btn.active')?.dataset.doc;
+            if (activeDoc !== 'cpf') return;
+            let v = docInput.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+            else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+            else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+            docInput.value = v;
+        });
+
+        return card;
+    }
+
+    // Coleta dados do form e chama API
+    async function submitPassengers(cartId) {
+        const cards = document.querySelectorAll('.passenger-card');
+        const passengers = [];
+        let valid = true;
+
+        cards.forEach(card => {
+            const nameEl = card.querySelector('.pax-name');
+            const docEl = card.querySelector('.pax-doc');
+            const docType = card.querySelector('.doc-btn.active')?.dataset.doc || 'cpf';
+            const name = nameEl.value.trim();
+            const doc = docEl.value.trim();
+
+            if (!name || name.length < 2) { nameEl.style.borderColor = '#c62828'; valid = false; }
+            else nameEl.style.borderColor = '';
+
+            if (!doc || doc.length < 4) { docEl.style.borderColor = '#c62828'; valid = false; }
+            else docEl.style.borderColor = '';
+
+            passengers.push({
+                reservation_id: card.dataset.reservationId,
+                full_name: name,
+                doc_type: docType,
+                doc_number: doc,
+                age_group: card.dataset.ageGroup
+            });
+        });
+
+        if (!valid) {
+            alert('Preencha todos os campos obrigatórios.');
+            return;
+        }
+
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = true;
+        btn.querySelector('span').textContent = 'Enviando…';
+
+        try {
+            const res = await fetch(`${API}/reservations/cart/${cartId}/passengers`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ passengers })
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                alert(data.message || 'Erro ao salvar passageiros. Tente novamente.');
+                btn.disabled = false;
+                btn.querySelector('span').textContent = 'Confirmar Passageiros';
+                return;
+            }
+            showState('state-done');
+        } catch (e) {
+            alert('Erro de conexão. Tente novamente.');
+            btn.disabled = false;
+            btn.querySelector('span').textContent = 'Confirmar Passageiros';
+        }
+    }
+
+    // ── Init ──
+    async function init() {
+        const cartId = getCartId();
+        if (!cartId) {
+            setError('Link inválido. Volte ao site e refaça sua reserva.');
+            return;
+        }
+
+        // Tenta verificar o status do cart via API
+        try {
+            const res = await fetch(`${API}/reservations/cart/${cartId}`);
+            if (!res.ok) {
+                if (res.status === 404) { setError('Reserva não encontrada.'); return; }
+                throw new Error(`HTTP ${res.status}`);
+            }
+            const data = await res.json();
+            const reservations = data.reservations || [];
+
+            if (!reservations.length) { setError('Reserva não encontrada.'); return; }
+
+            const status = reservations[0].status;
+
+            if (status === 'pending_payment') {
+                // Webhook pode ter demorado — aguarda até 10s e tenta novamente
+                await new Promise(r => setTimeout(r, 3000));
+                const res2 = await fetch(`${API}/reservations/cart/${cartId}`);
+                const data2 = await res2.json();
+                const status2 = (data2.reservations || [])[0]?.status;
+                if (status2 === 'deposit_paid') {
+                    buildPassengerForms(data2.reservations);
+                    showState('state-form');
+                } else {
+                    showState('state-pending');
+                }
+                return;
+            }
+
+            if (status === 'deposit_paid') {
+                buildPassengerForms(reservations);
+                showState('state-form');
+                return;
+            }
+
+            if (status === 'fully_paid' || status === 'rescheduled') {
+                showState('state-done');
+                return;
+            }
+
+            // cancelled ou outro
+            setError('Esta reserva foi cancelada ou está com status inesperado. Entre em contato.');
+
+        } catch (e) {
+            setError('Erro ao carregar sua reserva. Tente recarregar a página.');
+        }
+    }
+
+    document.getElementById('passengers-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const cartId = getCartId();
+        if (cartId) await submitPassengers(cartId);
+    });
+
+    init();
+})();
+</script>
+</body>
+</html>

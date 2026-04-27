@@ -53,7 +53,7 @@
 
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11.1.14/swiper-bundle.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr@4.6.13/dist/flatpickr.min.css">
-    <link rel="stylesheet" href="./css/style.css?v=21">
+    <link rel="stylesheet" href="./css/style.css?v=23">
 </head>
 <body>
 
@@ -899,12 +899,55 @@
             </div>
 
             <button class="btn btn-primary w-100 mt-20" id="confirm-booking-btn">
-                <span data-i18n="booking.confirm_prefix">Adicionar</span> (<span data-i18n="booking.total_label">Total:</span> R$ <span id="booking-total">0</span>)
+                <span data-i18n="booking.confirm_prefix">Continuar</span> — <span data-i18n="booking.total_label">Sinal:</span> R$ <span id="booking-total">0</span>
             </button>
 
             <p class="modal-disclaimer" data-i18n="booking.disclaimer">
                 *Reservas urgentes (para o dia de hoje) ou roteiros exclusivos devem ser solicitados via WhatsApp.
             </p>
+
+            <!-- Etapa 2: Dados do responsável -->
+            <div class="booking-modal-step" id="booking-step-2" hidden>
+            <button class="booking-back-btn" id="booking-back-btn" aria-label="Voltar">
+                <i data-lucide="arrow-left"></i> <span data-i18n="booking.back">Voltar</span>
+            </button>
+            <h3 class="modal-title" data-i18n="booking.step2_title">Seus dados</h3>
+            <p class="booking-step2-summary" id="booking-step2-summary"></p>
+
+            <div class="form-group">
+                <label for="booking-name"><i data-lucide="user"></i> <span data-i18n="booking.label_name">Nome completo</span> *</label>
+                <input type="text" id="booking-name" autocomplete="name" placeholder="Como consta no documento" data-i18n-placeholder="booking.name_placeholder">
+            </div>
+
+            <div class="form-group">
+                <label for="booking-whatsapp"><i data-lucide="phone"></i> <span data-i18n="booking.label_whatsapp">WhatsApp</span> *</label>
+                <div class="phone-field">
+                    <select id="booking-country-code" class="country-select">
+                        <option value="+55">🇧🇷 +55</option>
+                        <option value="+1">🇺🇸 +1</option>
+                        <option value="+44">🇬🇧 +44</option>
+                        <option value="+34">🇪🇸 +34</option>
+                        <option value="+33">🇫🇷 +33</option>
+                        <option value="+39">🇮🇹 +39</option>
+                        <option value="+49">🇩🇪 +49</option>
+                        <option value="+972">🇮🇱 +972</option>
+                        <option value="+54">🇦🇷 +54</option>
+                        <option value="+351">🇵🇹 +351</option>
+                    </select>
+                    <input type="tel" id="booking-whatsapp" autocomplete="tel" placeholder="99999-9999" data-i18n-placeholder="booking.whatsapp_placeholder">
+                </div>
+            </div>
+
+            <div class="form-group" id="booking-email-group">
+                <label for="booking-email"><i data-lucide="mail"></i> <span data-i18n="booking.label_email">E-mail</span> <span id="booking-email-required-mark">*</span></label>
+                <input type="email" id="booking-email" autocomplete="email" placeholder="seu@email.com">
+            </div>
+
+            <button class="btn btn-primary w-100 mt-20" id="pay-booking-btn">
+                <i data-lucide="lock"></i> <span data-i18n="booking.pay_btn">Pagar Sinal com Segurança</span>
+            </button>
+            <p class="booking-mp-badge" data-i18n="booking.mp_badge">Processado pelo MercadoPago · Pix ou Cartão</p>
+        </div>
         </div>
     </div>
 

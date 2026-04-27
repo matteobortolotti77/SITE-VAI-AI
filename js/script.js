@@ -593,12 +593,21 @@ const closeBookingBtn = document.getElementById('close-booking');
 const confirmBookingBtn = document.getElementById('confirm-booking-btn');
 
 let currentBookingProduct = null;
+let currentBookingSlug = null;
 let currentBookingPrice = 0;
 let currentBookingFullPrice = 0;
 let currentBookingChildPolicy = false;
 
+function toSlug(name) {
+    return name.toLowerCase()
+        .normalize('NFD').replace(/[̀-ͯ]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '');
+}
+
 function openBookingModal(productName, price, timesArray, fullPrice = null, childPolicy = false) {
     currentBookingProduct = productName;
+    currentBookingSlug = toSlug(productName);
     currentBookingPrice = parseFloat(price);
     currentBookingFullPrice = fullPrice ? parseFloat(fullPrice) : currentBookingPrice;
     currentBookingChildPolicy = !!childPolicy;
@@ -650,6 +659,7 @@ function openBookingModal(productName, price, timesArray, fullPrice = null, chil
     }
 
     document.getElementById('booking-date').value = '';
+    showBookingStep(1);
     openOverlay(bookingModal);
 }
 
@@ -823,43 +833,137 @@ function changeTicketQty(delta, target) {
     recalcTicketTotal();
 }
 
-if(confirmBookingBtn) {
+// ── Step 1 → Step 2 (dados do responsável) ──
+const bookingStep1 = document.querySelector('#booking-modal .booking-modal-content > *:not(.booking-modal-step)');
+const bookingStep2 = document.getElementById('booking-step-2');
+const bookingBackBtn = document.getElementById('booking-back-btn');
+const payBookingBtn = document.getElementById('pay-booking-btn');
+const countrySelect = document.getElementById('booking-country-code');
+
+function showBookingStep(n) {
+    const s2 = document.getElementById('booking-step-2');
+    const step1Els = bookingModal.querySelectorAll('.booking-modal-content > :not(#booking-step-2):not(.close-modal)');
+    if (n === 1) {
+        step1Els.forEach(el => { el.hidden = false; });
+        if (s2) s2.hidden = true;
+    } else {
+        step1Els.forEach(el => { el.hidden = true; });
+        if (s2) { s2.hidden = false; lucide.createIcons(); }
+    }
+}
+
+function buildStep2Summary() {
+    const date = document.getElementById('booking-date').value;
+    const time = document.getElementById('booking-time').value;
+    const pax = bookingPax();
+    const parts = [`${currentBookingProduct}`, `📅 ${date}`];
+    if (time && time !== 'A combinar' && time !== '') parts.push(`🕐 ${time}`);
+    const paxParts = [`${pax.adults} adulto${pax.adults > 1 ? 's' : ''}`];
+    if (pax.kids > 0) paxParts.push(`${pax.kids} criança${pax.kids > 1 ? 's' : ''}`);
+    if (pax.babies > 0) paxParts.push(`${pax.babies} bebê${pax.babies > 1 ? 's' : ''}`);
+    parts.push(`👥 ${paxParts.join(', ')}`);
+    const total = parseFloat(document.getElementById('booking-total').textContent.replace(',', '.'));
+    parts.push(`💳 Sinal: ${BRL.format(total)}`);
+    document.getElementById('booking-step2-summary').textContent = parts.join(' · ');
+}
+
+function updateEmailRequired() {
+    if (!countrySelect) return;
+    const isBR = countrySelect.value === '+55';
+    const mark = document.getElementById('booking-email-required-mark');
+    const emailInput = document.getElementById('booking-email');
+    if (mark) mark.style.display = isBR ? 'none' : 'inline';
+    if (emailInput) emailInput.required = !isBR;
+}
+
+if (countrySelect) {
+    countrySelect.addEventListener('change', updateEmailRequired);
+    updateEmailRequired();
+}
+
+if (confirmBookingBtn) {
     confirmBookingBtn.addEventListener('click', () => {
         const date = document.getElementById('booking-date').value;
-        const time = document.getElementById('booking-time').value;
+        if (!date) { showToast(t('toast.select_date'), 'error'); return; }
+        buildStep2Summary();
+        showBookingStep(2);
+        updateEmailRequired();
+    });
+}
+
+if (bookingBackBtn) {
+    bookingBackBtn.addEventListener('click', () => showBookingStep(1));
+}
+
+// ── Step 2 → POST /v1/reservations → redirect MP ──
+function parseDateBR(dateBR) {
+    const [d, m, y] = dateBR.split('/');
+    return `${y}-${m.padStart(2,'0')}-${d.padStart(2,'0')}`;
+}
+
+if (payBookingBtn) {
+    payBookingBtn.addEventListener('click', async () => {
+        const name = document.getElementById('booking-name').value.trim();
+        const whatsappNum = document.getElementById('booking-whatsapp').value.trim().replace(/\D/g, '');
+        const countryCode = countrySelect ? countrySelect.value : '+55';
+        const email = document.getElementById('booking-email').value.trim();
+        const isBR = countryCode === '+55';
+
+        if (!name || name.length < 2) {
+            showToast('Informe seu nome completo', 'error'); return;
+        }
+        if (!whatsappNum || whatsappNum.length < 7) {
+            showToast('Informe um WhatsApp válido', 'error'); return;
+        }
+        if (!isBR && !email) {
+            showToast('E-mail obrigatório para clientes internacionais', 'error'); return;
+        }
+
+        const whatsapp = countryCode + whatsappNum;
+        const dateBR = document.getElementById('booking-date').value;
+        const travelDate = parseDateBR(dateBR);
+        const departureTime = document.getElementById('booking-time').value || 'A combinar';
         const pax = bookingPax();
 
-        if (!date) {
-            showToast(t('toast.select_date'), 'error');
-            return;
+        const payload = {
+            customer: { name, whatsapp, ...(email ? { email } : {}) },
+            items: [{
+                product_slug: currentBookingSlug,
+                travel_date: travelDate,
+                departure_time: departureTime,
+                qty_adults: pax.adults,
+                qty_children: pax.kids,
+                qty_infants: pax.babies
+            }],
+            return_urls: {
+                success: `${window.location.origin}/sucesso.html`,
+                failure: `${window.location.origin}/falha.html`,
+                pending: `${window.location.origin}/pendente.html`
+            }
+        };
+
+        payBookingBtn.disabled = true;
+        payBookingBtn.querySelector('span').textContent = 'Processando…';
+
+        try {
+            const res = await fetch('http://localhost:3000/v1/reservations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                showToast(data.message || 'Erro ao processar reserva', 'error');
+                payBookingBtn.disabled = false;
+                payBookingBtn.querySelector('span').textContent = t('booking.pay_btn') || 'Pagar Sinal com Segurança';
+                return;
+            }
+            window.location.href = data.sandbox_init_point || data.init_point;
+        } catch (err) {
+            showToast('Erro de conexão. Tente novamente.', 'error');
+            payBookingBtn.disabled = false;
+            payBookingBtn.querySelector('span').textContent = t('booking.pay_btn') || 'Pagar Sinal com Segurança';
         }
-
-        const paxParts = [`${pax.adults} adulto${pax.adults > 1 ? 's' : ''}`];
-        if (pax.kids > 0) paxParts.push(`${pax.kids} criança${pax.kids > 1 ? 's' : ''} (6-9)`);
-        if (pax.babies > 0) paxParts.push(`${pax.babies} bebê${pax.babies > 1 ? 's' : ''} (0-5)`);
-
-        let detailStr = `(Data: ${date}`;
-        if (time !== 'A combinar' && time !== '') {
-            detailStr += ` - ${time}`;
-        }
-        detailStr += ` | ${paxParts.join(', ')}`;
-
-        if (currentBookingFullPrice > currentBookingPrice) {
-            const restAdult = (currentBookingFullPrice - currentBookingPrice) * pax.adults;
-            const restKid = (currentBookingFullPrice - currentBookingPrice) * 0.5 * pax.kids;
-            const restante = restAdult + restKid;
-            detailStr += ` | Pagar no embarque: R$ ${fmtNum(restante)}`;
-        }
-        detailStr += `)`;
-
-        const finalProductName = `${currentBookingProduct} ${detailStr}`;
-        const finalPrice = currentBookingPrice * pax.adults + currentBookingPrice * 0.5 * pax.kids;
-
-        cart.push({ name: finalProductName, price: finalPrice });
-        updateCartUI();
-
-        closeOverlay(bookingModal);
-        toggleCart();
     });
 }
 

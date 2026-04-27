@@ -4,6 +4,8 @@ import sensible from '@fastify/sensible';
 import { config } from './config.js';
 import healthRoutes from './routes/health.js';
 import productsRoutes from './routes/products.js';
+import reservationsRoutes from './routes/reservations.js';
+import paymentsRoutes from './routes/payments.js';
 
 const app = Fastify({
     logger: {
@@ -16,6 +18,8 @@ await app.register(sensible);
 
 await app.register(healthRoutes, { prefix: '/v1' });
 await app.register(productsRoutes, { prefix: '/v1' });
+await app.register(reservationsRoutes, { prefix: '/v1' });
+await app.register(paymentsRoutes, { prefix: '/v1' });
 
 app.setNotFoundHandler((req, reply) => {
     reply.code(404).send({ error: 'not_found', path: req.url });

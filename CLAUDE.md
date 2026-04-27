@@ -5,6 +5,27 @@
 
 ---
 
+## 0. REGRA CRÍTICA — LER ANTES DE PROPOR
+
+Antes de sugerir, projetar ou implementar QUALQUER mudança em:
+- backend (rotas, services, validação, regras de negócio)
+- schema do banco (tabelas, colunas, tipos, índices)
+- endpoint da API (`/v1/*`, `/admin/*`)
+- UX de formulário de reserva/checkout/admin
+- validação de dados (CPF, email, idade, etc)
+
+**OBRIGATÓRIO:**
+1. `Read` em `PROMPT_BACKEND_2.md` (~440 linhas — arquitetura, decisões, fluxos)
+2. `Read` em `backend/db/schema.sql` (~230 linhas — data model atual)
+3. Se for tocar em rota existente, `grep` por ela em `backend/src/routes/`
+4. Listar o que **já existe** antes de propor adicionar/criar
+
+Esses arquivos NÃO são carregados automaticamente. Sem ler explicitamente, eu invento coisas que já foram decididas — retrabalho, ruído, perda de confiança. Memória de conversa é parcial entre sessões.
+
+Reforço duplo desta regra em `~/.claude/.../memory/always_read_first.md`.
+
+---
+
 ## 1. O QUE É ESTE PROJETO
 
 SPA de turismo para a agência **Volta à Ilha** em Morro de São Paulo, Bahia.

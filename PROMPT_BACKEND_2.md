@@ -143,14 +143,14 @@ CREATE TYPE reservation_status AS ENUM (
 
 CREATE TABLE reservations (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cart_id             UUID NOT NULL,                 -- agrupa N reservas em 1 pagamento (Modelo C)
     customer_id         UUID NOT NULL REFERENCES customers(id),
     product_id          UUID NOT NULL REFERENCES products(id),
     travel_date         DATE NOT NULL,
     departure_time      TEXT NOT NULL,
     qty_adults          SMALLINT NOT NULL DEFAULT 1,
-    qty_children        SMALLINT NOT NULL DEFAULT 0,  -- 3-11 anos
-    qty_infants         SMALLINT NOT NULL DEFAULT 0,  -- 0-2 anos (gratuito)
-    qty_seniors         SMALLINT NOT NULL DEFAULT 0,  -- 60+ (verificar por produto)
+    qty_children        SMALLINT NOT NULL DEFAULT 0,  -- 6-9 anos (varia por produto)
+    qty_infants         SMALLINT NOT NULL DEFAULT 0,  -- 0-5 anos (gratuito)
     amount_deposit      NUMERIC(10,2) NOT NULL,
     amount_remaining    NUMERIC(10,2) NOT NULL,
     amount_total        NUMERIC(10,2) NOT NULL,
@@ -162,6 +162,19 @@ CREATE TABLE reservations (
     created_at          TIMESTAMPTZ DEFAULT now(),
     updated_at          TIMESTAMPTZ DEFAULT now()
 );
+CREATE INDEX idx_reservations_cart ON reservations(cart_id);
+
+-- Passageiros (coletados na página /sucesso após pagamento)
+CREATE TABLE passengers (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reservation_id  UUID NOT NULL REFERENCES reservations(id) ON DELETE CASCADE,
+    full_name       TEXT NOT NULL,
+    doc_type        TEXT NOT NULL CHECK (doc_type IN ('cpf', 'passport')),
+    doc_number      TEXT NOT NULL,
+    age_group       TEXT NOT NULL CHECK (age_group IN ('adult', 'child')),  -- infants não precisam de doc
+    created_at      TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX idx_passengers_reservation ON passengers(reservation_id);
 
 -- Índices críticos para performance
 CREATE INDEX idx_reservations_travel_date ON reservations(travel_date);
@@ -218,12 +231,13 @@ CREATE TABLE fleet_reallocations (
 ### Públicos (sem autenticação)
 
 ```
-GET  /products                          → lista todos produtos ativos
-GET  /products/:id                      → detalhe de um produto
-GET  /availability?product_id=&date=    → vagas disponíveis numa data
-POST /reservations                      → criar reserva + iniciar pagamento
-POST /payments/webhook/mercadopago      → callback do gateway (HMAC validado)
-GET  /reservations/:id/status           → status público por ID (sem dados sensíveis)
+GET  /products                                → lista todos produtos ativos
+GET  /products/:slug                          → detalhe de um produto
+GET  /availability?product_id=&date=          → vagas disponíveis numa data
+POST /reservations                            → criar carrinho de reservas + preferência MP
+GET  /reservations/cart/:cart_id              → status público do carrinho (sem dados sensíveis)
+POST /reservations/cart/:cart_id/passengers   → completa dados dos passageiros (após pagamento)
+POST /payments/webhook/mercadopago            → callback do gateway (HMAC validado)
 ```
 
 ### Autenticados (JWT via Supabase Auth)
@@ -244,6 +258,55 @@ PATCH /admin/products/:id/child-policy  → política infantil específica deste
 GET  /admin/analytics/sales             → dados para dashboard
 GET  /admin/notifications/send-daily    → disparo manual da lista diária
 ```
+
+---
+
+## FLUXO DE CHECKOUT (Modelo 4.2)
+
+Decidido em 2026-04-26 para maximizar conversão sem perder dados operacionais.
+
+### Etapa 1 — Modal de booking (mínimo 3 campos)
+```
+Nome completo *           (responsável pela reserva)
+WhatsApp *                (com seletor de país, default 🇧🇷)
+Email                     (* obrigatório se WhatsApp ≠ +55)
+```
+
+Regra do email:
+- Frontend: marca `required` dinamicamente quando country code do WhatsApp != BR
+- Backend: valida no Zod — `if (!whatsapp.startsWith('+55')) email é obrigatório`
+
+### Etapa 2 — POST /v1/reservations
+- Cria/upsert `customers` (chave: WhatsApp)
+- Para cada item do carrinho, cria `reservation` com mesmo `cart_id` (UUID)
+- Valida disponibilidade com `FOR UPDATE NOWAIT` (sem overbooking)
+- Valida D-0 server-side (`isUrgent()`)
+- Cria 1 preferência MP com `items[]` somando todos os produtos do cart
+- Retorna `{ cart_id, init_point, sandbox_init_point }`
+
+### Etapa 3 — Cliente paga no MercadoPago (Checkout Pro redirect)
+
+### Etapa 4 — Webhook MP → confirma todas as reservas com mesmo cart_id
+
+### Etapa 5 — Página /sucesso.html?cart_id=...
+Lista N formulários (1 por passageiro adulto+criança, infants 0-5 não):
+```
+Passageiro 1
+[ Nome completo * ]
+[ Doc: ○ CPF  ○ Passaporte ]
+[ Número do documento * ]
+```
+
+POST /v1/reservations/:cart_id/passengers preenche tabela `passengers`.
+
+Se cliente fechar a página antes: cron D-1 manda WhatsApp "Falta só completar os documentos para liberar embarque".
+
+### Por que esse modelo
+- 3 campos no modal vs 6+ → conversão 75-80% (dados Baymard)
+- WhatsApp obrigatório → garante contato mesmo se cliente abandona /sucesso
+- Email obrigatório só p/ estrangeiros → BR não vê fricção; EU/US recebem voucher
+- CPF do pagador é coletado pelo MP automaticamente (não pedimos)
+- Documento dos passageiros (potencialmente diferentes do pagador) só após confirmação de pagamento
 
 ---
 

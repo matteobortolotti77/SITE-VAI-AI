@@ -525,6 +525,14 @@ body {
     font-size: 1.1rem;
     font-weight: 600;
     background: transparent;
+    -webkit-appearance: none;
+    -moz-appearance: textfield;
+    appearance: textfield;
+}
+.qty-selector input::-webkit-outer-spin-button,
+.qty-selector input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
 }
 
 .mt-20 { margin-top: 20px; }
@@ -907,6 +915,117 @@ body {
     text-align: center;
     margin-top: 15px;
     color: #666;
+}
+
+/* Booking modal — step layout */
+.booking-modal-content { position: relative; }
+
+.booking-modal-step { animation: fadeIn 0.2s ease; }
+
+.booking-back-btn {
+    background: none;
+    border: none;
+    color: var(--color-primary);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9rem;
+    padding: 0;
+    margin-bottom: 16px;
+    font-family: var(--font-main);
+}
+.booking-back-btn i { width: 16px; height: 16px; }
+
+.booking-step2-summary {
+    font-size: 0.85rem;
+    color: #555;
+    background: #f5f5f5;
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 18px;
+    line-height: 1.5;
+}
+
+/* Phone field with country code select */
+.phone-field {
+    display: flex;
+    gap: 8px;
+    align-items: stretch;
+}
+.country-select {
+    flex-shrink: 0;
+    width: auto;
+    min-width: 90px;
+    padding: 0 8px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: var(--font-main);
+    font-size: 0.9rem;
+    background: #fff;
+    cursor: pointer;
+}
+.country-select:focus { outline: none; border-color: var(--color-primary); }
+.phone-field input[type="tel"] {
+    flex: 1;
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+.phone-field input[type="tel"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+
+/* Email field — always visible, * toggles */
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    background: #fff;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+.form-group input[type="email"]:focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+.form-group input[type="text"]:not(#booking-date):not(#ticket-date) {
+    padding: 12px 14px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    background: #fff;
+    transition: border-color 0.2s;
+    width: 100%;
+    box-sizing: border-box;
+}
+.form-group input[type="text"]:not(#booking-date):not(#ticket-date):focus {
+    outline: none;
+    border-color: var(--color-primary);
+}
+#booking-email-required-mark { color: var(--color-primary); }
+
+/* MercadoPago badge */
+.booking-mp-badge {
+    text-align: center;
+    font-size: 0.78rem;
+    color: #888;
+    margin-top: 10px;
+}
+
+/* Pay button loading state */
+#pay-booking-btn[disabled] {
+    opacity: 0.7;
+    cursor: not-allowed;
 }
 
 /* Cart item layout (replaces inline style.cssText) */

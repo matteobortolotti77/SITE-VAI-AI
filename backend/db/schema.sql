@@ -105,6 +105,7 @@ CREATE INDEX IF NOT EXISTS idx_customers_whatsapp ON customers(whatsapp);
 -- ==========================================================
 CREATE TABLE IF NOT EXISTS reservations (
     id                  UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    cart_id             UUID NOT NULL,                 -- agrupa N reservas em 1 pagamento (Modelo C)
     customer_id         UUID NOT NULL REFERENCES customers(id),
     product_id          UUID NOT NULL REFERENCES products(id),
     travel_date         DATE NOT NULL,
@@ -127,6 +128,21 @@ CREATE TABLE IF NOT EXISTS reservations (
 CREATE INDEX IF NOT EXISTS idx_reservations_travel_date ON reservations(travel_date);
 CREATE INDEX IF NOT EXISTS idx_reservations_product_date ON reservations(product_id, travel_date);
 CREATE INDEX IF NOT EXISTS idx_reservations_status ON reservations(status);
+CREATE INDEX IF NOT EXISTS idx_reservations_cart ON reservations(cart_id);
+
+-- ==========================================================
+-- PASSENGERS — coletados na página /sucesso após pagamento
+-- ==========================================================
+CREATE TABLE IF NOT EXISTS passengers (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    reservation_id  UUID NOT NULL REFERENCES reservations(id) ON DELETE CASCADE,
+    full_name       TEXT NOT NULL,
+    doc_type        TEXT NOT NULL CHECK (doc_type IN ('cpf', 'passport')),
+    doc_number      TEXT NOT NULL,
+    age_group       TEXT NOT NULL CHECK (age_group IN ('adult', 'child')),  -- infants 0-5 não precisam doc
+    created_at      TIMESTAMPTZ DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_passengers_reservation ON passengers(reservation_id);
 
 -- ==========================================================
 -- PAYMENTS (log imutável)
@@ -216,6 +232,7 @@ ALTER TABLE reservations ENABLE ROW LEVEL SECURITY;
 ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
+ALTER TABLE passengers ENABLE ROW LEVEL SECURITY;
 
 -- Anon pode ler produtos ativos (para o catálogo público)
 DROP POLICY IF EXISTS "products_public_read" ON products;
