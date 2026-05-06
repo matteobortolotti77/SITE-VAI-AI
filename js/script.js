@@ -655,7 +655,14 @@ function sanitizeCartItem(it) {
         : '';
     const price = Number(it.price);
     if (!name || !Number.isFinite(price) || price < 0 || price > 100000) return null;
-    return { name, price };
+    const slug = typeof it.slug === 'string' ? it.slug.slice(0, 80) : '';
+    const travel_date = typeof it.travel_date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(it.travel_date) ? it.travel_date : '';
+    const departure_time = typeof it.departure_time === 'string' ? it.departure_time.slice(0, 20) : '';
+    const qty_adults = Number.isInteger(it.qty_adults) && it.qty_adults > 0 ? it.qty_adults : 1;
+    const qty_children = Number.isInteger(it.qty_children) && it.qty_children >= 0 ? it.qty_children : 0;
+    const qty_infants = Number.isInteger(it.qty_infants) && it.qty_infants >= 0 ? it.qty_infants : 0;
+    const display_date = typeof it.display_date === 'string' ? it.display_date.slice(0, 20) : '';
+    return { name, price, slug, travel_date, departure_time, qty_adults, qty_children, qty_infants, display_date };
 }
 try {
     const raw = localStorage.getItem('voltaAilhaCart');
@@ -989,9 +996,26 @@ if (confirmBookingBtn) {
     confirmBookingBtn.addEventListener('click', () => {
         const date = document.getElementById('booking-date').value;
         if (!date) { showToast(t('toast.select_date'), 'error'); return; }
-        buildStep2Summary();
-        showBookingStep(2);
-        updateEmailRequired();
+        const travelDate = parseDateBR(date);
+        if (!travelDate) { showToast(t('toast.select_date'), 'error'); return; }
+        const departureTime = document.getElementById('booking-time').value || 'A combinar';
+        const pax = bookingPax();
+        const depositTotal = Math.round((pax.adults * currentBookingPrice + pax.kids * currentBookingPrice * 0.5) * 100) / 100;
+        cart.push({
+            name: currentBookingProduct,
+            price: depositTotal,
+            slug: currentBookingSlug,
+            travel_date: travelDate,
+            departure_time: departureTime,
+            qty_adults: pax.adults,
+            qty_children: pax.kids,
+            qty_infants: pax.babies,
+            display_date: date
+        });
+        updateCartUI();
+        closeOverlay(bookingModal);
+        showToast('✅ Adicionado ao carrinho!', 'info');
+        if (cartDrawer && !cartDrawer.classList.contains('open')) toggleCart();
     });
 }
 
@@ -1089,36 +1113,81 @@ function waLanguageHeader() {
     return `🌐 *Idioma do cliente:* ${names[currentLocale] || currentLocale}\n\n`;
 }
 
-// 4.X Finalizar Reserva — envia o carrinho para o WhatsApp
+// 4.X Finalizar Reserva — POST /v1/reservations → redirect MP
 const checkoutBtn = document.querySelector('.checkout-btn');
+const cartCountrySelect = document.getElementById('cart-country-code');
+function updateCartEmailRequired() {
+    if (!cartCountrySelect) return;
+    const isBR = cartCountrySelect.value === '+55';
+    const mark = document.getElementById('cart-email-required-mark');
+    const emailInput = document.getElementById('cart-email');
+    if (mark) mark.style.display = isBR ? 'none' : 'inline';
+    if (emailInput) emailInput.required = !isBR;
+}
+if (cartCountrySelect) cartCountrySelect.addEventListener('change', updateCartEmailRequired);
+
 if (checkoutBtn) {
-    checkoutBtn.addEventListener('click', () => {
+    checkoutBtn.addEventListener('click', async () => {
         if (cart.length === 0) return;
-        // L-17: prevent double-click
         if (checkoutBtn.disabled) return;
+        const name = (document.getElementById('cart-name')?.value || '').trim();
+        const whatsappNum = (document.getElementById('cart-whatsapp')?.value || '').trim().replace(/\D/g, '');
+        const countryCode = cartCountrySelect ? cartCountrySelect.value : '+55';
+        const email = (document.getElementById('cart-email')?.value || '').trim();
+        const isBR = countryCode === '+55';
+        if (!name || name.length < 2) { showToast('Informe seu nome completo', 'error'); return; }
+        if (!whatsappNum || whatsappNum.length < 7) { showToast('Informe um WhatsApp válido', 'error'); return; }
+        if (!isBR && !email) { showToast('E-mail obrigatório para clientes internacionais', 'error'); return; }
+        if (!cart.every(it => it.slug && it.travel_date)) {
+            showToast('Carrinho inválido. Adicione os itens novamente.', 'error'); return;
+        }
         checkoutBtn.disabled = true;
         const origText = checkoutBtn.textContent;
-        checkoutBtn.textContent = 'Abrindo WhatsApp…';
-
-        let msg = waLanguageHeader();
-        msg += `Olá! Gostaria de finalizar a reserva dos itens abaixo:\n\n`;
-        let total = 0;
-        cart.forEach((item, i) => {
-            total += item.price;
-            msg += `${i + 1}. ${item.name}\n   Sinal: ${BRL.format(item.price)}\n\n`;
-        });
-        msg += `💰 *TOTAL DO SINAL:* ${BRL.format(total)}\n\n`;
-        msg += `Aguardo confirmação de disponibilidade e o link de pagamento.`;
-
-        const encMsg = encodeURIComponent(msg);
-        window.open(`https://wa.me/${WHATSAPP_NUMBER}?text=${encMsg}`, '_blank', 'noopener,noreferrer');
-        // Re-enable after brief delay
-        setTimeout(() => {
+        checkoutBtn.textContent = 'Processando…';
+        const payload = {
+            customer: { name, whatsapp: countryCode + whatsappNum, ...(email ? { email } : {}) },
+            items: cart.map(it => ({
+                product_slug: it.slug,
+                travel_date: it.travel_date,
+                departure_time: it.departure_time || 'A combinar',
+                qty_adults: it.qty_adults || 1,
+                qty_children: it.qty_children || 0,
+                qty_infants: it.qty_infants || 0
+            })),
+            return_urls: {
+                success: 'https://voltaailha.com.br/sucesso.html',
+                failure: 'https://voltaailha.com.br/falha.html',
+                pending: 'https://voltaailha.com.br/pendente.html'
+            }
+        };
+        try {
+            const res = await fetch(`${API_BASE}/reservations`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                checkoutBtn.disabled = false;
+                checkoutBtn.textContent = origText;
+                if (res.status === 422 && data?.error === 'cutoff_exceeded') {
+                    openOverlay(document.getElementById('urgent-modal'));
+                    return;
+                }
+                showToast(data.message || 'Erro ao processar reserva', 'error');
+                return;
+            }
+            cart = [];
+            updateCartUI();
+            window.location.href = data.init_point || data.sandbox_init_point;
+        } catch {
+            showToast('Erro de conexão. Tente novamente.', 'error');
             checkoutBtn.disabled = false;
             checkoutBtn.textContent = origText;
-        }, 2000);
+        }
     });
 }
+
 
 if(confirmTicketBtn) {
     confirmTicketBtn.addEventListener('click', () => {
@@ -1161,22 +1230,18 @@ function updateCartUI() {
         localStorage.setItem('voltaAilhaCart', JSON.stringify({ ts: Date.now(), items: cart }));
     }
     const badgeEl = document.querySelector('.cart-badge');
-    badgeEl.textContent = cart.length;
-    if(cart.length === 0) {
-        badgeEl.style.display = 'none';
-    } else {
-        badgeEl.style.display = 'flex';
-    }
+    if (badgeEl) { badgeEl.textContent = cart.length; badgeEl.style.display = cart.length === 0 ? 'none' : 'flex'; }
 
     const container = document.getElementById('cart-items-container');
     const totalEl = document.getElementById('cart-total-value');
-
+    const customerForm = document.getElementById('cart-customer-form');
     while (container.firstChild) container.removeChild(container.firstChild);
+    if (customerForm) customerForm.hidden = cart.length === 0;
 
-    if(cart.length === 0) {
+    if (cart.length === 0) {
         const emptyMsg = document.createElement('p');
         emptyMsg.className = 'empty-cart-msg';
-        emptyMsg.textContent = 'Seu carrinho está vazio.';
+        emptyMsg.textContent = t('cart.empty') || 'Seu carrinho está vazio.';
         container.appendChild(emptyMsg);
         totalEl.textContent = BRL.format(0);
         return;
@@ -1185,24 +1250,32 @@ function updateCartUI() {
     let total = 0;
     cart.forEach((item, index) => {
         total += item.price;
-
         const row = document.createElement('div');
         row.className = 'cart-item-row';
-
         const infoDiv = document.createElement('div');
         infoDiv.className = 'cart-item-info';
-
         const nameDiv = document.createElement('div');
         nameDiv.className = 'cart-item-name';
         nameDiv.textContent = item.name;
-
+        infoDiv.appendChild(nameDiv);
+        if (item.display_date || item.departure_time || item.qty_adults) {
+            const detailDiv = document.createElement('div');
+            detailDiv.className = 'cart-item-detail';
+            const parts = [];
+            if (item.display_date) parts.push(`📅 ${item.display_date}`);
+            if (item.departure_time && item.departure_time !== 'A combinar') parts.push(`🕐 ${item.departure_time}`);
+            const paxParts = [];
+            if (item.qty_adults) paxParts.push(`${item.qty_adults} adulto${item.qty_adults > 1 ? 's' : ''}`);
+            if (item.qty_children) paxParts.push(`${item.qty_children} criança${item.qty_children > 1 ? 's' : ''}`);
+            if (item.qty_infants) paxParts.push(`${item.qty_infants} bebê${item.qty_infants > 1 ? 's' : ''}`);
+            if (paxParts.length) parts.push(`👥 ${paxParts.join(', ')}`);
+            detailDiv.textContent = parts.join(' · ');
+            infoDiv.appendChild(detailDiv);
+        }
         const priceDiv = document.createElement('strong');
         priceDiv.className = 'cart-item-price';
         priceDiv.textContent = BRL.format(item.price);
-
-        infoDiv.appendChild(nameDiv);
         infoDiv.appendChild(priceDiv);
-
         const removeBtn = document.createElement('button');
         removeBtn.className = 'cart-item-remove';
         removeBtn.setAttribute('data-action', 'remove-cart-item');
@@ -1212,18 +1285,14 @@ function updateCartUI() {
         trashIcon.setAttribute('data-lucide', 'trash-2');
         trashIcon.className = 'icon-trash';
         removeBtn.appendChild(trashIcon);
-
         row.appendChild(infoDiv);
         row.appendChild(removeBtn);
         container.appendChild(row);
     });
-
-    if (window.lucide) {
-        lucide.createIcons({root: container});
-    }
-
+    if (window.lucide) lucide.createIcons({root: container});
     totalEl.textContent = BRL.format(total);
 }
+
 
 async function removeFromCart(index) {
     const ok = await openConfirmDialog(t('confirm.remove_title'), t('confirm.remove_text'));
