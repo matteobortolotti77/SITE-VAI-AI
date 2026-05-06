@@ -22,16 +22,27 @@ export const config = {
         webhookSecret: optional('MP_WEBHOOK_SECRET', ''),
     },
 
+    resend: {
+        apiKey: optional('RESEND_API_KEY', ''),
+        from: optional('RESEND_FROM', 'reservas@voltaailha.com.br'),
+    },
+
+    zapi: {
+        instanceId: optional('Z_API_INSTANCE_ID', ''),
+        token: optional('Z_API_TOKEN', ''),
+        whatsappNumber: optional('Z_API_WHATSAPP_NUMBER', '5575998240043'),
+    },
+
     isReady() {
-        // Read-only: precisa só de SUPABASE_URL + (service_role OU anon)
         return !!(this.supabase.url && (this.supabase.serviceRoleKey || this.supabase.anonKey));
     },
     canWrite() {
-        // Writes (POST /reservations etc) exigem service_role
         return !!(this.supabase.url && this.supabase.serviceRoleKey);
     },
     canCharge() {
-        // Pagamentos exigem MercadoPago
         return !!this.mp.accessToken;
+    },
+    canNotify() {
+        return !!(this.resend.apiKey && this.zapi.instanceId && this.zapi.token);
     }
 };

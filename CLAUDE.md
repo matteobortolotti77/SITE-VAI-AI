@@ -1,7 +1,7 @@
 # CLAUDE.md — Volta à Ilha (Master Spec)
 
 > **Documento único e autoritativo.** Substitui e consolida `GEMINI.md`, `PROMPT_BACKEND.md` e `PROMPT_BACKEND_2.md`.
-> **Última atualização:** 2026-04-27 — **Versão:** 1.5
+> **Última atualização:** 2026-04-30 — **Versão:** 1.7
 > **Idioma:** PT-BR (texto técnico da especificação). JSON-LD / Schema.org permanece em EN por exigência dos search engines.
 
 ---
@@ -89,17 +89,16 @@ A agência opera **100% via fornecedores terceirizados** (barqueiros, guias, tra
 | Banco | PostgreSQL | `16` (Supabase) | Free tier até ~500 MAU |
 | Auth | Supabase Auth | — | JWT + RLS |
 | Pagamento | MercadoPago | SDK oficial | Pix + cartão |
-| **PDF** | **TBD** | — | ⚠ owner=Matteo · bloqueia Fase 4 |
-| **WhatsApp** | **TBD** | — | ⚠ owner=Matteo · bloqueia Fase 5 |
-| **Email** | **TBD** | — | ⚠ owner=Matteo · bloqueia Fase 4 |
+| **PDF** | **pdf-lib** | `^1.17` | Layout programático, ~500KB |
+| **WhatsApp** | **Z-API** | API REST | Managed, ~R$50/mês, SLA garantido |
+| **Email** | **Resend** | SDK oficial | 3k/mês free tier |
 | Hosting | **Railway.app** | — | Deploy git-push |
 | CDN/WAF | Cloudflare | Free | CSP, cache, WAF |
 
-> **TBD #1 — PDF library.** Opções avaliadas: Puppeteer (headless Chrome, fiel ao HTML/CSS, ~300MB) ou pdf-lib (leve, layout programático). Decisão até **definir antes do início da Fase 4**.
-
-> **TBD #2 — WhatsApp provider.** Opções avaliadas: Evolution API (self-hosted, gratuito + ops) ou Z-API (managed, ~R$50/mês). API oficial Meta **descartada** (custo + aprovação). Decisão até **definir antes do início da Fase 5**.
-
-> **TBD #3 — Email provider.** Opções avaliadas: Resend (DX moderna, 3k/mês free), Brevo (300/dia free + WhatsApp combo), AWS SES (industrial). Decisão até **definir antes do início da Fase 4**.
+> **Decisões registradas (2026-04-30):**
+> - **PDF = pdf-lib.** Voucher é layout estruturado (header + QR + texto + footer §8.8). Puppeteer descartado por footprint (~300MB) e RAM em Railway.
+> - **WhatsApp = Z-API.** Managed (~R$50/mês) + SLA. Evolution self-hosted descartado: §11.3 (resiliência offline operacional) exige uptime garantido para cron lista fornecedores. Meta oficial descartada (custo + aprovação).
+> - **Email = Resend.** 3k/mês free cobre launch. Brevo descartado (UI pesada, combo WhatsApp redundante com Z-API). SES descartado (overkill MVP, setup DNS lento).
 
 ### 2.3 O que NÃO usar
 - **React/Vue/Next/Svelte** — projeto é vanilla por escolha arquitetural (zero build, zero gargalo).
@@ -543,144 +542,22 @@ Cards de produto = fundo sólido/semi-sólido.
 > Última atualização: 2026-04-27.
 
 ### 10.1 Bloqueadores absolutos — abertos
-- ❌ TBD #1 — escolher PDF lib (Puppeteer vs pdf-lib).
-- ❌ TBD #2 — escolher WhatsApp provider (Evolution vs Z-API).
-- ❌ TBD #3 — escolher Email provider (Resend vs Brevo vs SES).
-- ❌ Conta MercadoPago PJ aprovada + webhook secret.
+- ✅ TBD #1 — PDF lib = pdf-lib (decidido 2026-04-30).
+- ✅ TBD #2 — WhatsApp = Z-API (decidido 2026-04-30). ✅ Conta criada + `Z_API_INSTANCE_ID` + `Z_API_TOKEN` configurados (2026-05-05).
+- ✅ TBD #3 — Email = Resend (decidido 2026-04-30). ✅ Conta criada + domínio verificado + `RESEND_API_KEY` configurada (2026-05-05).
+- ✅ Conta MercadoPago PJ aprovada (2026-05-05). Token de produção configurado. ⚠️ Webhook secret: confirmar se é de produção após configurar endpoint `/v1/payments/webhook/mercadopago` na Railway.
 - ❌ Capacidades reais de cada produto (Matteo).
-- ❌ Criar `dpo@voltaailha.com.br` (citado em política de privacidade).
-- ❌ CSP headers no Cloudflare (pré-launch).
+- ✅ Criar `dpo@voltaailha.com.br` — alias ativo via Cloudflare Email Routing → matteo.bortolotti@icloud.com (2026-05-05).
+- ✅ CSP headers no Cloudflare (pré-launch).
 - ❌ Otimizar `hero.mp4` < 5MB.
-- ❌ Apontar DNS produção + cert HTTPS.
+- ✅ Apontar DNS produção + cert HTTPS.
 
-### 10.2 Done log (consolidado em 2026-04-27)
-> Todos os itens abaixo foram marcados como concluídos durante consolidação. Ausência de data de commit individual: ver `git log` para timeline real.
-
-**Frontend / SPA:**
-- favicon.ico criado e linkado
-- `og-share.jpg` criado (1200×630) + meta tags atualizadas
-- Botão "Finalizar Reserva" com fluxo mínimo (envia carrinho via WhatsApp)
-- Schema.org com telefone real
-- Imagens das passagens: ativos locais (não mais Unsplash)
-- CDN consolidado em `cdn.jsdelivr.net`
-- Lucide com `defer` + versão fixa
-- `window.open` com `noopener noreferrer`
-- `alert()`/`confirm()` substituídos por toast + dialog próprios
-- Inner Swipers com paginação local (`.inner-pagination` por card)
-- Carrinho com TTL 24h em formato `{ts, items}`
-- Modais com Escape + focus trap (`openOverlay`/`closeOverlay`)
-- Preço no carrinho via `Intl.NumberFormat` BRL
-- Carrossel "Atividades" como view própria
-- i18n Opção B (7 idiomas) implementado
-- `<link rel="canonical">`, `robots.txt`, `sitemap.xml`
-- Footer legal completo (razão social, CNPJ, endereço, link política)
-- `politica-privacidade.html` (LGPD)
-
-**Backend:**
-- Estrutura de pastas + Fastify server
-- Schema SQL (`db/schema.sql`)
-- Rotas read-only `/health`, `/products`, `/availability`
-- Comportamento "503 service_not_configured" sem credentials
-
-### 10.3 Backlog técnico — pendente
-- ❌ `hero.mp4` com `<link rel="preload">` + poster frame + `width`/`height` (também coberto em §10.4 #C-10)
-- ❌ Imagens de fundo via `style=""` inline → migrar para classes lazy-loadable (também §10.4 #C-9)
+### 10.2 Backlog técnico — pendente
+- ❌ `hero.mp4` com `<link rel="preload">` + poster frame + `width`/`height`
+- ❌ Imagens de fundo via `style=""` inline → migrar para classes lazy-loadable
 - ❌ Migration: adicionar `notifications.retry_count INT DEFAULT 0`
 - ❌ Migration: adicionar `reservations.customer_ack_at TIMESTAMPTZ`
 - ❌ `db/seed.sql` para popular 16 produtos iniciais (depende de capacidades)
-
-### 10.4 Audit frontend — 2026-04-27 (58 itens)
-
-> Resultado da revisão crítica completa de `index.html`, `politica-privacidade.html`, `css/style.css`, `js/script.js`, `js/i18n.js`. Categorias: **Seg** (segurança), **A11y** (acessibilidade WCAG), **SEO**, **Perf** (performance), **CSS** (manutenibilidade), **Bug** (lógico/edge case), **UX**, **i18n**.
-> Estado: ❌ todos pendentes salvo indicação. Itens marcados ⤴ sobrepõem com §10.3.
-
-#### CRITICAL — bloqueia launch (10) — ✅ RESOLVIDOS em 2026-04-27 (v1.2)
-| # | Item | Arquivo:linha | Cat | Status |
-|---|---|---|---|---|
-| C-1 | `innerHTML` em `data-i18n-html` (XSS via dicionário) — viola §11.4 | `js/script.js:46-49` | Seg | ✅ sanitizer com allow-list (`setTrustedHTML`) |
-| C-2 | `it.body_html` injetado sem escape em accordions dinâmicos | `js/script.js:188` | Seg | ✅ `sanitizeHTML(it.body_html)` aplicado |
-| C-3 | Cutoff D-0 hardcoded `08:30` no JS — diverge de `products.cutoff_hour` (§5.1) | `js/script.js:754` | Bug | ✅ per-product via `data-cutoff-hour/-minute` + tratamento 422 `CUTOFF_EXCEEDED` |
-| C-4 | Sem CSP meta tag (e provavelmente sem header) | `index.html` `<head>` | Seg | ✅ CSP meta com allow-list de fontes (cdn.jsdelivr.net, fonts.googleapis.com, Railway, MP) |
-| C-5 | Variável CSS fantasma `var(--color-primary)` referenciada onde só existe `--primary-color` | `css/style.css:928, 975, 1023+` | CSS | ✅ 6 ocorrências substituídas |
-| C-6 | `<label>` sem `for=` em todos os forms de booking/ticket | `index.html:851-858, 939, 945, 969-982` | A11y | ✅ `for=` + `name=` adicionados; ícones decorativos com `aria-hidden`; pax-label virou `<label>` |
-| C-7 | `<a href="#">` na nav sem `preventDefault` explícito | `index.html:68-71, 103-106` | Bug | ✅ falso-positivo do audit — `preventDefault` já estava em `script.js:510, 546` |
-| C-8 | `aria-hidden="true"` no `<main>` não setado quando modal abre | `js/script.js:322-366` | A11y | ✅ `setBackgroundInert()` aplica `aria-hidden` + `inert` em header/main/footer; bonus M-14 (`document.contains`) |
-| C-9 | `BRL.format()` e `fmtNum()` coexistem — formatação inconsistente | `js/script.js:799-809, 1030, 1076` | UX | ✅ `fmtNum` removido; `NUM_BR` (Intl) para totais sem prefixo; `BRL.format` para WhatsApp/carrinho; totais armazenados em `currentBookingTotal`/`currentTicketTotal` |
-| C-10 | Scroll listener sem throttle/`requestAnimationFrame` | `js/script.js:295-301` | Perf | ✅ rAF + `{ passive: true }` |
-
-#### HIGH — afeta significativamente (12) — ✅ RESOLVIDOS em 2026-04-27 (v1.3)
-| # | Item | Arquivo:linha | Cat | Status |
-|---|---|---|---|---|
-| H-1 | `console.error` em produção (info leak) | `js/script.js:568` | Seg | ✅ falso-positivo — nenhum `console.error` existe no código |
-| H-2 | Sem SRI (`integrity=`) nos `<script>`/`<link>` CDN | `index.html:54-55, 1060-1067` | Seg | ✅ falso-positivo — SRI já presente em todos os CDN assets |
-| H-3 | WhatsApp message: `item.name` não escapado antes de `encodeURIComponent` | `js/script.js:983-985` | Seg | ✅ falso-positivo — `encodeURIComponent` já sanitiza; `sanitizeCartItem` strip controle chars |
-| H-4 | Contraste header vidro sobre hero escuro < 4.5:1 (WCAG AA) | `css/style.css:82-89` | A11y | ✅ `text-shadow: 0 1px 3px rgba(0,0,0,0.5)` nos nav links; removido em `.scrolled`/`.on-section` |
-| H-5 | `:focus-visible` ausente em buttons/links/inputs | `css/style.css` | A11y | ✅ regra global `:focus-visible` com `outline: 2px solid var(--primary-color)`; azul em contextos passagens/ticket |
-| H-6 | Lang dropdown ARIA incompleto: `aria-expanded` não atualizado, sem keyboard nav | `index.html:73, 87` | A11y | ✅ `aria-expanded` já existia; adicionado Arrow↑↓ + Escape keyboard nav + auto-focus primeiro item |
-| H-7 | Erros de form sem `role="alert"`/`aria-invalid`/`aria-describedby` | modais | A11y | ✅ `showToast` agora alterna `role="alert"` + `aria-live="assertive"` para erros |
-| H-8 | `prefers-reduced-motion` ignorado | `css/style.css` | A11y | ✅ media query `prefers-reduced-motion: reduce` desabilita animações, transições e esconde vídeo |
-| H-9 | Lucide icons (`<i data-lucide>`) sem `aria-hidden="true"` | `index.html` (vários) | A11y | ✅ `aria-hidden="true"` adicionado a todos os ~50 ícones decorativos (header, nav, accordions, buttons, modais) |
-| H-10 | Focus trap quebra em modal-dentro-de-modal (`modalStack`) | `js/script.js:354-365` | A11y | ✅ falso-positivo — `modalStack` com `findIndex` + splice já suporta N modais sobrepostos |
-| H-11 | Hash routing + canonical estático = views não indexáveis | `index.html:9` | SEO | ✅ won't-fix pré-launch — limitação arquitetural do SPA vanilla; hash routing é decisão de stack (§2.1); SSR não está em escopo |
-| H-12 | Schema.org incompleto: sem `logo`, `sameAs`, `image`, `areaServed` | `index.html:27-48` | SEO | ✅ adicionado `logo`, `image` (og_share.jpg), `sameAs` (Instagram, WhatsApp), `areaServed` (Morro de São Paulo) |
-
-#### MEDIUM — melhoria recomendada (15) — ✅ RESOLVIDOS em 2026-04-27 (v1.4)
-| # | Item | Arquivo:linha | Cat | Status |
-|---|---|---|---|---|
-| M-1 | `og:title` / `twitter:title` / `<title>` divergentes | `index.html:6, 11-25` | SEO | ✅ unificados para "Volta à Ilha \| Agência de Turismo em Morro de São Paulo" |
-| M-2 | `og:image` sem `og:image:width`/`height`/`type` | `index.html:19, 25` | SEO | ✅ adicionado `og:image:width=1200`, `og:image:height=630`, `og:image:type=image/jpeg` |
-| M-3 | `hreflang` ausente apesar de 7 idiomas declarados | `index.html` | SEO | ✅ won't-fix — `hreflang` é inútil em SPA hash-based; crawlers ignoram fragmentos `#` |
-| M-4 | `lucide.createIcons()` chamado 4× sem coordenação (race com Swiper) | `js/script.js:6, 288, 848, 1097` | Perf | ✅ won't-fix — calls são contextuais: init, pós-dynamic-products, step2, e scoped com `{root}`. Sem race real |
-| M-5 | `applyLocale()` faz 4× `querySelectorAll` global a cada troca de idioma | `js/script.js:42-64` | Perf | ✅ won't-fix — custo desprezível no tamanho do DOM atual (~1ms); otimização prematura |
-| M-6 | `parseDateBR("")` → `"undefined-undefined-undefined"` sem validação | `js/script.js:895-898` | Bug | ✅ adicionada validação de input vazio/formato; retorna `null` + guard no caller com showToast |
-| M-7 | `localStorage` cart sem validação de shape de `item.price`/`name` (NaN silencioso) | `js/script.js:554-569, 1062` | Bug | ✅ já fixado v1.2 — `sanitizeCartItem` valida shape/tipo de `price` e `name` |
-| M-8 | `fetchProducts` timeout 5000ms curto demais para 4G de Morro | `js/script.js:229` | UX | ✅ timeout aumentado de 5s para 12s |
-| M-9 | `fmtNum` regex `/\.00$/` quebra em arredondamento `.01` | `js/script.js:799-809` | Bug | ✅ já fixado v1.2 — `fmtNum` completamente removido |
-| M-10 | `recalcTicketTotal` soma floats IEEE 754 sem proteção (centavos) | `js/script.js` | Bug | ✅ `Math.round(... * 100) / 100` em `recalcBookingTotal` e `recalcTicketTotal` |
-| M-11 | `confirmDialog` acumula `addEventListener` em click-spam | `js/script.js:374-396` | Bug | ✅ já fixado — `openConfirmDialog` usa named handlers com `finish()` cleanup |
-| M-12 | Lógica `bookingPax`/`ticketPax`/`changeQty` duplicada | `js/script.js:783-834` | Manutenção | ✅ refatorado: `readPax(prefix)` + `changePaxQty(prefix, delta, target, recalcFn)` genéricos |
-| M-13 | `aria-labelledby="booking-title"` aponta para `<h3>` com `textContent` dinâmico | `index.html:840` | A11y | ✅ won't-fix — `aria-labelledby` referencia o ID do elemento; conteúdo dinâmico é lido corretamente por screen readers |
-| M-14 | `previousFocus.focus()` pode crashar se elemento foi removido do DOM | `js/script.js:338` | Bug | ✅ já fixado v1.2 — `document.contains` check antes de `previousFocus.focus()` |
-| M-15 | `<input>` sem atributo `name=` em todos os forms (autocomplete/password manager quebrados) | `index.html:853, 858, 865, 939+` | UX | ✅ step 1 já tinha `name=` (v1.2); step 2 inputs (`booking-name`, `booking-whatsapp`, `booking-email`) agora também |
-
-#### LOW — débito técnico / nice-to-have (21) — ✅ RESOLVIDOS em 2026-04-27 (v1.5)
-| # | Item | Arquivo:linha | Cat | Status |
-|---|---|---|---|---|
-| L-1 | Sem skip-to-content link | `index.html` | A11y | ✅ adicionado `.skip-link` com CSS + `id="main-content"` no `<main>` |
-| L-2 | `tabindex` / tab order não revisado em modais sobrepostos | `index.html` | A11y | ✅ won't-fix — `inert` + `modalStack` já garante tab order correto em todos os modais |
-| L-3 | 21× `!important` (override Flatpickr + alguns supérfluos) | `css/style.css` | CSS | ✅ won't-fix — 25 `!important` restantes são todos necessários (Flatpickr override, `prefers-reduced-motion`, `pax-children[hidden]`). Remover causaria regressões |
-| L-4 | Z-index magic numbers (10, 47, 99, 338, ..., 5000) sem escala | `css/style.css` | CSS | ✅ 14 z-index refatorados para CSS vars nomeadas (`--z-header`, `--z-modal`, `--z-toast`, etc.) em `:root` |
-| L-5 | 3 nomenclaturas de variáveis CSS para mesmas coisas (`--primary-color` vs `--color-primary`) | `css/style.css:4-14` | CSS | ✅ falso-positivo — só existem `--primary-color`/`--secondary-color`. Não há `--color-primary` |
-| L-6 | Media queries `max-width` (desktop-first) — viola mobile-first declarado | `css/style.css:659, 806` | CSS | ✅ won't-fix — desktop-first é funcional e consistente. Migrar = reescrever todo o CSS. Risco inaceitável |
-| L-7 | Seletores frágeis `:not(#booking-date):not(#ticket-date)` | `css/style.css:1008-1018` | CSS | ✅ won't-fix — necessários para diferenciar inputs Flatpickr (readonly) vs inputs de texto normais |
-| L-8 | Cores hardcoded fora `:root` (gradientes terminal, `#25D366`, ...) | `css/style.css` (vários) | CSS | ✅ won't-fix — cores hardcoded são valores de marca (WhatsApp green, gradientes de rota) que não variam |
-| L-9 | Sem escala documentada para spacing / font-size / radius / shadow / transition | `css/style.css` | CSS | ✅ won't-fix — over-engineering para projeto deste porte. Consistência mantida por convenção |
-| L-10 | `applyDynamicProducts()` chamada sem `.catch()` final | `js/script.js:1185` | Bug | ✅ `.catch(() => {})` adicionado — fallback silencioso para HTML estático |
-| L-11 | Chaves `wa.*` em PT-BR em todos os 7 dicionários (cliente HE/EN vê PT) | `js/i18n.js:1010-1015+` | i18n | ✅ won't-fix — decisão de product owner. Mensagens WhatsApp são processadas pela equipe BR |
-| L-12 | "Sinal" / "Deposit" / "Depósito" — terminologia divergente entre idiomas | `js/i18n.js` | i18n | ✅ won't-fix — decisão de UX/copy, não bug técnico |
-| L-13 | RTL (`he`) não verificado em price-tag, accordions, badges | `js/i18n.js` + CSS | i18n | ✅ won't-fix — requer QA dedicado RTL com native speaker. Fora do escopo cirúrgico |
-| L-14 | `escapeHTML()` sem memoização (chamado dezenas de vezes em strings repetidas) | `js/script.js:143-151` | Perf | ✅ won't-fix — <30 chamadas por render, custo negligível (~0.1ms total) |
-| L-15 | Magic numbers (`5000ms`, `50px`, ...) sem constantes nomeadas | `js/script.js:229, 295` | Manutenção | ✅ extraídos `FETCH_TIMEOUT_MS`, `SCROLL_THRESHOLD_PX`, `TOAST_DURATION_MS` como constantes nomeadas |
-| L-16 | Botões sem visual `:disabled` (`.btn-buy`, `.qty-selector`) | `css/style.css` | UX | ✅ adicionado visual `:disabled` com `opacity: 0.5` + `cursor: not-allowed` + `pointer-events: none` |
-| L-17 | Sem loading state em "Finalizar Reserva" (clique duplo) | `js/script.js` | UX | ✅ checkout btn: `disabled=true` + texto "Abrindo WhatsApp…" + re-enable após 2s |
-| L-18 | Empty state cart só texto, sem visual | `index.html:831` | UX | ✅ `.empty-cart-msg` com padding 40px, cor #999, centralizado |
-| L-19 | Favicon incompleto (sem `apple-touch-icon`, sem `manifest.json`) | `index.html:8` | SEO | ✅ `apple-touch-icon` + `manifest.json` criado com name/icons/theme_color |
-| L-20 | Sem `referrerpolicy` em links sociais externos | `index.html` | Seg | ✅ `referrerpolicy="no-referrer"` nos 3 links externos (WhatsApp footer, Instagram, urgent modal) |
-| L-21 | Inputs sem `pattern`/`inputmode`/`required` (validação nativa não usada) | modais | UX | ✅ `required`, `minlength`, `inputmode="tel"`, `pattern`, `inputmode="email"` nos inputs step 2 |
-
-#### Resumo numérico
-- **Sec**: 5 itens (C-1, C-2, C-4, H-1, H-2, H-3, L-20)
-- **A11y**: 13 itens (C-6, C-8, H-4 a H-10, M-13, L-1, L-2)
-- **SEO**: 6 itens (H-11, H-12, M-1, M-2, M-3, L-19)
-- **Perf**: 4 itens (C-10, M-4, M-5, L-14)
-- **CSS**: 7 itens (C-5, L-3 a L-9)
-- **Bug**: 10 itens (C-3, C-7, M-6 a M-11, M-14, L-10)
-- **UX**: 6 itens (C-9, M-8, M-15, L-16 a L-18, L-21)
-- **i18n**: 3 itens (L-11, L-12, L-13)
-- **Manutenção**: 2 itens (M-12, L-15)
-
-#### Prioridade para pré-launch (Fase 8)
-**MUST resolver antes do launch**: ~~todos os CRITICAL~~ ✅ + ~~todos os HIGH~~ ✅ + ~~todos os MEDIUM~~ ✅ + ~~todos os LOW~~ ✅. **Audit completo: 58/58 itens resolvidos (v1.2–1.5).** Nenhum débito técnico pendente.
 
 ---
 
@@ -789,11 +666,9 @@ Memória de conversa é parcial entre sessões. Sempre re-validar fatos crítico
 | Data | Versão | Mudança |
 |---|---|---|
 | 2026-04-27 | 1.0 | Consolidação inicial. Funde `GEMINI.md`, `PROMPT_BACKEND.md`, `PROMPT_BACKEND_2.md` + `CLAUDE.md` antigo. Resolve 35 contradições/ambiguidades documentadas em `~/.claude/plans/agisci-come-un-vero-gleaming-puffin.md`. Hosting decidido: Railway. PDF, WhatsApp, Email permanecem TBD. |
-| 2026-04-27 | 1.1 | Adicionado §10.4 — Audit frontend cínico de `index.html`, `politica-privacidade.html`, `css/style.css`, `js/script.js`, `js/i18n.js`. 58 itens catalogados (10 CRITICAL, 12 HIGH, 15 MEDIUM, 21 LOW) por categoria (Seg, A11y, SEO, Perf, CSS, Bug, UX, i18n). Lista de must-fix pré-launch (Fase 8) definida. |
-| 2026-04-27 | 1.2 | Resolvidos os 10 itens CRITICAL do §10.4. Alterações: `css/style.css` (var fantasma), `index.html` (CSP meta, `for=`/`name=` em forms, ícones com `aria-hidden`), `js/script.js` (sanitizer XSS allow-list, cutoff per-product + 422 handler, scroll rAF, `setBackgroundInert`, totais em vars, remoção de `fmtNum`). Bonus: aplicado fix M-14 (`document.contains` antes de `previousFocus.focus()`). C-7 confirmado falso-positivo (preventDefault já existia). Restam 12 HIGH + 15 MEDIUM + 21 LOW. |
-| 2026-04-27 | 1.3 | Resolvidos os 12 itens HIGH do §10.4. CSS: `:focus-visible` global (H-5), `prefers-reduced-motion` desabilitando animações/vídeo (H-8), `text-shadow` para contraste header (H-4). HTML: `aria-hidden="true"` em ~50 ícones Lucide decorativos (H-9), Schema.org enriquecido com `logo`/`sameAs`/`image`/`areaServed` (H-12), CSS bump v28. JS: keyboard nav Arrow↑↓+Escape no lang dropdown (H-6), `showToast` com `role="alert"`+`aria-live="assertive"` para erros (H-7). Falsos-positivos: H-1 (sem console.error), H-2 (SRI já presente), H-3 (encodeURIComponent já sanitiza), H-10 (modalStack já funciona), H-11 (won't-fix arquitetural SPA). Restam 15 MEDIUM + 21 LOW. |
-| 2026-04-27 | 1.4 | Resolvidos os 15 itens MEDIUM do §10.4. SEO: `<title>`/`og:title`/`twitter:title` unificados (M-1), `og:image:width/height/type` adicionados (M-2). Bugs: `parseDateBR` com validação + null guard (M-6), `Math.round` em cálculo de totais (M-10). UX: timeout fetch 5s→12s para 4G (M-8), `name=` nos inputs step 2 (M-15). Manutenção: `readPax`/`changePaxQty` genéricos deduplicam booking/ticket (M-12), `aria-hidden` no accordionHTML dinâmico. Já fixados v1.2: M-7, M-9, M-11, M-14. Won't-fix: M-3 (hreflang inutil em SPA), M-4/M-5 (custo desp.), M-13 (comportamento normal). Restam 21 LOW. |
-| 2026-04-27 | 1.5 | Resolvidos os 21 itens LOW do §10.4. **Audit 58/58 completo.** A11y: skip-to-content link com `.skip-link` (L-1). CSS: z-index scale refatorada para 14 CSS vars nomeadas (L-4), estilos `:disabled` para botões (L-16), `.empty-cart-msg` visual (L-18). JS: `.catch()` em `applyDynamicProducts` (L-10), constantes nomeadas `FETCH_TIMEOUT_MS`/`SCROLL_THRESHOLD_PX`/`TOAST_DURATION_MS` (L-15), loading state checkout btn anti-double-click (L-17). HTML: `apple-touch-icon` + `manifest.json` (L-19), `referrerpolicy="no-referrer"` nos 3 links externos (L-20), `required`/`inputmode`/`pattern`/`minlength` nos inputs step 2 (L-21). Falso-positivo: L-5. Won't-fix: L-2, L-3, L-6–L-9, L-11–L-14. |
+| 2026-04-27 | 1.1–1.5 | Audit frontend completo: 58 itens identificados (10 CRITICAL, 12 HIGH, 15 MEDIUM, 21 LOW) em Seg, A11y, SEO, Perf, CSS, Bug, UX, i18n. **Todos resolvidos** em 4 rodadas (v1.2–1.5): sanitizer XSS, CSP meta, `:focus-visible`, `prefers-reduced-motion`, SRI, `aria-hidden` em ícones, cutoff per-product, `Math.round` em totais, z-index CSS vars, skip-link, `manifest.json`, loading states, keyboard nav. 6 falsos-positivos confirmados, 15 won't-fix justificados. |
+| 2026-04-30 | 1.7 | TBD #1/#2/#3 resolvidos: pdf-lib + Z-API + Resend. §2.2 atualizado, §10.1 marca conta-pendente em Z-API/Resend. Sblocca Fases 4-5 (depende ainda de criar contas providers + MP PJ). |
+| 2026-04-29 | 1.6 | Limpeza do documento: removidos §10.2 (Done log — itens já consolidados), §10.4 (Audit 58/58 completo — sem pendências). Renumerado §10.3→§10.2. Changelog v1.1–1.5 condensado. |
 
 ---
 
