@@ -439,10 +439,14 @@ body {
     border-bottom: 1px solid #eee;
 }
 
-.cart-items {
+.cart-body {
     flex: 1;
-    padding: 20px;
     overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+.cart-items {
+    padding: 20px;
 }
 
 .cart-footer {
@@ -1128,8 +1132,10 @@ body {
     line-height: 1.4;
 }
 
-/* Cart customer form (checkout section) */
-.cart-divider { border: none; border-top: 1px solid #eee; margin: 16px 0 14px; }
+.cart-customer-form {
+    padding: 0 20px 20px;
+}
+.cart-divider { border: none; border-top: 1px solid #eee; margin: 0 0 16px; }
 .cart-customer-title {
     font-size: 0.9rem;
     font-weight: 700;
@@ -1143,6 +1149,29 @@ body {
     color: #444;
     margin-bottom: 5px;
     display: block;
+}
+
+/* Country code free-text input */
+.phone-field--free { flex-wrap: nowrap; gap: 8px; }
+.country-code-input {
+    flex: 0 0 72px;
+    width: 72px;
+    padding: 12px 10px;
+    border: 1.5px solid #ddd;
+    border-radius: 10px;
+    font-family: var(--font-main);
+    font-size: 0.95rem;
+    text-align: center;
+    background: #fff;
+    transition: border-color 0.2s;
+}
+.country-code-input:focus { outline: none; border-color: var(--primary-color); }
+.phone-hint {
+    display: block;
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 5px;
+    line-height: 1.4;
 }
 
 

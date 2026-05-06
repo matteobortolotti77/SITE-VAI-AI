@@ -1115,16 +1115,20 @@ function waLanguageHeader() {
 
 // 4.X Finalizar Reserva — POST /v1/reservations → redirect MP
 const checkoutBtn = document.querySelector('.checkout-btn');
-const cartCountrySelect = document.getElementById('cart-country-code');
+const cartCountryInput = document.getElementById('cart-country-code');
+function getCartCountryCode() {
+    let code = (cartCountryInput?.value || '+55').trim();
+    if (!code.startsWith('+')) code = '+' + code;
+    return code;
+}
 function updateCartEmailRequired() {
-    if (!cartCountrySelect) return;
-    const isBR = cartCountrySelect.value === '+55';
+    const isBR = getCartCountryCode() === '+55';
     const mark = document.getElementById('cart-email-required-mark');
     const emailInput = document.getElementById('cart-email');
     if (mark) mark.style.display = isBR ? 'none' : 'inline';
     if (emailInput) emailInput.required = !isBR;
 }
-if (cartCountrySelect) cartCountrySelect.addEventListener('change', updateCartEmailRequired);
+if (cartCountryInput) cartCountryInput.addEventListener('input', updateCartEmailRequired);
 
 if (checkoutBtn) {
     checkoutBtn.addEventListener('click', async () => {
@@ -1132,7 +1136,7 @@ if (checkoutBtn) {
         if (checkoutBtn.disabled) return;
         const name = (document.getElementById('cart-name')?.value || '').trim();
         const whatsappNum = (document.getElementById('cart-whatsapp')?.value || '').trim().replace(/\D/g, '');
-        const countryCode = cartCountrySelect ? cartCountrySelect.value : '+55';
+        const countryCode = getCartCountryCode();
         const email = (document.getElementById('cart-email')?.value || '').trim();
         const isBR = countryCode === '+55';
         if (!name || name.length < 2) { showToast('Informe seu nome completo', 'error'); return; }

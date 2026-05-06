@@ -843,39 +843,32 @@
             <h3 data-i18n="cart.title">Seu Carrinho</h3>
             <button class="close-cart" aria-label="Fechar carrinho" data-i18n-aria="aria.close_cart"><i data-lucide="x" aria-hidden="true"></i></button>
         </div>
-        <div class="cart-items" id="cart-items-container">
-            <!-- Itens do carrinho serão inseridos via JS vazio por padrão -->
-            <p class="empty-cart-msg" data-i18n="cart.empty">Seu carrinho está vazio.</p>
-        </div>
-        <!-- Dados do responsável — aparece quando há itens no carrinho -->
-        <div class="cart-customer-form" id="cart-customer-form" hidden>
-            <hr class="cart-divider">
-            <h4 class="cart-customer-title">Seus dados para a reserva</h4>
-            <div class="form-group">
-                <label for="cart-name">Nome completo *</label>
-                <input type="text" id="cart-name" autocomplete="name" placeholder="Como consta no documento" required minlength="2">
+        <!-- Gaveta: corpo rolável (itens + formulário) -->
+        <div class="cart-body">
+            <div class="cart-items" id="cart-items-container">
+                <!-- Itens do carrinho serão inseridos via JS vazio por padrão -->
+                <p class="empty-cart-msg" data-i18n="cart.empty">Seu carrinho está vazio.</p>
             </div>
-            <div class="form-group">
-                <label for="cart-whatsapp">WhatsApp *</label>
-                <div class="phone-field">
-                    <select id="cart-country-code" class="country-select">
-                        <option value="+55">🇧🇷 +55</option>
-                        <option value="+1">🇺🇸 +1</option>
-                        <option value="+44">🇬🇧 +44</option>
-                        <option value="+34">🇪🇸 +34</option>
-                        <option value="+33">🇫🇷 +33</option>
-                        <option value="+39">🇮🇹 +39</option>
-                        <option value="+49">🇩🇪 +49</option>
-                        <option value="+972">🇮🇱 +972</option>
-                        <option value="+54">🇦🇷 +54</option>
-                        <option value="+351">🇵🇹 +351</option>
-                    </select>
-                    <input type="tel" id="cart-whatsapp" autocomplete="tel" placeholder="99999-9999" required inputmode="tel" minlength="7">
+            <!-- Dados do responsável — aparece quando há itens no carrinho -->
+            <div class="cart-customer-form" id="cart-customer-form" hidden>
+                <hr class="cart-divider">
+                <h4 class="cart-customer-title">Seus dados para a reserva</h4>
+                <div class="form-group">
+                    <label for="cart-name">Nome completo *</label>
+                    <input type="text" id="cart-name" autocomplete="name" placeholder="Como consta no documento" required minlength="2">
                 </div>
-            </div>
-            <div class="form-group">
-                <label for="cart-email">E-mail <span id="cart-email-required-mark" style="display:none">*</span></label>
-                <input type="email" id="cart-email" autocomplete="email" placeholder="seu@email.com" inputmode="email">
+                <div class="form-group">
+                    <label for="cart-whatsapp">WhatsApp (com código do país) *</label>
+                    <div class="phone-field phone-field--free">
+                        <input type="text" id="cart-country-code" class="country-code-input" value="+55" maxlength="5" inputmode="tel" placeholder="+55" aria-label="Código do país">
+                        <input type="tel" id="cart-whatsapp" autocomplete="tel" placeholder="99999-9999" required inputmode="tel" minlength="7">
+                    </div>
+                    <small class="phone-hint">Ex: +55 para Brasil · +1 para EUA · +44 para Reino Unido · +351 para Portugal</small>
+                </div>
+                <div class="form-group">
+                    <label for="cart-email">E-mail <span id="cart-email-required-mark" style="display:none">*</span></label>
+                    <input type="email" id="cart-email" autocomplete="email" placeholder="seu@email.com" inputmode="email">
+                </div>
             </div>
         </div>
         <div class="cart-footer">
