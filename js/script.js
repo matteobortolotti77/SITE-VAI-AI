@@ -1071,7 +1071,7 @@ if (payBookingBtn) {
                 showToast(data.message || 'Erro ao processar reserva', 'error');
                 return;
             }
-            window.location.href = data.sandbox_init_point || data.init_point;
+            window.location.href = data.init_point || data.sandbox_init_point;
         } catch (err) {
             showToast('Erro de conexão. Tente novamente.', 'error');
             payBookingBtn.disabled = false;
