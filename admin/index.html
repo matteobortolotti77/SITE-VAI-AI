@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Volta à Ilha — Painel Admin</title>
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap">
+    <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+    <main id="login-screen" class="login-screen">
+        <form id="login-form" class="login-card" novalidate>
+            <h1>Volta à Ilha</h1>
+            <p class="login-sub">Painel de gestão</p>
+            <label>
+                Email
+                <input type="email" id="login-email" required autocomplete="username">
+            </label>
+            <label>
+                Senha
+                <input type="password" id="login-password" required autocomplete="current-password">
+            </label>
+            <button type="submit" id="login-submit">Entrar</button>
+            <p id="login-error" class="login-error" hidden></p>
+        </form>
+    </main>
+
+    <div id="app-shell" class="app-shell" hidden>
+        <aside class="sidebar">
+            <div class="sidebar-brand">🌴 VAI Admin</div>
+            <nav class="sidebar-nav">
+                <a href="#dashboard" data-route="dashboard">Dashboard</a>
+                <a href="#reservas" data-route="reservas">Reservas</a>
+                <a href="#produtos" data-route="produtos">Produtos</a>
+                <a href="#fornecedores" data-route="fornecedores">Fornecedores</a>
+                <a href="#envios" data-route="envios">Envios diários</a>
+            </nav>
+            <div class="sidebar-foot">
+                <span id="admin-email" class="admin-email"></span>
+                <button id="logout-btn" class="logout-btn">Sair</button>
+            </div>
+        </aside>
+        <main class="main-content">
+            <header class="main-header">
+                <h2 id="view-title">Dashboard</h2>
+            </header>
+            <section id="view-container" class="view-container">
+                <p class="placeholder">Carregando…</p>
+            </section>
+        </main>
+    </div>
+
+    <script type="module" src="js/admin.js"></script>
+</body>
+</html>

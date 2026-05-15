@@ -1,0 +1,5 @@
+{
+  "supabaseUrl": "https://YOUR_PROJECT.supabase.co",
+  "supabaseAnonKey": "eyJ...",
+  "apiBase": "https://api.voltaailha.com.br/v1"
+}
