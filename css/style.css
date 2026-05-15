@@ -1686,3 +1686,18 @@ body {
     font-size: 0.95rem;
     line-height: 1.5;
 }
+
+/* =========================================
+   #14a — Hide static HTML products until API render completes.
+   JS removes .is-pending after applyDynamicProducts (success OR failure).
+   Failure path = fallback to static HTML, so we DO still reveal eventually.
+   ========================================= */
+.product-slider.is-pending {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease-out;
+}
+.product-slider:not(.is-pending) {
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+}

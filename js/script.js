@@ -1385,6 +1385,13 @@ document.addEventListener('click', (e) => {
 applyLocale(detectLocale());
 
 // 8. CARREGA PRODUTOS DINÂMICOS (overlay sobre HTML estático)
-applyDynamicProducts().catch(() => {}); // L-10: silencia erros de rede (fallback = HTML estático)
+// #14a: HTML estático começa com .is-pending (oculto). Remove após apply concluir
+// — sucesso (mostra produtos do DB) ou falha (fallback HTML estático). Em ambos os casos,
+// revela o conteúdo. Evita flash de 20 cards estáticos antes da render dos 11 ativos.
+applyDynamicProducts()
+    .catch(() => {}) // L-10: silencia erros de rede (fallback = HTML estático)
+    .finally(() => {
+        document.querySelectorAll('.product-slider.is-pending').forEach(el => el.classList.remove('is-pending'));
+    });
 
 })(); // Fim da IIFE
