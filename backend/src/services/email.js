@@ -66,7 +66,7 @@ export function buildVoucherEmail({ customerName, voucherUrl, productName, trave
                     <li>Apresente este voucher (impresso ou no celular) no embarque.</li>
                     <li>TUPA e taxas ambientais NÃO incluídas.</li>
                 </ul>
-                <p>Dúvidas: <a href="https://wa.me/5575998240043">WhatsApp +55 75 99824-0043</a></p>
+                <p>Dúvidas: <a href="https://wa.me/${config.zapi.whatsappNumber}">WhatsApp +55 75 99824-0043</a></p>
                 <hr/>
                 <small>Volta à Ilha · CNPJ 13.510.711/0001-58 · voltaailha.com.br</small>
             </div>
@@ -93,7 +93,7 @@ export function buildReservationConfirmationEmail({ customerName, cartId, produc
                 <p><strong>Total pago agora (sinal):</strong> R$ ${esc(totalDeposit)}</p>
                 <p>Você receberá o voucher em breve via WhatsApp.</p>
                 <p>Qualquer dúvida, fale com a gente:
-                   <a href="https://wa.me/5575998240043">WhatsApp</a>
+                   <a href="https://wa.me/${config.zapi.whatsappNumber}">WhatsApp</a>
                 </p>
                 <hr/>
                 <small>CNPJ: 13.510.711/0001-58 · voltaailha.com.br</small>

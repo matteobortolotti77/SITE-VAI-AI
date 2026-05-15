@@ -370,16 +370,11 @@ export default async function reservationsRoutes(app) {
                 reservation_id: p.reservation_id,
                 full_name: p.full_name,
                 doc_type: p.doc_type,
-                doc_number: p.doc_number.replace(/\D/g, ''),  // normaliza CPF; passport mantém alfanumérico → vamos tratar abaixo
-                age_group: p.age_group
-            })).map((p, i) => {
-                // Restaura número original pra passport (alfanumérico)
-                const original = passengers[i];
-                if (original.doc_type === 'passport') {
-                    p.doc_number = original.doc_number.trim().toUpperCase();
-                }
-                return p;
-            }))
+                doc_number: p.doc_type === 'passport'
+                    ? p.doc_number.trim().toUpperCase()
+                    : p.doc_number.replace(/\D/g, ''),
+                age_group: p.age_group,
+            })))
             .select('id');
 
         if (insErr) return reply.code(500).send({ error: insErr.message });

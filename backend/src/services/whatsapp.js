@@ -59,7 +59,7 @@ Ref: \`${cartId}\`
 *Responda OK para confirmar o recebimento.*
 
 Dúvidas? Estamos aqui 👇
-https://wa.me/5575998240043`;
+https://wa.me/${config.zapi.whatsappNumber}`;
 }
 
 /**

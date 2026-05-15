@@ -23,6 +23,19 @@ export function startCronJobs(logger) {
         }
     });
 
+    // Diário 03:00 BRT: limpa idempotency_keys com mais de 7 dias
+    new Cron('0 3 * * *', { timezone: 'America/Bahia', name: 'idempotency-cleanup' }, async () => {
+        try {
+            const db = getDb();
+            const cutoff = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            const { error } = await db.from('idempotency_keys').delete().lt('created_at', cutoff);
+            if (error) throw new Error(error.message);
+            logger.info('Cron idempotency-cleanup executado');
+        } catch (err) {
+            logger.error({ err: err.message }, 'Cron idempotency-cleanup falhou');
+        }
+    });
+
     // Worker notifications: cada 30s processa pendentes (retry 0/30s/5min)
     new Cron('*/30 * * * * *', { name: 'notification-worker' }, async () => {
         try {

@@ -28,7 +28,7 @@ export async function runPostPaymentPipeline(cartId) {
     for (const r of reservations) {
         if (r.voucher_url) continue;
         try {
-            const voucherUrl = `${config.publicBaseUrl || 'https://voltaailha.com.br'}/sucesso?cart_id=${cartId}`;
+            const voucherUrl = `${config.publicBaseUrl || 'https://voltaailha.com.br'}/reserva?id=${r.id}`;
             const pdfBytes = await generateVoucherPDF({ reservation: r, voucherUrl });
             const url = await uploadVoucher(r.id, pdfBytes);
             await db.from('reservations').update({ voucher_url: url }).eq('id', r.id);
