@@ -1,7 +1,26 @@
 // Voucher PDF generator (CLAUDE.md §8.8 — conteúdo obrigatório)
-// pdf-lib (~500KB) + qrcode. Layout programático A4.
-import { PDFDocument, StandardFonts, rgb } from 'pdf-lib';
+// pdf-lib + @pdf-lib/fontkit + qrcode. Noto Sans TTF para suporte Unicode (clientes internacionais).
+import { PDFDocument, rgb } from 'pdf-lib';
+import fontkit from '@pdf-lib/fontkit';
 import QRCode from 'qrcode';
+import { readFile } from 'fs/promises';
+import { fileURLToPath } from 'url';
+import { join, dirname } from 'path';
+
+const __dir = dirname(fileURLToPath(import.meta.url));
+const FONTS_DIR = join(__dir, '../../assets/fonts');
+
+async function loadFonts(pdf) {
+    pdf.registerFontkit(fontkit);
+    const [regBytes, boldBytes] = await Promise.all([
+        readFile(join(FONTS_DIR, 'NotoSans-Regular.ttf')),
+        readFile(join(FONTS_DIR, 'NotoSans-Bold.ttf')),
+    ]);
+    return {
+        reg: await pdf.embedFont(regBytes),
+        bold: await pdf.embedFont(boldBytes),
+    };
+}
 
 const A4_W = 595.28;
 const A4_H = 841.89;
@@ -20,8 +39,7 @@ const COLOR_BG_BOX = rgb(0.96, 0.97, 0.98);
 export async function generateVoucherPDF({ reservation, voucherUrl }) {
     const pdf = await PDFDocument.create();
     const page = pdf.addPage([A4_W, A4_H]);
-    const fontReg = await pdf.embedFont(StandardFonts.Helvetica);
-    const fontBold = await pdf.embedFont(StandardFonts.HelveticaBold);
+    const { reg: fontReg, bold: fontBold } = await loadFonts(pdf);
 
     const r = reservation;
     const c = r.customer || {};
