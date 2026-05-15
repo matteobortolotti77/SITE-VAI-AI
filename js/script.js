@@ -124,7 +124,9 @@ if (langBtn && langDropdown) {
 // 0.3 PRODUTOS DINÂMICOS — fetch /v1/products e re-renderiza carrosséis
 // Progressive enhancement: HTML estático aparece primeiro; se backend responder
 // em ≤2s, sobrescreve com dados frescos do DB. Se falhar, mantém estático.
-const API_BASE = 'https://site-vai-ai-production.up.railway.app/v1';
+const API_BASE = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+    ? `http://${location.hostname}:3000/v1`
+    : 'https://site-vai-ai-production.up.railway.app/v1';
 
 // Mapping accordion title (pt-BR base) → chave i18n
 const ACCORDION_KEYS = {
@@ -144,6 +146,7 @@ const PRODUCT_I18N_PREFIX = {
     'gamboa-convencional': 'product.gamboa_conv',
     'quadriciclo': 'product.quadriciclo',
     'buggy': 'product.buggy',
+    'lancha-transparente': 'product.lancha_transparente',
     'mergulho-cilindro': 'product.mergulho',
     'cavalgada': 'product.cavalgada',
     'tiroleza': 'product.tiroleza',
