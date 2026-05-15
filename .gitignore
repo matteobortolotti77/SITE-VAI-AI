@@ -3,7 +3,6 @@
 node_modules/
 .vscode/
 backend/.env
-admin/config.json
 assets/hero.original.mp4
 assets/og_share.original.jpg
 assets/logo.original.png

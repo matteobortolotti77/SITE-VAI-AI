@@ -34,7 +34,8 @@ const $ = (sel) => document.querySelector(sel);
 // ---------- bootstrap ----------
 async function bootstrap() {
     const cfg = await loadConfig();
-    state.apiBase = cfg.apiBase.replace(/\/$/, '');
+    const isLocal = location.hostname === 'localhost' || location.hostname === '127.0.0.1';
+    state.apiBase = (isLocal ? `http://${location.hostname}:3000/v1` : cfg.apiBase).replace(/\/$/, '');
     state.supabase = createClient(cfg.supabaseUrl, cfg.supabaseAnonKey, {
         auth: { persistSession: true, autoRefreshToken: true },
     });

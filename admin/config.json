@@ -1,0 +1,5 @@
+{
+  "supabaseUrl": "https://ibkyqpatestghbdxgqup.supabase.co",
+  "supabaseAnonKey": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlia3lxcGF0ZXN0Z2hiZHhncXVwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzcxMTY2ODIsImV4cCI6MjA5MjY5MjY4Mn0.RCujy01UwL7hnU9NOv53z_vKH6KcBpjNIE_XsF9LJQc",
+  "apiBase": "https://api.voltaailha.com.br/v1"
+}
