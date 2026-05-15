@@ -1,6 +1,6 @@
 // MercadoPago Checkout Pro — cria preference de pagamento
 // Doc: https://www.mercadopago.com.br/developers/pt/reference/preferences/_checkout_preferences/post
-import { MercadoPagoConfig, Preference } from 'mercadopago';
+import { MercadoPagoConfig, Preference, PaymentRefund } from 'mercadopago';
 import { config } from '../config.js';
 
 let _client = null;
@@ -61,5 +61,23 @@ export async function createPreference({ cartId, items, payer, urls }) {
         preferenceId: result.id,
         init_point: result.init_point,
         sandbox_init_point: result.sandbox_init_point
+    };
+}
+
+/**
+ * Faz refund parcial ou total de um pagamento aprovado no MP.
+ * @param {string} paymentId — ID do pagamento no gateway (não preference_id)
+ * @param {number} amount — valor a estornar (BRL); omitir = total
+ * @returns {Promise<{ id: string, status: string, amount: number }>}
+ */
+export async function refundPayment(paymentId, amount) {
+    const client = getClient();
+    const refund = new PaymentRefund(client);
+    const body = amount != null ? { amount: Number(amount.toFixed(2)) } : {};
+    const result = await refund.create({ payment_id: paymentId, body });
+    return {
+        id: String(result.id),
+        status: result.status,
+        amount: Number(result.amount),
     };
 }

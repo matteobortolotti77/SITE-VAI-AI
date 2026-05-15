@@ -18,9 +18,12 @@ export async function sendWhatsAppText(phone, text) {
     // Z-API espera número sem + e sem caracteres especiais
     const phoneClean = phone.replace(/\D/g, '');
 
+    const headers = { 'Content-Type': 'application/json' };
+    if (config.zapi.clientToken) headers['Client-Token'] = config.zapi.clientToken;
+
     const res = await fetch(`${BASE_URL}/send-text`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ phone: phoneClean, message: text }),
     });
 

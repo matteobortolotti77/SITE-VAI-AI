@@ -10,11 +10,13 @@ export const config = {
     port: Number(optional('PORT', 3000)),
     env: optional('NODE_ENV', 'development'),
     corsOrigin: optional('CORS_ORIGIN', 'http://localhost:8765').split(',').map(s => s.trim()),
+    publicBaseUrl: optional('PUBLIC_BASE_URL', 'https://voltaailha.com.br'),
 
     supabase: {
         url: optional('SUPABASE_URL', ''),
         anonKey: optional('SUPABASE_ANON_KEY', ''),
         serviceRoleKey: optional('SUPABASE_SERVICE_ROLE_KEY', ''),
+        jwtSecret: optional('SUPABASE_JWT_SECRET', ''),
     },
 
     mp: {
@@ -30,6 +32,7 @@ export const config = {
     zapi: {
         instanceId: optional('Z_API_INSTANCE_ID', ''),
         token: optional('Z_API_TOKEN', ''),
+        clientToken: optional('Z_API_CLIENT_TOKEN', ''),
         whatsappNumber: optional('Z_API_WHATSAPP_NUMBER', '5575998240043'),
     },
 

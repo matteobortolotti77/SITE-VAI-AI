@@ -4,6 +4,21 @@
 import { createHmac } from 'node:crypto';
 import { getDb } from '../db/client.js';
 import { config } from '../config.js';
+import { runPostPaymentPipeline } from '../services/post-payment.js';
+
+// LGPD §11.7: remove PII (email, doc, nome) antes de gravar payload do gateway
+function sanitizeMpPayload(p) {
+    if (!p || typeof p !== 'object') return p;
+    const allowed = [
+        'id', 'status', 'status_detail', 'transaction_amount', 'currency_id',
+        'payment_type_id', 'payment_method_id', 'date_created', 'date_approved',
+        'date_last_updated', 'external_reference', 'live_mode', 'operation_type',
+        'transaction_details', 'fee_details', 'installments',
+    ];
+    const out = {};
+    for (const k of allowed) if (p[k] !== undefined) out[k] = p[k];
+    return out;
+}
 
 /**
  * Valida assinatura HMAC do webhook MP.
@@ -11,7 +26,14 @@ import { config } from '../config.js';
  * String assinada: "id:<payment_id>;request-id:<x-request-id>;ts:<timestamp>;"
  */
 function validateSignature(request, paymentId) {
-    if (!config.mp.webhookSecret) return true; // sem secret configurado: aceita tudo (dev)
+    if (!config.mp.webhookSecret) {
+        if (config.env === 'production') {
+            request.log.error('MP_WEBHOOK_SECRET ausente em produção — rejeitando webhook');
+            return false;
+        }
+        request.log.warn('MP_WEBHOOK_SECRET ausente (dev) — assinatura ignorada');
+        return true;
+    }
 
     const xSig = request.headers['x-signature'] || '';
     const xReqId = request.headers['x-request-id'] || '';
@@ -91,41 +113,54 @@ export default async function paymentsRoutes(app) {
             return reply.code(200).send({ status, action: 'waiting' });
         }
 
-        // Só atualiza se ainda estiver pending (idempotente)
-        const ids = reservations
-            .filter(r => r.status === 'pending_payment')
-            .map(r => r.id);
+        // Idempotência: insere payments com upsert. Se gateway_id já existe, conflict → skip pipeline.
+        const allIds = reservations.map(r => r.id);
+        const paymentRows = allIds.map(rid => ({
+            reservation_id: rid,
+            gateway: 'mercadopago',
+            gateway_id: paymentId,
+            type: 'deposit',
+            amount: payment.transaction_amount || 0,
+            method: payment.payment_type_id || null,
+            status: payment.status,
+            gateway_payload: sanitizeMpPayload(payment),
+        }));
 
-        if (ids.length > 0) {
+        const { data: insertedPayments, error: payErr } = await db
+            .from('payments')
+            .upsert(paymentRows, { onConflict: 'gateway,gateway_id', ignoreDuplicates: true })
+            .select('id');
+
+        if (payErr) {
+            request.log.error({ cartId, err: payErr.message }, 'Webhook MP: payments upsert falhou');
+            return reply.code(500).send({ error: 'db_payment_insert_failed' });
+        }
+
+        const isFirstTimeWebhook = (insertedPayments?.length || 0) > 0;
+        if (!isFirstTimeWebhook) {
+            request.log.info({ cartId, paymentId }, 'Webhook MP: replay (idempotency hit) — skip pipeline');
+            return reply.code(200).send({ ok: true, idempotent: true, cart_id: cartId });
+        }
+
+        // Atualiza status apenas se ainda pending
+        const pendingIds = reservations.filter(r => r.status === 'pending_payment').map(r => r.id);
+        if (pendingIds.length > 0) {
             const { error: updErr } = await db
                 .from('reservations')
-                .update({
-                    status: newStatus,
-                    gateway_payment_id: paymentId,
-                    updated_at: new Date().toISOString()
-                })
-                .in('id', ids);
-
+                .update({ status: newStatus, gateway_payment_id: paymentId, updated_at: new Date().toISOString() })
+                .in('id', pendingIds);
             if (updErr) {
                 request.log.error({ cartId, err: updErr.message }, 'Webhook MP: falha ao atualizar reservas');
                 return reply.code(500).send({ error: 'db_update_failed' });
             }
+            request.log.info({ cartId, newStatus, updated: pendingIds.length }, 'Webhook MP: reservas atualizadas');
+        }
 
-            // Log do pagamento na tabela payments
-            const paymentRows = ids.map(rid => ({
-                reservation_id: rid,
-                gateway: 'mercadopago',
-                gateway_id: paymentId,
-                type: 'deposit',
-                amount: payment.transaction_amount || 0,
-                method: payment.payment_type_id || null,
-                status: payment.status,
-                gateway_payload: payment
-            }));
-
-            await db.from('payments').insert(paymentRows);
-
-            request.log.info({ cartId, newStatus, updated: ids.length }, 'Webhook MP: reservas atualizadas');
+        // Pipeline pós-pagamento async (1× garantido por idempotency)
+        if (newStatus === 'deposit_paid') {
+            runPostPaymentPipeline(cartId).catch(err => {
+                request.log.error({ cartId, err: err.message }, 'Post-payment pipeline failed');
+            });
         }
 
         return reply.code(200).send({ ok: true, cart_id: cartId, status: newStatus });

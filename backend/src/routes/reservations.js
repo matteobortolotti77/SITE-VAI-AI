@@ -9,6 +9,8 @@ import { config } from '../config.js';
 import { createPreference } from '../services/mercadopago.js';
 import { computeAmounts, validateQty } from '../services/pricing.js';
 import { isUrgent } from '../services/cutoff.js';
+import { pickProviderForProduct, alertOrphanReservation } from '../services/assignment.js';
+import { getVoucherSignedUrl } from '../services/storage.js';
 
 // === Schemas Zod ===
 const cartItemSchema = z.object({
@@ -155,71 +157,81 @@ export default async function reservationsRoutes(app) {
             }
         }
 
-        // 4. Lock + verificação de disponibilidade (per produto/data/horário)
-        // Usa view availability — não dá pra FOR UPDATE em view, então fazemos check simples
-        // Numa segunda iteração: SELECT FOR UPDATE direto na tabela reservations
-        for (const item of payload.items) {
-            const product = productBySlug[item.product_slug];
-            const { data: avail, error: availErr } = await db
-                .from('availability')
-                .select('seats_left')
-                .eq('product_id', product.id)
-                .eq('travel_date', item.travel_date)
-                .eq('departure_time', item.departure_time)
-                .maybeSingle();
-
-            const seatsLeft = avail ? avail.seats_left : product.capacity;
-            const seatsNeeded = product.pricing_mode === 'per_vehicle'
-                ? 1
-                : (item.qty_adults + item.qty_children);
-
-            if (seatsLeft < seatsNeeded) {
-                return reply.code(409).send({
-                    error: 'no_availability',
-                    product_slug: item.product_slug,
-                    travel_date: item.travel_date,
-                    departure_time: item.departure_time,
-                    seats_left: seatsLeft,
-                    seats_needed: seatsNeeded
-                });
-            }
-        }
-
-        // 5. Upsert customer
+        // 4. Upsert customer
         const customerId = await upsertCustomer(db, payload.customer);
 
-        // 6. Cria N reservas com mesmo cart_id
+        // 5. Para cada item: RPC atomic (lock + check + insert). Race-condition safe.
         const cartId = randomUUID();
-        const reservationsToInsert = payload.items.map(item => {
+        const orphans = [];
+        const insertedReservations = [];
+        const rollbackIds = [];
+        for (const item of payload.items) {
             const product = productBySlug[item.product_slug];
             const amounts = computeAmounts(product, {
                 adults: item.qty_adults,
                 children: item.qty_children,
                 infants: item.qty_infants
             });
-            return {
-                cart_id: cartId,
-                customer_id: customerId,
+            const assignment = await pickProviderForProduct(db, product.id);
+            if (!assignment.provider_id) {
+                orphans.push({
+                    productName: product.name,
+                    customerName: payload.customer.name,
+                    travelDate: item.travel_date,
+                });
+            }
+
+            const { data: rpcRows, error: rpcErr } = await db.rpc('reserve_seat_atomic', {
+                p_cart_id: cartId,
+                p_customer_id: customerId,
+                p_product_id: product.id,
+                p_provider_id: assignment.provider_id,
+                p_commission_amount: assignment.commission_amount,
+                p_travel_date: item.travel_date,
+                p_departure_time: item.departure_time,
+                p_qty_adults: item.qty_adults,
+                p_qty_children: item.qty_children,
+                p_qty_infants: item.qty_infants,
+                p_amount_deposit: amounts.deposit,
+                p_amount_remaining: amounts.remaining,
+                p_amount_total: amounts.total,
+                p_gateway: 'mercadopago',
+            });
+
+            if (rpcErr) {
+                // Rollback parcial: cancela reservas já criadas
+                if (rollbackIds.length) {
+                    await db.from('reservations').update({ status: 'cancelled_force_majeure', notes: 'rollback rpc error' }).in('id', rollbackIds);
+                }
+                return reply.code(500).send({ error: 'reservation_rpc_failed', message: rpcErr.message });
+            }
+            const result = rpcRows?.[0];
+            if (!result || !result.ok) {
+                if (rollbackIds.length) {
+                    await db.from('reservations').update({ status: 'cancelled_force_majeure', notes: 'rollback no_availability' }).in('id', rollbackIds);
+                }
+                return reply.code(409).send({
+                    error: 'no_availability',
+                    product_slug: item.product_slug,
+                    travel_date: item.travel_date,
+                    departure_time: item.departure_time,
+                    seats_left: result?.seats_left ?? 0,
+                    seats_needed: result?.seats_needed ?? 0,
+                });
+            }
+            rollbackIds.push(result.reservation_id);
+            insertedReservations.push({
+                id: result.reservation_id,
                 product_id: product.id,
-                travel_date: item.travel_date,
-                departure_time: item.departure_time,
-                qty_adults: item.qty_adults,
-                qty_children: item.qty_children,
-                qty_infants: item.qty_infants,
                 amount_deposit: amounts.deposit,
-                amount_remaining: amounts.remaining,
                 amount_total: amounts.total,
-                status: 'pending_payment',
-                gateway: 'mercadopago'
-            };
-        });
+            });
+        }
 
-        const { data: insertedReservations, error: insErr } = await db
-            .from('reservations')
-            .insert(reservationsToInsert)
-            .select('id, product_id, amount_deposit, amount_total');
-
-        if (insErr) return reply.code(500).send({ error: 'db_insert_failed', message: insErr.message });
+        // Dispara alertas orphan (assíncrono, não bloqueia checkout)
+        for (const o of orphans) {
+            alertOrphanReservation({ cartId, ...o }).catch(() => {});
+        }
 
         // 7. Cria preference MP somando os deposits
         const mpItems = payload.items.map(item => {
@@ -262,9 +274,9 @@ export default async function reservationsRoutes(app) {
             return reply.code(502).send({ error: 'mp_preference_failed', message: e.message });
         }
 
-        // 8. Salva preference_id em todas as reservas do cart
+        // 8. Salva preference_id (não payment_id — esse vem do webhook)
         await db.from('reservations')
-            .update({ gateway_payment_id: preferenceResult.preferenceId })
+            .update({ gateway_preference_id: preferenceResult.preferenceId })
             .eq('cart_id', cartId);
 
         return reply.code(201).send({
@@ -291,6 +303,32 @@ export default async function reservationsRoutes(app) {
         if (error) return reply.code(500).send({ error: error.message });
         if (!data || data.length === 0) return reply.code(404).send({ error: 'not_found' });
         return { cart_id: request.params.cart_id, reservations: data };
+    });
+
+    // GET /v1/reservations/cart/:cart_id/voucher/:reservation_id — gera signed URL fresh (cliente)
+    app.get('/reservations/cart/:cart_id/voucher/:reservation_id', async (request, reply) => {
+        if (!config.canWrite()) return reply.code(503).send({ error: 'service_not_configured' });
+        const { cart_id, reservation_id } = request.params;
+        if (!/^[0-9a-f-]{36}$/i.test(cart_id) || !/^[0-9a-f-]{36}$/i.test(reservation_id)) {
+            return reply.code(400).send({ error: 'invalid_id' });
+        }
+        const db = getDb();
+        const { data: r } = await db
+            .from('reservations')
+            .select('id, status, voucher_url')
+            .eq('cart_id', cart_id)
+            .eq('id', reservation_id)
+            .maybeSingle();
+        if (!r) return reply.code(404).send({ error: 'not_found' });
+        if (!['deposit_paid', 'fully_paid'].includes(r.status)) {
+            return reply.code(409).send({ error: 'not_paid' });
+        }
+        try {
+            const url = await getVoucherSignedUrl(reservation_id);
+            return { url, expires_in: 7 * 24 * 3600 };
+        } catch (e) {
+            return reply.code(404).send({ error: 'voucher_not_found', message: e.message });
+        }
     });
 
     // POST /v1/reservations/cart/:cart_id/passengers
